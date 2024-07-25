@@ -63,11 +63,7 @@ class ActivityMongo extends uuObjectDao {
    * @param {string} awid
    * @param {object} filterObject - Object consisting of filters to use for finding uuObjects: state, recurrent, owner.
    * @param {object} pageInfo
-   * @typedef {object} PageInfo
-   * @property {number} pageIndex
-   * @property {number} pageSize
-   * @property {number} total
-   * @returns {Promise<{itemList: [Object], pageInfo: PageInfo}>}
+   * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
   async list(awid, filterObject, pageInfo = {}) {
     const { state, recurrent, owner } = filterObject;
@@ -85,10 +81,7 @@ class ActivityMongo extends uuObjectDao {
    * @param {string} awid
    * @param {[string]} uuIdentityList
    * @param {object} pageInfo
-   * @typedef {object} PageInfo
-   * @property {number} pageIndex
-   * @property {number} pageSize
-   * @property {number} total
+   *
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
   async listByMembers(awid, uuIdentityList, pageInfo = {}) {
@@ -103,3 +96,11 @@ class ActivityMongo extends uuObjectDao {
 }
 
 module.exports = ActivityMongo;
+
+/**
+ * Information about returned itemList - standard page info.
+ * @typedef {object} PageInfo
+ * @property {number} pageIndex
+ * @property {number} pageSize
+ * @property {number} total
+ */

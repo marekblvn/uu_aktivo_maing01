@@ -1,6 +1,9 @@
 "user strict";
 const { uuObjectDao } = require("uu_appg01_server").ObjectStore;
 
+/**
+ * Data access object for uuObject {@link https://uuapp.plus4u.net/uu-bookkit-maing01/a0a59dd9c4f14b7694ed686c96917ada/book/page?code=56429595 activity}.
+ */
 class ActivityMongo extends uuObjectDao {
   async createSchema() {
     await super.createIndex({ awid: 1, _id: 1 }, { unique: true });

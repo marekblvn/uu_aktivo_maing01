@@ -5,7 +5,26 @@
       "realization": "MongoDB",
       "schemaMap": {
         "aktivoMain": {
-          "realization": "dao/AktivoMainMongo"
+          "realization": "dao/AktivoMainMongo",
+          "maxNoi": 1
+        },
+        "activity": {
+          "realization": "dao/ActivityMongo",
+          "maxNoi": 1000
+        },
+        "datetime": {
+          "realization": "dao/DatetimeMongo",
+          "maxNoi": 1000
+        },
+        "post": {
+          "realization": "dao/PostMongo",
+          "maxNoi": 100000
+        },
+        "attendance": {
+          "realization": "dao/AttendanceMongo"
+        },
+        "invitation": {
+          "realization": "dao/InvitationMongo"
         }
       }
     }

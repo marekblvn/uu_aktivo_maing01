@@ -13,3 +13,7 @@ const attendanceListDtoInType = shape({
     pageSize: integer(),
   }),
 });
+
+const attendanceDeleteDtoInType = shape({
+  id: id().isRequired(),
+});

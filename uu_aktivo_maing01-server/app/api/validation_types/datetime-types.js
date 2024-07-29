@@ -16,6 +16,10 @@ const datetimeCreateDtoInType = shape({
   }).isRequired(),
 });
 
+const datetimeCreateNextDtoInType = shape({
+  id: id().isRequired(),
+});
+
 const datetimeGetDtoInType = shape({
   id: id().isRequired(),
 });

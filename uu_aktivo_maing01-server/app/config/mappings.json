@@ -30,6 +30,11 @@
         "realization": "api/controllers/ActivityController.create",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "activity/get": {
+        "realization": "api/controllers/ActivityController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
       }
     }
   }

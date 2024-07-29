@@ -15,6 +15,13 @@ class ActivityController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return ActivityAbl.get(awid, dtoIn, session, authorizationResult);
   }
+  list(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.list(awid, dtoIn, session, authorizationResult);
+  }
 }
 
 module.exports = new ActivityController();

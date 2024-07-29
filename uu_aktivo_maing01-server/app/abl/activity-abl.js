@@ -152,6 +152,57 @@ class ActivityAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async update(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityUpdateDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Update),
+      Errors.Update.InvalidDtoIn,
+    );
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Update.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    if (!activity) {
+      throw new Errors.Update.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    // Check if user is only StandardUser
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      // User is only StandardUser
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+
+      // Check if user is just a member, not administrator or owner
+      if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
+        // If so, throw error - user is not authorized to update the activity
+        throw new Errors.Update.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.update({ awid, ...dtoIn });
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Update.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new ActivityAbl();

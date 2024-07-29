@@ -69,13 +69,11 @@ class ActivityMongo extends UuObjectDao {
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
   async list(awid, filterObject, pageInfo = {}) {
-    const { state, recurrent, owner } = filterObject;
     let filter = {
       awid,
-      state,
-      recurrent,
-      owner,
+      ...filterObject,
     };
+    console.log(filter);
     return await super.find(filter, pageInfo);
   }
 

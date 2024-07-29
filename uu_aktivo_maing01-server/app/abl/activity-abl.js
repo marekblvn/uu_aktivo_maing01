@@ -105,6 +105,53 @@ class ActivityAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+  async list(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityListDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.List),
+      Errors.List.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    console.log("USER AUTHORIZED PROFILES: ", authorizedProfiles);
+    let daoFilter = {};
+    if (
+      authorizedProfiles.includes(PROFILE_CODES.Authorities) ||
+      authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      if (dtoIn.filters?.recurrent !== undefined) {
+        daoFilter.recurrent = dtoIn.filters.recurrent;
+      }
+      if (dtoIn.filters?.owner) {
+        daoFilter.owner = dtoIn.filters.owner;
+      }
+      if (dtoIn.filters?.members?.length) {
+        daoFilter.members = {
+          $all: dtoIn.filters.members,
+        };
+      }
+    } else {
+      daoFilter = {
+        members: {
+          $in: [session.getIdentity().getUuIdentity()],
+        },
+      };
+    }
+    const pageInfo = dtoIn.pageInfo || { pageIndex: 0, pageSize: 10 };
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.list(awid, daoFilter, pageInfo);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.List.ActivityDaoListFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new ActivityAbl();

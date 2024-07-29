@@ -7,6 +7,12 @@ const Errors = require("../api/errors/activity-error");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
+const PROFILE_CODES = {
+  Authorities: "Authorities",
+  Executives: "Executives",
+  StandardUsers: "StandardUsers",
+};
+
 class ActivityAbl {
   constructor() {
     this.validator = new Validator(Path.join(__dirname, "..", "api", "validation_types", "activity-types.js"));
@@ -51,6 +57,51 @@ class ActivityAbl {
       }
       throw error;
     }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async get(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityGetDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Get),
+      Errors.Get.InvalidDtoIn,
+    );
+
+    // Get user's authorized profiles
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Get.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    // No uuObject was returned by the DAO method
+    if (!activity) {
+      throw new Errors.Get.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    // Check if user is only StandardUser
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      // User is only StandardUser
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+
+      // Check if user is member of the activity
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+    let dtoOut = activity;
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

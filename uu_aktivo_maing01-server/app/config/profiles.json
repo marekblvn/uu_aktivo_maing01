@@ -36,6 +36,10 @@
       "activity/create": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "activity/get": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
       }
     }
   }

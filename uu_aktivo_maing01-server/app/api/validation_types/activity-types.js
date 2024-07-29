@@ -40,7 +40,7 @@ const activityListDtoInType = shape({
     members: array(uuIdentity(), 1, 1000),
   }),
   pageInfo: shape({
-    pageInfo: integer(),
+    pageIndex: integer(),
     pageSize: integer(),
   }),
 });

@@ -13,6 +13,47 @@ class ActivityAbl {
     this.activityDao = DaoFactory.getDao("activity");
     this.activityDao.createSchema();
   }
+  async create(awid, dtoIn, session) {
+    let validationResult = this.validator.validate("activityCreateDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Create),
+      Errors.Create.InvalidDtoIn,
+    );
+    dtoIn.awid = awid;
+    if (!dtoIn.description) {
+      dtoIn.description = "";
+    }
+    if (!dtoIn.location) {
+      dtoIn.location = "";
+    }
+    if (dtoIn.minParticipants === undefined) {
+      dtoIn.minParticipants = 0;
+    }
+    if (dtoIn.idealParticipants === undefined) {
+      dtoIn.idealParticipants = 0;
+    }
+    const userIdentity = session.getIdentity().getUuIdentity();
+    dtoIn.owner = userIdentity;
+    dtoIn.administrators = [];
+    dtoIn.members = [userIdentity];
+    dtoIn.recurrent = false;
+    dtoIn.datetimeId = null;
+    dtoIn.frequency = {};
+    dtoIn.notificationOffset = {};
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.create(dtoIn);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Create.ActivityDaoCreateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new ActivityAbl();

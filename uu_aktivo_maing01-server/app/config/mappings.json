@@ -25,6 +25,11 @@
         "realization": "index.html",
         "httpMethod": "GET",
         "type": "UVE"
+      },
+      "activity/create": {
+        "realization": "api/controllers/ActivityController.create",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

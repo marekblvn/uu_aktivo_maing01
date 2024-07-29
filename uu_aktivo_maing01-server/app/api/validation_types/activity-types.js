@@ -15,17 +15,6 @@ const activityUpdateDtoInType = shape({
   location: uu5String(256),
   idealParticipants: integer(0, 1000),
   minParticipants: integer(0, 1000),
-  recurrent: boolean(),
-  frequency: shape({
-    days: integer(0, 365),
-    months: integer(0, 12),
-  }),
-  notificationOffset: shape({
-    months: integer(0, 12),
-    days: integer(0, 30),
-    hours: integer(0, 23),
-    minutes: integer(0, 59),
-  }),
 });
 
 const activityGetDtoInType = shape({

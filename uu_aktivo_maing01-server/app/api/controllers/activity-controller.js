@@ -43,6 +43,13 @@ class ActivityController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return ActivityAbl.updateNotificationOffset(awid, dtoIn, session, authorizationResult);
   }
+  addAdministrator(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.addAdministrator(awid, dtoIn, session, authorizationResult);
+  }
 }
 
 module.exports = new ActivityController();

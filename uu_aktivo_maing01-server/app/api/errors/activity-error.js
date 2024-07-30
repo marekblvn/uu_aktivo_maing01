@@ -274,6 +274,13 @@ const AddAdministrator = {
       this.message = "Update activity by activity DAO update failed.";
     }
   },
+  OwnerCannotBeAdministrator: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${AddAdministrator.UC_CODE}ownerCannotBeAdministrator`;
+      this.message = "Owner cannot be added as an administrator.";
+    }
+  },
 };
 
 const RemoveAdministrator = {

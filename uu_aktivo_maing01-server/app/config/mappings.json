@@ -65,6 +65,11 @@
         "realization": "api/controllers/ActivityController.removeAdministrator",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "activity/transferOwnership": {
+        "realization": "api/controllers/ActivityController.transferOwnership",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

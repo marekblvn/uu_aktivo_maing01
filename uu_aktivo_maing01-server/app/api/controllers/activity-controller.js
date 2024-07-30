@@ -64,6 +64,13 @@ class ActivityController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return ActivityAbl.transferOwnership(awid, dtoIn, session, authorizationResult);
   }
+  removeMember(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.removeMember(awid, dtoIn, session, authorizationResult);
+  }
 }
 
 module.exports = new ActivityController();

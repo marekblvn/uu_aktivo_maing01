@@ -64,6 +64,10 @@
       "activity/removeAdministrator": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "activity/transferOwnership": {
+        "sysStateList": ["active"],
+        "profileList": ["Executives", "StandardUsers"]
       }
     }
   }

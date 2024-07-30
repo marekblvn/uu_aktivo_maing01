@@ -338,6 +338,18 @@ class ActivityAbl {
         throw new Errors.UpdateNotificationOffset.InvalidCombination({ uuAppErrorMap });
       }
     }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.update({ awid, ...dtoIn });
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateNotificationOffset.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
   }
 }
 

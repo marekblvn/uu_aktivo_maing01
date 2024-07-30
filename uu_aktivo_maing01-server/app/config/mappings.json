@@ -40,6 +40,21 @@
         "realization": "api/controllers/ActivityController.list",
         "httpMethod": "GET",
         "type": "CMD"
+      },
+      "activity/update": {
+        "realization": "api/controllers/ActivityController.update",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/updateFrequency": {
+        "realization": "api/controllers/ActivityController.updateFrequency",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/updateNotificationOffset": {
+        "realization": "api/controllers/ActivityController.updateNotificationOffset",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

@@ -60,6 +60,119 @@ const Update = {
   },
 };
 
+const UpdateFrequency = {
+  UC_CODE: `${ERR_PREFIX}updateFrequency/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with the provided id does not exist.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to update frequency of this activity.";
+    }
+  },
+  ActivityDaoUpdateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}activityDaoUpdateFailed`;
+      this.message = "Update activity by activity DAO update failed.";
+    }
+  },
+  InvalidCombination: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}invalidCombination`;
+      this.message = "Invalid combination of frequency and notification offset.";
+    }
+  },
+  ActivityNotRecurrent: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}activityNotRecurrent`;
+      this.message = "Activity is not recurrent. Frequency can't be updated.";
+    }
+  },
+  ActivityDoesNotHaveDatetime: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}activityDoesNotHaveDatetime`;
+      this.message = "Activity does not have a datetime. Frequency can't be updated.";
+    }
+  },
+};
+
+const UpdateNotificationOffset = {
+  UC_CODE: `${ERR_PREFIX}updateNotificationOffset/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with the provided id does not exist.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to update notification offset of this activity.";
+    }
+  },
+  ActivityDaoUpdateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}activityDaoUpdateFailed`;
+      this.message = "Update activity by activity DAO update failed.";
+    }
+  },
+  InvalidCombination: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}invalidCombination`;
+      this.message = "Invalid combination of frequency and notification offset.";
+    }
+  },
+  ActivityDoesNotHaveDatetime: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}activityDoesNotHaveDatetime`;
+      this.message = "Activity does not have a datetime. Notification offset can't be updated.";
+    }
+  },
+};
+
 const Get = {
   UC_CODE: `${ERR_PREFIX}get/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
@@ -473,6 +586,8 @@ const Delete = {
 module.exports = {
   Create,
   Update,
+  UpdateFrequency,
+  UpdateNotificationOffset,
   Get,
   List,
   AddAdministrator,

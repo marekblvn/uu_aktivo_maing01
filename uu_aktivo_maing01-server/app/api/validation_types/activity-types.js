@@ -17,6 +17,23 @@ const activityUpdateDtoInType = shape({
   minParticipants: integer(0, 1000),
 });
 
+const activityUpdateFrequencyDtoInType = shape({
+  id: id().isRequired(),
+  frequency: shape({
+    months: integer(0, 12).isRequired(),
+    days: integer(0, 31).isRequired(),
+  }).isRequired(),
+});
+
+const activityUpdateNotificationOffsetDtoInType = shape({
+  id: id().isRequired(),
+  notificationOffset: shape({
+    days: integer(0, 31).isRequired(),
+    hours: integer(0, 23).isRequired(),
+    minutes: integer(0, 59).isRequired(),
+  }).isRequired(),
+});
+
 const activityGetDtoInType = shape({
   id: id().isRequired(),
 });

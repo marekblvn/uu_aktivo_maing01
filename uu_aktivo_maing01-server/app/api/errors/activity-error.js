@@ -412,6 +412,13 @@ const RemoveMember = {
       this.message = "User not authorized to remove member from this activity.";
     }
   },
+  TargetUserIsAdministrator: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${RemoveMember.UC_CODE}targetUserIsAdministrator`;
+      this.message = "Target user is administrator and can only be removed by the owner.";
+    }
+  },
   TargetUserIsOwner: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

@@ -18,6 +18,7 @@ class ActivityAbl {
     this.validator = new Validator(Path.join(__dirname, "..", "api", "validation_types", "activity-types.js"));
     this.activityDao = DaoFactory.getDao("activity");
     this.activityDao.createSchema();
+    this.datetimeDao = DaoFactory.getDao("datetime");
   }
   async create(awid, dtoIn, session) {
     let validationResult = this.validator.validate("activityCreateDtoInType", dtoIn);
@@ -518,6 +519,108 @@ class ActivityAbl {
         throw new Errors.TransferOwnership.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
       }
       throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async removeMember(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityRemoveMemberDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.TransferOwnership),
+      Errors.TransferOwnership.InvalidDtoIn,
+    );
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.RemoveMember.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.RemoveMember.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      if (userUuIdentity !== activity.owner && !activity.administrators.includes(userUuIdentity)) {
+        throw new Errors.RemoveMember.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    let administratorsUpdate = {};
+    if (dtoIn.uuIdentity === activity.owner) {
+      throw new Errors.RemoveMember.TargetUserIsOwner({ uuAppErrorMap });
+    } else if (activity.administrators.includes(dtoIn.uuIdentity)) {
+      if (userUuIdentity !== activity.owner) {
+        throw new Errors.RemoveMember.TargetUserIsAdministrator({ uuAppErrorMap });
+      } else {
+        administratorsUpdate = { $pull: { administrators: dtoIn.uuIdentity } };
+      }
+    } else if (!activity.members.includes(dtoIn.uuIdentity)) {
+      throw new Errors.RemoveMember.TargetUserIsNotMember({ uuAppErrorMap });
+    }
+
+    let dtoOut;
+    const updateObject = {
+      id: dtoIn.id,
+      awid,
+      $pull: { members: dtoIn.uuIdentity },
+      ...administratorsUpdate,
+    };
+
+    try {
+      dtoOut = await this.activityDao.update(updateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.RemoveMember.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (activity.datetimeId !== null) {
+      let datetime;
+      try {
+        datetime = this.datetimeDao.get(awid, activity.datetimeId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.RemoveMember.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!datetime) {
+        throw new Errors.RemoveMember.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: activity.datetimeId });
+      }
+
+      const datetimeUpdatedObject = {
+        id: datetime.id,
+        awid,
+        $pull: {
+          confirmed: dtoIn.uuIdentity,
+          denied: dtoIn.uuIdentity,
+          undecided: dtoIn.uuIdentity,
+        },
+      };
+
+      try {
+        await this.datetimeDao.update(datetimeUpdatedObject);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.RemoveMember.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
     }
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;

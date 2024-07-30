@@ -72,6 +72,10 @@
       "activity/removeMember": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "activity/leave": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
       }
     }
   }

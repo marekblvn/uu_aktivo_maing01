@@ -591,13 +591,15 @@ class ActivityAbl {
     if (activity.datetimeId !== null) {
       let datetime;
       try {
-        datetime = this.datetimeDao.get(awid, activity.datetimeId);
+        datetime = await this.datetimeDao.get(awid, activity.datetimeId);
       } catch (error) {
         if (error instanceof ObjectStoreError) {
           throw new Errors.RemoveMember.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
         }
         throw error;
       }
+
+      console.log(datetime);
 
       if (!datetime) {
         throw new Errors.RemoveMember.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: activity.datetimeId });

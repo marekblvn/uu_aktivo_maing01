@@ -80,6 +80,11 @@
         "realization": "api/controllers/ActivityController.leave",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "activity/delete": {
+        "realization": "api/controllers/ActivityController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

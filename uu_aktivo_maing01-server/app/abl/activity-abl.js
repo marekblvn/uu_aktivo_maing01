@@ -19,6 +19,9 @@ class ActivityAbl {
     this.activityDao = DaoFactory.getDao("activity");
     this.activityDao.createSchema();
     this.datetimeDao = DaoFactory.getDao("datetime");
+    this.postDao = DaoFactory.getDao("post");
+    this.invitationDao = DaoFactory.getDao("invitation");
+    this.attendanceDao = DaoFactory.getDao("attendance");
   }
   async create(awid, dtoIn, session) {
     let validationResult = this.validator.validate("activityCreateDtoInType", dtoIn);
@@ -712,6 +715,90 @@ class ActivityAbl {
         throw error;
       }
     }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async delete(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityDeleteDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Delete),
+      Errors.Delete.InvalidDtoIn,
+    );
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.Delete.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (activity.owner !== userUuIdentity) {
+        throw new Errors.Delete.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    try {
+      await this.attendanceDao.deleteByActivityId(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.AttendanceDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    try {
+      await this.postDao.deleteByActivityId(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.PostDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    try {
+      await this.invitationDao.deleteByActivityId(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.InvitationDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    try {
+      await this.datetimeDao.deleteByActivityId(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.DatetimeDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.ActivityDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut = dtoOut || {};
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

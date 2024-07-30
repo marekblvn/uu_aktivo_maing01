@@ -55,6 +55,11 @@
         "realization": "api/controllers/ActivityController.updateNotificationOffset",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "activity/addAdministrator": {
+        "realization": "api/controllers/ActivityController.addAdministrator",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

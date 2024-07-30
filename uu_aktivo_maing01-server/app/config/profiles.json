@@ -67,7 +67,7 @@
       },
       "activity/transferOwnership": {
         "sysStateList": ["active"],
-        "profileList": ["Executives", "StandardUsers"]
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
       }
     }
   }

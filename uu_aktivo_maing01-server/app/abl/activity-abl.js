@@ -351,6 +351,65 @@ class ActivityAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async addAdministrator(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityAddAdministratorDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.AddAdministrator),
+      Errors.AddAdministrator.InvalidDtoIn,
+    );
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.AddAdministrator.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    if (!activity) {
+      throw new Errors.AddAdministrator.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      if (activity.owner !== userUuIdentity) {
+        throw new Errors.UpdateNotificationOffset.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    if (dtoIn.uuIdentity === activity.owner) {
+      throw new Errors.AddAdministrator.OwnerCannotBeAdministrator({ uuAppErrorMap });
+    }
+
+    if (!activity.members.includes(dtoIn.uuIdentity)) {
+      throw new Errors.AddAdministrator.TargetUserIsNotMember({ uuAppErrorMap });
+    }
+
+    if (activity.administrators.includes(dtoIn.uuIdentity)) {
+      throw new Errors.AddAdministrator.TargetUserAlreadyAdministrator({ uuAppErrorMap });
+    }
+
+    let dtoOut;
+    const updateObject = { id: dtoIn.id, awid, $push: { administrators: dtoIn.uuIdentity } };
+    try {
+      dtoOut = await this.activityDao.update(updateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.AddAdministrator.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new ActivityAbl();

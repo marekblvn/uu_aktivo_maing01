@@ -599,8 +599,6 @@ class ActivityAbl {
         throw error;
       }
 
-      console.log(datetime);
-
       if (!datetime) {
         throw new Errors.RemoveMember.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: activity.datetimeId });
       }
@@ -620,6 +618,96 @@ class ActivityAbl {
       } catch (error) {
         if (error instanceof ObjectStoreError) {
           throw new Errors.RemoveMember.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async leave(awid, dtoIn, session) {
+    let validationResult = this.validator.validate("activityLeaveDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Leave),
+      Errors.Leave.InvalidDtoIn,
+    );
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Leave.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.Leave.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+
+    if (!activity.members.includes(userUuIdentity)) {
+      throw new Errors.Leave.UserNotAuthorized({ uuAppErrorMap });
+    }
+
+    if (activity.owner === userUuIdentity) {
+      throw new Errors.Leave.UserIsOwner({ uuAppErrorMap });
+    }
+
+    let dtoOut;
+    const updateObject = {
+      id: dtoIn.id,
+      awid,
+      $pull: {
+        administrators: userUuIdentity,
+        members: userUuIdentity,
+      },
+    };
+
+    try {
+      dtoOut = await this.activityDao.update(updateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Leave.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (activity.datetimeId !== null) {
+      let datetime;
+      try {
+        datetime = await this.datetimeDao.get(awid, activity.datetimeId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Leave.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!datetime) {
+        throw new Errors.Leave.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: activity.datetimeId });
+      }
+
+      const datetimeUpdatedObject = {
+        id: datetime.id,
+        awid,
+        $pull: {
+          confirmed: userUuIdentity,
+          denied: userUuIdentity,
+          undecided: userUuIdentity,
+        },
+      };
+
+      try {
+        await this.datetimeDao.update(datetimeUpdatedObject);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Leave.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
         }
         throw error;
       }

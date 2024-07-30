@@ -50,6 +50,13 @@ class ActivityController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return ActivityAbl.addAdministrator(awid, dtoIn, session, authorizationResult);
   }
+  removeAdministrator(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.removeAdministrator(awid, dtoIn, session, authorizationResult);
+  }
 }
 
 module.exports = new ActivityController();

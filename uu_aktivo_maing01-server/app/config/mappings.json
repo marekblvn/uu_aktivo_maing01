@@ -60,6 +60,11 @@
         "realization": "api/controllers/ActivityController.addAdministrator",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "activity/removeAdministrator": {
+        "realization": "api/controllers/ActivityController.removeAdministrator",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

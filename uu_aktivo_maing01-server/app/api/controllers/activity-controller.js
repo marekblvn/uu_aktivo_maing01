@@ -29,6 +29,20 @@ class ActivityController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return ActivityAbl.update(awid, dtoIn, session, authorizationResult);
   }
+  updateFrequency(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.updateFrequency(awid, dtoIn, session, authorizationResult);
+  }
+  updateNotificationOffset(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.updateNotificationOffset(awid, dtoIn, session, authorizationResult);
+  }
 }
 
 module.exports = new ActivityController();

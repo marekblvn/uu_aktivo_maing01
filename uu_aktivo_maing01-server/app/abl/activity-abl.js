@@ -203,6 +203,142 @@ class ActivityAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async updateFrequency(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityUpdateFrequencyDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.UpdateFrequency),
+      Errors.UpdateFrequency.InvalidDtoIn,
+    );
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateFrequency.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    if (!activity) {
+      throw new Errors.UpdateFrequency.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    // Check if user is only StandardUser
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      // User is only StandardUser
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+
+      // Check if user is just a member, not owner
+      if (activity.owner !== userUuIdentity) {
+        // If so, throw error - user is not authorized to update the activity
+        throw new Errors.Update.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    if (activity.datetimeId === null) {
+      throw new Errors.UpdateFrequency.ActivityDoesNotHaveDatetime({ uuAppErrorMap });
+    }
+
+    if (activity.recurrent === false) {
+      throw new Errors.UpdateFrequency.ActivityNotRecurrent({ uuAppErrorMap });
+    }
+
+    if (activity.notificationOffset) {
+      let months = dtoIn.frequency.months;
+      let days = dtoIn.frequency.days;
+      let now = new Date();
+      let dateStamp = new Date(now);
+      dateStamp.setMonth(months + dateStamp.getMonth());
+      dateStamp.setDate(days + dateStamp.getDate());
+      let notifDays = activity.notificationOffset.days;
+      let notifHours = activity.notificationOffset.hours;
+      let notifMinutes = activity.notificationOffset.minutes;
+      dateStamp.setDate(dateStamp.getDate() - notifDays);
+      dateStamp.setHours(dateStamp.getHours() - notifHours, dateStamp.getMinutes() - notifMinutes);
+      if (dateStamp < now) {
+        throw new Errors.UpdateFrequency.InvalidCombination({ uuAppErrorMap });
+      }
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.update({ awid, ...dtoIn });
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateFrequency.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async updateNotificationOffset(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityUpdateNotificationOffsetDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.UpdateNotificationOffset),
+      Errors.UpdateNotificationOffset.InvalidDtoIn,
+    );
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateNotificationOffset.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    if (!activity) {
+      throw new Errors.UpdateNotificationOffset.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    // Check if user is only StandardUser
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      // User is only StandardUser
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+
+      // Check if user is just a member, not owner
+      if (activity.owner !== userUuIdentity) {
+        // If so, throw error - user is not authorized to update the activity
+        throw new Errors.UpdateNotificationOffset.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    if (activity.datetimeId === null) {
+      throw new Errors.UpdateNotificationOffset.ActivityDoesNotHaveDatetime({ uuAppErrorMap });
+    }
+
+    if (activity.frequency) {
+      let days = dtoIn.notificationOffset.days;
+      let hours = dtoIn.notificationOffset.hours;
+      let minutes = dtoIn.notificationOffset.minutes;
+      let now = new Date();
+      let dateStamp = new Date(now);
+      dateStamp.setDate(days + dateStamp.getDate());
+      dateStamp.setHours(hours + dateStamp.getHours(), minutes + dateStamp.getMinutes());
+      let freqDays = activity.frequency.days;
+      let freqMonths = activity.frequency.months;
+      dateStamp.setDate(dateStamp.getMonth() - freqMonths);
+      dateStamp.setDate(dateStamp.getDate() - freqDays);
+      if (dateStamp < now) {
+        throw new Errors.UpdateNotificationOffset.InvalidCombination({ uuAppErrorMap });
+      }
+    }
+  }
 }
 
 module.exports = new ActivityAbl();

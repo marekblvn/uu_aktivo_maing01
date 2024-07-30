@@ -1,0 +1,270 @@
+"use strict";
+const AktivoMainUseCaseError = require("./aktivo-main-use-case-error");
+
+const ERR_PREFIX = `${AktivoMainUseCaseError.ERROR_PREFIX}datetime/`;
+
+const Create = {
+  UC_CODE: `${ERR_PREFIX}create/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
+    }
+  },
+  DatetimeAlreadyExists: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}datetimeAlreadyExists`;
+      this.message = "The activity already has a datetime.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to create datetime in this activity.";
+    }
+  },
+  DatetimeDaoCreateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}datetimeDaoCreateFailed`;
+      this.message = "Create datetime by datetime DAO create failed.";
+    }
+  },
+  ActivityDaoUpdateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}activityDaoUpdateFailed`;
+      this.message = "Update activity by activity DAO update failed.";
+    }
+  },
+};
+
+const CreateNext = {
+  UC_CODE: `${ERR_PREFIX}createNext/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}datetimeDaoGetFailed`;
+      this.message = "Get datetime by datetime DAO get failed.";
+    }
+  },
+  DatetimeDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}datetimeDoesNotExist`;
+      this.message = "Datetime with provided id does not exist.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
+    }
+  },
+  DatetimeDaoDeleteFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}datetimeDaoDeleteFailed`;
+      this.message = "Delete datetime by datetime DAO delete failed.";
+    }
+  },
+  DatetimeDaoCreateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}datetimeDaoCreateFailed`;
+      this.message = "Create datetime by datetime DAO create failed.";
+    }
+  },
+};
+
+const Get = {
+  UC_CODE: `${ERR_PREFIX}get/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}datetimeDaoGetFailed`;
+      this.message = "Get datetime by datetime DAO get failed.";
+    }
+  },
+  DatetimeDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}datetimeDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to access datetime of this activity.";
+    }
+  },
+};
+
+const UpdateParticipation = {
+  UC_CODE: `${ERR_PREFIX}updateParticipation/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateParticipation.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateParticipation.UC_CODE}datetimeDaoGetFailed`;
+      this.message = "Get datetime by datetime DAO get failed.";
+    }
+  },
+  DatetimeDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateParticipation.UC_CODE}datetimeDoesNotExist`;
+      this.message = "Datetime with provided id does not exist.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateParticipation.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to update their participation on this datetime.";
+    }
+  },
+  DatetimeHasPassed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateParticipation.UC_CODE}datetimeHasPassed`;
+      this.message = "The datetime has passed and the participation can not be updated anymore.";
+    }
+  },
+  DatetimeDaoUpdateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateParticipation.UC_CODE}datetimeDaoUpdateFailed`;
+      this.message = "Update datetime by datetime DAO update failed.";
+    }
+  },
+};
+
+const Delete = {
+  UC_CODE: `${ERR_PREFIX}delete/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}datetimeDaoGetFailed`;
+      this.message = "Get datetime by datetime DAO get failed.";
+    }
+  },
+  DatetimeDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}datetimeDoesNotExist`;
+      this.message = "Datetime with provided id does not exist.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to create datetime in this activity.";
+    }
+  },
+  DatetimeDaoDeleteFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}datetimeDaoDeleteFailed`;
+      this.message = "Delete datetime by datetime DAO delete failed.";
+    }
+  },
+  ActivityDaoUpdateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDaoUpdateFailed`;
+      this.message = "Update activity by activity DAO update failed.";
+    }
+  },
+};
+
+module.exports = {
+  Create,
+  CreateNext,
+  Get,
+  UpdateParticipation,
+  Delete,
+};

@@ -1,0 +1,80 @@
+/* eslint-disable */
+
+const activityCreateDtoInType = shape({
+  name: uu5String(1, 256).isRequired(),
+  description: uu5String(512),
+  location: uu5String(256),
+  idealParticipants: integer(0, 1000),
+  minParticipants: integer(0, 1000),
+});
+
+const activityUpdateDtoInType = shape({
+  id: id().isRequired(),
+  name: uu5String(1, 256),
+  description: uu5String(512),
+  location: uu5String(256),
+  idealParticipants: integer(0, 1000),
+  minParticipants: integer(0, 1000),
+});
+
+const activityUpdateFrequencyDtoInType = shape({
+  id: id().isRequired(),
+  frequency: shape({
+    months: integer(0, 12).isRequired(),
+    days: integer(0, 31).isRequired(),
+  }).isRequired(),
+});
+
+const activityUpdateNotificationOffsetDtoInType = shape({
+  id: id().isRequired(),
+  notificationOffset: shape({
+    days: integer(0, 31).isRequired(),
+    hours: integer(0, 23).isRequired(),
+    minutes: integer(0, 59).isRequired(),
+  }).isRequired(),
+});
+
+const activityGetDtoInType = shape({
+  id: id().isRequired(),
+});
+
+const activityListDtoInType = shape({
+  filters: shape({
+    state: oneOf(["active", "suspended"]),
+    recurrent: boolean(),
+    owner: uuIdentity(),
+    members: array(uuIdentity(), 1, 1000),
+  }),
+  pageInfo: shape({
+    pageIndex: integer(),
+    pageSize: integer(),
+  }),
+});
+
+const activityAddAdministratorDtoInType = shape({
+  id: id().isRequired(),
+  uuIdentity: uuIdentity().isRequired(),
+});
+
+const activityRemoveAdministratorDtoInType = shape({
+  id: id().isRequired(),
+  uuIdentity: uuIdentity().isRequired(),
+});
+
+const activityTransferOwnershipDtoInType = shape({
+  id: id().isRequired(),
+  uuIdentity: uuIdentity().isRequired(),
+});
+
+const activityRemoveMemberDtoInType = shape({
+  id: id().isRequired(),
+  uuIdentity: uuIdentity().isRequired(),
+});
+
+const activityLeaveDtoInType = shape({
+  id: id().isRequired(),
+});
+
+const activityDeleteDtoInType = shape({
+  id: id().isRequired(),
+});

@@ -26,6 +26,12 @@
       "accessCode2": "6YNV1u5G290-J!%83708141q51_!763n",
       "uuIdentity": "3039-912-8064-0000",
       "profileList": ["Authorities"]
+    },
+    "StandardUsers": {
+      "accessCode1": "Y5&Cv$yt3rJx26u2P2&r03u9St@2!d5V",
+      "accessCode2": "6YNV1u5G290-J!%83708141q51_!763n",
+      "uuIdentity": "3039-912-8064-0000",
+      "profileList": ["StandardUsers"]
     }
   },
   "log_level": "FATAL",

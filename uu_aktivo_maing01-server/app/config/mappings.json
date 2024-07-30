@@ -25,6 +25,66 @@
         "realization": "index.html",
         "httpMethod": "GET",
         "type": "UVE"
+      },
+      "activity/create": {
+        "realization": "api/controllers/ActivityController.create",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/get": {
+        "realization": "api/controllers/ActivityController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
+      "activity/list": {
+        "realization": "api/controllers/ActivityController.list",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
+      "activity/update": {
+        "realization": "api/controllers/ActivityController.update",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/updateFrequency": {
+        "realization": "api/controllers/ActivityController.updateFrequency",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/updateNotificationOffset": {
+        "realization": "api/controllers/ActivityController.updateNotificationOffset",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/addAdministrator": {
+        "realization": "api/controllers/ActivityController.addAdministrator",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/removeAdministrator": {
+        "realization": "api/controllers/ActivityController.removeAdministrator",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/transferOwnership": {
+        "realization": "api/controllers/ActivityController.transferOwnership",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/removeMember": {
+        "realization": "api/controllers/ActivityController.removeMember",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/leave": {
+        "realization": "api/controllers/ActivityController.leave",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "activity/delete": {
+        "realization": "api/controllers/ActivityController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

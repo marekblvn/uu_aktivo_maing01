@@ -75,6 +75,11 @@
         "realization": "api/controllers/ActivityController.removeMember",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "activity/leave": {
+        "realization": "api/controllers/ActivityController.leave",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

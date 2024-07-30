@@ -410,6 +410,63 @@ class ActivityAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async removeAdministrator(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityRemoveAdministratorDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.RemoveAdministrator),
+      Errors.RemoveAdministrator.InvalidDtoIn,
+    );
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.RemoveAdministrator.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.RemoveAdministrator.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      if (userUuIdentity !== activity.owner) {
+        throw new Errors.RemoveAdministrator.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    if (!activity.members.includes(dtoIn.uuIdentity)) {
+      throw new Errors.RemoveAdministrator.TargetUserIsNotMember({ uuAppErrorMap });
+    }
+
+    if (!activity.administrators.includes(dtoIn.uuIdentity)) {
+      throw new Errors.RemoveAdministrator.TargetUserNotAdministrator({ uuAppErrorMap });
+    }
+
+    const updateObject = { id: dtoIn.id, awid, $pull: { administrators: dtoIn.uuIdentity } };
+
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.update(updateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.RemoveAdministrator.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new ActivityAbl();

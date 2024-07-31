@@ -53,8 +53,10 @@ class PostAbl {
       if (!activity.members.includes(userUuIdentity)) {
         throw new Errors.Create.UserNotMember({ uuAppErrorMap });
       }
-      if (dtoIn.type === "important" && !activity.administrators.includes(userUuIdentity)) {
-        throw new Errors.Create.UserNotAuthorized({ uuAppErrorMap });
+      if (dtoIn.type === "important") {
+        if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
+          throw new Errors.Create.UserNotAuthorized({ uuAppErrorMap });
+        }
       }
     }
 

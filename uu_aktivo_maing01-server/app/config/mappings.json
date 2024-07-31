@@ -100,6 +100,11 @@
         "realization": "api/controllers/PostController.list",
         "httpMethod": "GET",
         "type": "CMD"
+      },
+      "post/update": {
+        "realization": "api/controllers/PostController.update",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

@@ -31,6 +31,14 @@ class PostController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return PostAbl.update(awid, dtoIn, session, authorizationResult);
   }
+
+  delete(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return PostAbl.delete(awid, dtoIn, session, authorizationResult);
+  }
 }
 
 module.exports = new PostController();

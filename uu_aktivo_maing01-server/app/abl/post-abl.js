@@ -242,6 +242,75 @@ class PostAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async delete(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("postDeleteDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Delete),
+      Errors.Delete.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      let post;
+      try {
+        post = await this.postDao.get(awid, dtoIn.id);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Delete.PostDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!post) {
+        throw new Errors.Delete.PostDoesNotExist({ uuAppErrorMap }, { postId: dtoIn.id });
+      }
+
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, post.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Delete.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.Delete.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: post.activityId });
+      }
+
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.Delete.UserNotMember({ uuAppErrorMap });
+      }
+
+      if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
+        if (post.uuIdentity !== userUuIdentity) {
+          throw new Errors.Delete.UserNotAuthorized({ uuAppErrorMap });
+        }
+      }
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.postDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.PostDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut = dtoOut || {};
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new PostAbl();

@@ -9,6 +9,12 @@ class PostController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return PostAbl.create(awid, dtoIn, session, authorizationResult);
   }
+
+  get(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    return PostAbl.get(awid, dtoIn);
+  }
 }
 
 module.exports = new PostController();

@@ -85,6 +85,31 @@
         "realization": "api/controllers/ActivityController.delete",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "post/create": {
+        "realization": "api/controllers/PostController.create",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "post/get": {
+        "realization": "api/controllers/PostController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
+      "post/list": {
+        "realization": "api/controllers/PostController.list",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
+      "post/update": {
+        "realization": "api/controllers/PostController.update",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "post/delete": {
+        "realization": "api/controllers/PostController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

@@ -95,6 +95,11 @@
         "realization": "api/controllers/PostController.get",
         "httpMethod": "GET",
         "type": "CMD"
+      },
+      "post/list": {
+        "realization": "api/controllers/PostController.list",
+        "httpMethod": "GET",
+        "type": "CMD"
       }
     }
   }

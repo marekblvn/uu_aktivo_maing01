@@ -105,6 +105,68 @@ class PostAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async list(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("postListDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.List),
+      Errors.List.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      if (!dtoIn.activityId) {
+        throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
+      }
+
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, dtoIn.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.List.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.List.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.activityId });
+      }
+
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.List.UserNotMember({ uuAppErrorMap });
+      }
+    }
+
+    let dtoOut;
+    if (dtoIn.activityId) {
+      try {
+        dtoOut = await this.postDao.listByActivityId(awid, dtoIn.activityId, dtoIn.pageInfo);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.List.PostDaoListByActivityIdFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    } else {
+      try {
+        dtoOut = await this.postDao.list(awid, dtoIn.pageInfo);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.List.PostDaoListFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new PostAbl();

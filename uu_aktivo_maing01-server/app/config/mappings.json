@@ -105,6 +105,11 @@
         "realization": "api/controllers/PostController.update",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "post/delete": {
+        "realization": "api/controllers/PostController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

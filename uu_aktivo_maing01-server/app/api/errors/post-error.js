@@ -178,6 +178,13 @@ const Update = {
       this.message = "User is not a member of this activity.";
     }
   },
+  UserNotAdministratorOrOwner: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Update.UC_CODE}userNotAdministratorOrOwner`;
+      this.message = "User cannot set post type to 'important' because they are not the administrator or owner.";
+    }
+  },
   PostDaoUpdateFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

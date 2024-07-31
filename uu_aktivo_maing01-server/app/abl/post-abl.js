@@ -167,6 +167,79 @@ class PostAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async update(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("postUpdateDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Update),
+      Errors.Update.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      let post;
+      try {
+        post = await this.postDao.get(awid, dtoIn.id);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Update.PostDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!post) {
+        throw new Errors.Update.PostDoesNotExist({ uuAppErrorMap }, { postId: dtoIn.id });
+      }
+
+      if (post.uuIdentity !== userUuIdentity) {
+        throw new Errors.Update.UserNotAuthorized({ uuAppErrorMap });
+      }
+
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, post.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Update.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.Update.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: post.activityId });
+      }
+
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.Update.UserNotMember({ uuAppErrorMap });
+      }
+
+      if (dtoIn.type === "important") {
+        if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
+          throw new Errors.Update.UserNotAdministratorOrOwner({ uuAppErrorMap });
+        }
+      }
+    }
+
+    let dtoOut;
+    const updateObject = { awid, ...dtoIn };
+    try {
+      dtoOut = await this.postDao.update(updateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Update.PostDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new PostAbl();

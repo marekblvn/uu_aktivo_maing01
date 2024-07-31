@@ -88,6 +88,10 @@
       "post/get": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives"]
+      },
+      "post/list": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
       }
     }
   }

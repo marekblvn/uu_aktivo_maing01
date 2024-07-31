@@ -90,6 +90,11 @@
         "realization": "api/controllers/PostController.create",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "post/get": {
+        "realization": "api/controllers/PostController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
       }
     }
   }

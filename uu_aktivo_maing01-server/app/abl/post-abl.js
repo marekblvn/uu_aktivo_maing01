@@ -78,6 +78,33 @@ class PostAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async get(awid, dtoIn) {
+    let validationResult = this.validator.validate("postGetDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Get),
+      Errors.Get.InvalidDtoIn,
+    );
+
+    let dtoOut;
+    try {
+      dtoOut = await this.postDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Get.PostDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!dtoOut) {
+      throw new Errors.Get.PostDoesNotExist({ uuAppErrorMap }, { postId: dtoIn.id });
+    }
+
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new PostAbl();

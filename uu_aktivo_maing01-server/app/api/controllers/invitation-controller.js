@@ -18,6 +18,14 @@ class InvitationController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return InvitationAbl.get(awid, dtoIn, session, authorizationResult);
   }
+
+  list(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return InvitationAbl.list(awid, dtoIn, session, authorizationResult);
+  }
 }
 
 module.exports = new InvitationController();

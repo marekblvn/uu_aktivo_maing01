@@ -112,6 +112,10 @@
       "invitation/list": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "invitation/accept": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
       }
     }
   }

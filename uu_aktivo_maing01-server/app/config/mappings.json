@@ -115,6 +115,11 @@
         "realization": "api/controllers/InvitationController.create",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "invitation/get": {
+        "realization": "api/controllers/InvitationController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
       }
     }
   }

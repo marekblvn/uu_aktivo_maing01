@@ -135,6 +135,11 @@
         "realization": "api/controllers/InvitationController.delete",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "attendance/list": {
+        "realization": "api/controllers/AttendanceController.list",
+        "httpMethod": "GET",
+        "type": "CMD"
       }
     }
   }

@@ -150,6 +150,60 @@ class DatetimeAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async get(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeGetDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Get),
+      Errors.Get.InvalidDtoIn,
+    );
+
+    let datetime;
+    try {
+      datetime = await this.datetimeDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Get.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!datetime) {
+      throw new Errors.Get.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      let activity;
+
+      try {
+        activity = await this.activityDao.get(awid, datetime.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Get.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.Get.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: datetime.activityId });
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    let dtoOut = { ...datetime };
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new DatetimeAbl();

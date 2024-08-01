@@ -12,6 +12,13 @@ const Create = {
       this.message = "DtoIn is not valid.";
     }
   },
+  FrequencyIsRequired: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}frequencyIsRequired`;
+      this.message = "Frequency is required for recurrent activity.";
+    }
+  },
   ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

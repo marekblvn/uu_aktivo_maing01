@@ -267,6 +267,69 @@ class InvitationAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+  async delete(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("invitationDeleteDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Delete),
+      Errors.Delete.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      let invitation;
+      try {
+        invitation = await this.invitationDao.get(awid, dtoIn.id);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Delete.InvitationDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!invitation) {
+        throw new Errors.Delete.InvitationDoesNotExist({ uuAppErrorMap }, { invitationId: dtoIn.id });
+      }
+
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, invitation.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Delete.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.Delete.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: invitation.activityId });
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (invitation.uuIdentity !== userUuIdentity) {
+        if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
+          throw new Errors.Delete.UserNotAuthorized({ uuAppErrorMap });
+        }
+      }
+    }
+    let dtoOut;
+    try {
+      dtoOut = await this.invitationDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.InvitationDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut = dtoOut || {};
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new InvitationAbl();

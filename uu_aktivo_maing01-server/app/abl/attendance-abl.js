@@ -15,7 +15,7 @@ const PROFILE_CODES = {
 
 class AttendanceAbl {
   constructor() {
-    this.validator = new Validator(Path.join(__dirname, "..", "api", "validation-types", "attendance-types.js"));
+    this.validator = new Validator(Path.join(__dirname, "..", "api", "validation_types", "attendance-types.js"));
     this.attendanceDao = DaoFactory.getDao("attendance");
     this.attendanceDao.createSchema();
     this.activityDao = DaoFactory.getDao("activity");

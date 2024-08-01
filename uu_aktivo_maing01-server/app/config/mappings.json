@@ -150,6 +150,11 @@
         "realization": "api/controllers/AttendanceController.delete",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "datetime/create": {
+        "realization": "api/controllers/DatetimeController.create",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

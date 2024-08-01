@@ -87,11 +87,9 @@ class InvitationMongo extends UuObjectDao {
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
   async list(awid, filterObject, pageInfo = {}) {
-    const { activityId, uuIdentity } = filterObject;
     let filter = {
       awid,
-      activityId,
-      uuIdentity,
+      ...filterObject,
     };
     return await super.find(filter, pageInfo);
   }

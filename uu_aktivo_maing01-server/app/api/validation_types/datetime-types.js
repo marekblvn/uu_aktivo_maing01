@@ -5,8 +5,8 @@ const datetimeCreateDtoInType = shape({
   datetime: datetime().isRequired(),
   recurrent: boolean().isRequired(),
   frequency: shape({
-    days: integer(0, 365),
-    months: integer(0, 12),
+    days: integer(0, 365).isRequired(),
+    months: integer(0, 12).isRequired(),
   }),
   notificationOffset: shape({
     months: integer(0, 12),

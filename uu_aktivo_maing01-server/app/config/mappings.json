@@ -110,6 +110,11 @@
         "realization": "api/controllers/PostController.delete",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "invitation/create": {
+        "realization": "api/controllers/InvitationController.create",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

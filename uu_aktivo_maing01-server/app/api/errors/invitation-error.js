@@ -40,11 +40,11 @@ const Create = {
       this.message = "Target user is already a member of this activity.";
     }
   },
-  InvitationDaoListFailed: class extends AktivoMainUseCaseError {
+  InvitationDaoGetByActivityIdAndUuIdentityFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${Create.UC_CODE}invitationDaoListFailed`;
-      this.message = "List invitations by invitation DAO list failed.";
+      this.code = `${Create.UC_CODE}invitationDaoGetByActivityIdAndUuIdentityFailed`;
+      this.message = "Get invitation by invitation DAO getByActivityIdAndUuIdentity failed.";
     }
   },
   TargetUserAlreadyInvited: class extends AktivoMainUseCaseError {

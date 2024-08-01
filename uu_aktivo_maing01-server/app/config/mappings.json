@@ -155,6 +155,11 @@
         "realization": "api/controllers/DatetimeController.create",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "datetime/get": {
+        "realization": "api/controllers/DatetimeController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
       }
     }
   }

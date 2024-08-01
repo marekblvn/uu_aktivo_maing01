@@ -137,7 +137,7 @@
         "type": "CMD"
       },
       "attendance/create": {
-        "realization": "api/controller/AttendanceController.create",
+        "realization": "api/controllers/AttendanceController.create",
         "httpMethod": "POST",
         "type": "CMD"
       }

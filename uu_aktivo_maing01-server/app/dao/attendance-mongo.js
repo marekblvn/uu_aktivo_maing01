@@ -64,31 +64,14 @@ class AttendanceMongo extends UuObjectDao {
   /**
    * Returns an object consisting of itemList - list of uuObjects, and pageInfo - object with pageIndex, pageSize and total.
    * @param {string} awid
-   * @param {DateFilters} dateFilters
+   * @param {object} filterObject
    * @param {object} pageInfo
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, dateFilters, pageInfo = {}) {
+  async list(awid, filterObject = {}, pageInfo = {}) {
     let filter = {
       awid,
-      ...dateFilters,
-    };
-    return await super.find(filter, pageInfo);
-  }
-
-  /**
-   * Returns an object consisting of itemList - list of uuObjects, and pageInfo - object with pageIndex, pageSize and total.
-   * @param {string} awid
-   * @param {string} activityId
-   * @param {DateFilters} dateFilters
-   * @param {object} pageInfo
-   * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
-   */
-  async listByActivityId(awid, activityId, dateFilters, pageInfo = {}) {
-    let filter = {
-      awid,
-      activityId,
-      ...dateFilters,
+      ...filterObject,
     };
     return await super.find(filter, pageInfo);
   }
@@ -116,12 +99,4 @@ module.exports = AttendanceMongo;
  * @property {number} pageIndex
  * @property {number} pageSize
  * @property {number} total
- */
-
-/**
- * Filters for the datetime of the attendance uuObject. Has a bottom and top boundary. Bottom boundary is inclusive.
- * @typedef DateFilters
- * @property {object} datetime
- * @property {Date} datetime.$gte - Bottom boundary for the datetime, inclusive
- * @property {Date} datetime.$lt - Top boundary for the datetime
  */

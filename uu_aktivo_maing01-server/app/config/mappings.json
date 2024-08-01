@@ -110,6 +110,56 @@
         "realization": "api/controllers/PostController.delete",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "invitation/create": {
+        "realization": "api/controllers/InvitationController.create",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "invitation/get": {
+        "realization": "api/controllers/InvitationController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
+      "invitation/list": {
+        "realization": "api/controllers/InvitationController.list",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
+      "invitation/accept": {
+        "realization": "api/controllers/InvitationController.accept",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "invitation/delete": {
+        "realization": "api/controllers/InvitationController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "attendance/create": {
+        "realization": "api/controllers/AttendanceController.create",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "attendance/list": {
+        "realization": "api/controllers/AttendanceController.list",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
+      "attendance/delete": {
+        "realization": "api/controllers/AttendanceController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "datetime/create": {
+        "realization": "api/controllers/DatetimeController.create",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "datetime/get": {
+        "realization": "api/controllers/DatetimeController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
       }
     }
   }

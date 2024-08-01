@@ -10,6 +10,7 @@ class InvitationMongo extends UuObjectDao {
     await super.createIndex({ awid: 1, _id: 1 }, { unique: true });
     await super.createIndex({ awid: 1, activityId: 1 }, { unique: false });
     await super.createIndex({ awid: 1, uuIdentity: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, activityId: 1, uuIdentity: 1 }, { unique: true });
   }
 
   /**
@@ -31,6 +32,22 @@ class InvitationMongo extends UuObjectDao {
     let filter = {
       awid,
       id,
+    };
+    return await super.findOne(filter);
+  }
+
+  /**
+   * Finds one uuObject based on awid, activityId and uuIdentity.
+   * @param {string} awid
+   * @param {string} activityId
+   * @param {string} uuIdentity
+   * @returns {Promise<object>}
+   */
+  async getByActivityIdAndUuIdentity(awid, activityId, uuIdentity) {
+    let filter = {
+      awid,
+      activityId,
+      uuIdentity,
     };
     return await super.findOne(filter);
   }
@@ -70,11 +87,9 @@ class InvitationMongo extends UuObjectDao {
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
   async list(awid, filterObject, pageInfo = {}) {
-    const { activityId, uuIdentity } = filterObject;
     let filter = {
       awid,
-      activityId,
-      uuIdentity,
+      ...filterObject,
     };
     return await super.find(filter, pageInfo);
   }

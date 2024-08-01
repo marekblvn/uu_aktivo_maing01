@@ -40,11 +40,11 @@ const Create = {
       this.message = "Target user is already a member of this activity.";
     }
   },
-  InvitationDaoListFailed: class extends AktivoMainUseCaseError {
+  InvitationDaoGetByActivityIdAndUuIdentityFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${Create.UC_CODE}invitationDaoListFailed`;
-      this.message = "List invitations by invitation DAO list failed.";
+      this.code = `${Create.UC_CODE}invitationDaoGetByActivityIdAndUuIdentityFailed`;
+      this.message = "Get invitation by invitation DAO getByActivityIdAndUuIdentity failed.";
     }
   },
   TargetUserAlreadyInvited: class extends AktivoMainUseCaseError {
@@ -236,6 +236,20 @@ const Delete = {
       super(...arguments);
       this.code = `${Delete.UC_CODE}invitationDoesNotExist`;
       this.message = "Invitation with provided id does not exist.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
     }
   },
   UserNotAuthorized: class extends AktivoMainUseCaseError {

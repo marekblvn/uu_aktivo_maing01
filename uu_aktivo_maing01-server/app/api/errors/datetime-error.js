@@ -12,6 +12,13 @@ const Create = {
       this.message = "DtoIn is not valid.";
     }
   },
+  FrequencyIsRequired: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}frequencyIsRequired`;
+      this.message = "Frequency is required for recurrent activity.";
+    }
+  },
   ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -38,6 +45,27 @@ const Create = {
       super(...arguments);
       this.code = `${Create.UC_CODE}userNotAuthorized`;
       this.message = "User is not authorized to create datetime in this activity.";
+    }
+  },
+  InvalidDatetime: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}invalidDatetime`;
+      this.message = "Provided datetime is not valid - notification would be in the past.";
+    }
+  },
+  InvalidNotificationOffset: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}invalidNotificationOffset`;
+      this.message = "Provided notification offset it not valid. Notification offset must be at least an hour.";
+    }
+  },
+  InvalidFrequencyAndNotificationOffset: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}invalidFrequencyAndNotificationOffset`;
+      this.message = "Invalid combination of frequency and notification offset.";
     }
   },
   DatetimeDaoCreateFailed: class extends AktivoMainUseCaseError {

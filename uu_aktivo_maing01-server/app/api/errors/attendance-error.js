@@ -26,6 +26,27 @@ const Create = {
       this.message = "Datetime with provided id does not exist.";
     }
   },
+  DatetimeStillActive: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}datetimeStillActive`;
+      this.message = "Datetime is still active.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
+    }
+  },
   AttendanceDaoCreateFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -109,6 +130,20 @@ const Delete = {
       super(...arguments);
       this.code = `${Delete.UC_CODE}attendanceDoesNotExist`;
       this.message = "Attendance with provided id does not exist.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
     }
   },
   UserNotAuthorized: class extends AktivoMainUseCaseError {

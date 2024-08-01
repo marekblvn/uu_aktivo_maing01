@@ -47,6 +47,13 @@ const Create = {
       this.message = "User is not authorized to create datetime in this activity.";
     }
   },
+  InvalidCombination: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}invalidCombination`;
+      this.message = "Invalid combination of frequency and notification offset.";
+    }
+  },
   DatetimeDaoCreateFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

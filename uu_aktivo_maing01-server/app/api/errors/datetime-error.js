@@ -58,7 +58,7 @@ const Create = {
     constructor() {
       super(...arguments);
       this.code = `${Create.UC_CODE}invalidNotificationOffset`;
-      this.message = "Provided notification offset it not valid.";
+      this.message = "Provided notification offset it not valid. Notification offset must be at least an hour.";
     }
   },
   InvalidFrequencyAndNotificationOffset: class extends AktivoMainUseCaseError {

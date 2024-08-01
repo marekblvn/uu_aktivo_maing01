@@ -128,6 +128,10 @@
       "attendance/list": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "attendance/delete": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
       }
     }
   }

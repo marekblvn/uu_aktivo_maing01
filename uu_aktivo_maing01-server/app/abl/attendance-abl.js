@@ -149,6 +149,70 @@ class AttendanceAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async delete(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("attendanceDeleteDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Delete),
+      Errors.Delete.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      let attendance;
+      try {
+        attendance = await this.attendanceDao.get(awid, dtoIn.id);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Delete.AttendanceDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!attendance) {
+        throw new Errors.Delete.AttendanceDoesNotExist({ uuAppErrorMap }, { attendanceId: dtoIn.id });
+      }
+
+      let activity;
+      try {
+        activity = this.activityDao.get(awid, attendance.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Delete.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.Delete.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: attendance.activityId });
+      }
+
+      if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
+        throw new Errors.Delete.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.attendanceDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.AttendanceDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut = dtoOut || {};
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new AttendanceAbl();

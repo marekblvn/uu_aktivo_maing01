@@ -120,6 +120,11 @@
         "realization": "api/controllers/InvitationController.get",
         "httpMethod": "GET",
         "type": "CMD"
+      },
+      "invitation/list": {
+        "realization": "api/controllers/InvitationController.list",
+        "httpMethod": "GET",
+        "type": "CMD"
       }
     }
   }

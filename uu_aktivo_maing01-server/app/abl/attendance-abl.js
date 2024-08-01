@@ -82,6 +82,73 @@ class AttendanceAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async list(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("attendanceListDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.List),
+      Errors.List.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      if (!dtoIn.filters?.activityId) {
+        throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
+      }
+
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, dtoIn.filters.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.List.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.List.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.filters.activityId });
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.List.UserNotMember({ uuAppErrorMap });
+      }
+    }
+
+    const { filters } = dtoIn || {};
+    const queryFilters = {};
+    if (filters) {
+      const { after, before, activityId } = filters;
+      if (activityId) {
+        queryFilters.activityId = activityId;
+      }
+      if (after) {
+        queryFilters.datetime = { $gte: after };
+      }
+      if (before) {
+        queryFilters.datetime = queryFilters.datetime || {};
+        queryFilters.datetime.$lt = before;
+      }
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.attendanceDao.list(awid, queryFilters, dtoIn.pageInfo);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.List.AttendanceDaoListFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new AttendanceAbl();

@@ -167,8 +167,6 @@ class InvitationAbl {
       }
     }
 
-    console.log(dtoIn.filters);
-
     let dtoOut;
     try {
       dtoOut = await this.invitationDao.list(awid, dtoIn.filters, dtoIn.pageInfo);

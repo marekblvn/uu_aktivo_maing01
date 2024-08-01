@@ -132,6 +132,20 @@ const Delete = {
       this.message = "Attendance with provided id does not exist.";
     }
   },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
+    }
+  },
   UserNotAuthorized: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

@@ -87,6 +87,43 @@ class InvitationAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+  async get(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("invitationGetDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Get),
+      Errors.Get.InvalidDtoIn,
+    );
+
+    let invitation;
+    try {
+      invitation = await this.invitationDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Get.InvitationDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!invitation) {
+      throw new Errors.Get.InvitationDoesNotExist({ uuAppErrorMap }, { invitationId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (invitation.uuIdentity !== userUuIdentity) {
+        throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    let dtoOut = { ...invitation, uuAppErrorMap };
+    return dtoOut;
+  }
 }
 
 module.exports = new InvitationAbl();

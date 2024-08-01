@@ -19,6 +19,7 @@ class InvitationAbl {
     this.invitationDao = DaoFactory.getDao("invitation");
     this.invitationDao.createSchema();
     this.activityDao = DaoFactory.getDao("activity");
+    this.datetimeDao = DaoFactory.getDao("datetime");
   }
   async create(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("invitationCreateDtoInType", dtoIn);
@@ -176,6 +177,93 @@ class InvitationAbl {
       }
       throw error;
     }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+  async accept(awid, dtoIn, session) {
+    let validationResult = this.validator.validate("invitationAcceptDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Accept),
+      Errors.Accept.InvalidDtoIn,
+    );
+
+    let invitation;
+    try {
+      invitation = await this.invitationDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Accept.InvitationDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!invitation) {
+      throw new Errors.Accept.InvitationDoesNotExist({ uuAppErrorMap }, { invitationId: dtoIn.id });
+    }
+
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+
+    if (invitation.uuIdentity !== userUuIdentity) {
+      throw new Errors.Accept.UserNotAuthorized({ uuAppErrorMap });
+    }
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, invitation.activityId);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Accept.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.Accept.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: invitation.activityId });
+    }
+
+    if (activity.members.includes(invitation.uuIdentity)) {
+      throw new Errors.Accept.UserAlreadyMember({ uuAppErrorMap });
+    }
+
+    let dtoOut;
+    const updateObject = { id: invitation.activityId, awid, $push: { members: invitation.uuIdentity } };
+    try {
+      dtoOut = await this.activityDao.update(updateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Accept.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (activity.datetimeId !== null) {
+      let datetime;
+      try {
+        datetime = await this.datetimeDao.get(awid, activity.datetimeId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Accept.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!datetime) {
+        throw new Errors.Accept.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: activity.datetimeId });
+      }
+
+      const datetimeUpdateObject = { id: datetime.id, awid, $push: { undecided: invitation.uuIdentity } };
+      try {
+        await this.datetimeDao.update(datetimeUpdateObject);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Accept.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    }
+
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

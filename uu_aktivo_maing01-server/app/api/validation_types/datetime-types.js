@@ -9,7 +9,6 @@ const datetimeCreateDtoInType = shape({
     months: integer(0, 12).isRequired(),
   }),
   notificationOffset: shape({
-    months: integer(0, 12),
     days: integer(0, 31),
     hours: integer(0, 23),
     minutes: integer(0, 59),

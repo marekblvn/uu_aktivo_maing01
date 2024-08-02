@@ -59,53 +59,55 @@ class DatetimeAbl {
       }
     }
 
-    // CHECKING IF THE COMBINATION OF PROVIDED DATETIME AND THE NOTIFICATION OFFSET IS VALID
-    // -- invalid combination would be such that the notification date and time calculates from the datetime would be in the past from now (in that case, the first notification would never be sent)
-    let datetime = new Date(dtoIn.datetime);
-    // calculate the date and time of the first notification
-    let firstNotification = new Date(datetime);
-    firstNotification.setDate(firstNotification.getDate() - dtoIn.notificationOffset.days);
-    firstNotification.setHours(
-      firstNotification.getHours() - dtoIn.notificationOffset.hours,
-      firstNotification.getMinutes() - dtoIn.notificationOffset.minutes,
-    );
+    const datetimeAsDate = new Date(dtoIn.datetime);
+    const now = new Date();
+    let diff = datetimeAsDate - now;
 
-    // if the first notification date and time is in the past from now, throw error
-    if (firstNotification < new Date()) {
+    // datetime must NOT be sooner than 12 hours from now
+    if (diff / 1_000 / 3_600 < 12) {
       throw new Errors.Create.InvalidDatetime({ uuAppErrorMap });
     }
 
-    // CHECKING IF THE NOTIFICATION OFFSET IS AT LEAST AN HOUR
-    if (firstNotification.getTime() >= datetime.getTime() - 59 * 60 * 1000) {
+    const notificationOffsetInHours =
+      dtoIn.notificationOffset.days * 24 + dtoIn.notificationOffset.hours + dtoIn.notificationOffset.minutes / 60;
+
+    // notificationOffset combined must be AT LEAST an hour
+    if (notificationOffsetInHours < 1) {
       throw new Errors.Create.InvalidNotificationOffset({ uuAppErrorMap });
     }
 
+    const notificationDate = new Date(datetimeAsDate);
+    notificationDate.setDate(notificationDate.getDate() - dtoIn.notificationOffset.days);
+    notificationDate.setHours(
+      notificationDate.getHours() - dtoIn.notificationOffset.hours,
+      notificationDate.getMinutes() - dtoIn.notificationOffset.minutes,
+    );
+    // notificationDate --> date of the first notification
+
+    // date of notification must NOT be in the past from now
+    if (notificationDate < now) {
+      throw new Errors.Create.NotificationDateIsInPast({ uuAppErrorMap });
+    }
+
     if (dtoIn.recurrent === true) {
-      if (!dtoIn.frequency || (dtoIn.frequency?.days === 0 && dtoIn.frequency?.months === 0)) {
+      if (!dtoIn.frequency || (dtoIn.frequency.months === 0 && dtoIn.frequency.days === 0)) {
         throw new Errors.Create.FrequencyIsRequired({ uuAppErrorMap });
       }
+    }
 
-      // CHECKING IF THE COMBINATION OF FREQUENCY AND NOTIFICATION OFFSET IS VALID
-      // -- invalid combination would be such that the notification date and time after calculation is before the previous datetime (the sum of notification offset days, hours, minutes must not be higher than the sum of frequency months and days)
+    const nextDatetime = new Date(datetimeAsDate);
+    nextDatetime.setMonth(nextDatetime.getMonth() + dtoIn.frequency.months);
+    nextDatetime.setDate(nextDatetime.getDate() + dtoIn.frequency.days);
+    const nextNotificationDate = new Date(nextDatetime);
+    nextNotificationDate.setDate(nextNotificationDate.getDate() - dtoIn.notificationOffset.days);
+    nextNotificationDate.setHours(
+      nextNotificationDate.getHours() - dtoIn.notificationOffset.hours,
+      nextNotificationDate.getMinutes() - dtoIn.notificationOffset.minutes,
+    );
 
-      let nextDatetime = new Date(datetime);
-
-      // calculate the date and time of when next datetime would be from the passed datetime
-      nextDatetime.setMonth(nextDatetime.getMonth() + dtoIn.frequency.months);
-      nextDatetime.setDate(nextDatetime.getDate() + dtoIn.frequency.days);
-      // prepare the next notification
-      let nextNotification = new Date(nextDatetime);
-      // calculate the date and time of when the next notification would be from the next datetime
-      nextNotification.setDate(nextNotification.getDate() - dtoIn.notificationOffset.days);
-      nextNotification.setHours(
-        nextNotification.getHours() - dtoIn.notificationOffset.hours,
-        nextNotification.getMinutes() - dtoIn.notificationOffset.minutes,
-      );
-
-      // calculate if the nextNotification time is more than an hour after the first datetime
-      if (nextNotification.getTime() - datetime.getTime() <= 1000 * 60 * 60) {
-        throw new Errors.Create.InvalidFrequencyAndNotificationOffset({ uuAppErrorMap });
-      }
+    // next notification must NOT be sent BEFORE the current datetime, only after the next datetime is calculated, which happens then the current datetime passes
+    if (nextNotificationDate <= datetimeAsDate) {
+      throw new Errors.Create.InvalidFrequencyAndNotificationOffset({ uuAppErrorMap });
     }
 
     const datetimeCreateObject = {
@@ -114,8 +116,8 @@ class DatetimeAbl {
       undecided: activity.members,
       confirmed: [],
       denied: [],
-      datetime: dtoIn.datetime,
-      notification: firstNotification,
+      datetime: datetimeAsDate,
+      notification: notificationDate,
     };
     let dtoOut;
     try {
@@ -202,6 +204,93 @@ class DatetimeAbl {
 
     let dtoOut = { ...datetime };
     dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async updateParticipation(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeUpdateParticipationDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.UpdateParticipation),
+      Errors.UpdateParticipation.InvalidDtoIn,
+    );
+
+    let datetime;
+    try {
+      datetime = await this.datetimeDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateParticipation.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!datetime) {
+      throw new Errors.UpdateParticipation.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: dtoIn.id });
+    }
+
+    const members = [...datetime.undecided, ...datetime.confirmed, ...datetime.denied];
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+    if (!members.includes(userUuIdentity)) {
+      throw new Errors.UpdateParticipation.UserNotAuthorized({ uuAppErrorMap });
+    }
+
+    const currentTimeMs = new Date().getTime();
+    const datetimeTimeMs = new Date(datetime.datetime).getTime();
+    const timeDiffMs = currentTimeMs - datetimeTimeMs;
+    if (timeDiffMs >= 30_000) {
+      throw new Errors.UpdateParticipation.DatetimeHasPassed({ uuAppErrorMap });
+    }
+
+    const filteredUndecided = datetime.undecided.filter((v) => v !== userUuIdentity);
+    const filteredDenied = datetime.denied.filter((v) => v !== userUuIdentity);
+    const filteredConfirmed = datetime.confirmed.filter((v) => v !== userUuIdentity);
+
+    let dtoOut;
+    switch (dtoIn.type) {
+      case "confirmed":
+        if (datetime.confirmed.includes(userUuIdentity)) {
+          dtoOut = datetime;
+          break;
+        }
+        filteredConfirmed.push(userUuIdentity);
+        break;
+      case "denied":
+        if (datetime.denied.includes(userUuIdentity)) {
+          dtoOut = datetime;
+          break;
+        }
+        filteredDenied.push(userUuIdentity);
+        break;
+      case "undecided":
+        if (datetime.undecided.includes(userUuIdentity)) {
+          dtoOut = datetime;
+          break;
+        }
+        filteredUndecided.push(userUuIdentity);
+        break;
+    }
+
+    if (!dtoOut) {
+      const datetimeUpdateObject = {
+        id: dtoIn.id,
+        awid,
+        undecided: filteredUndecided,
+        confirmed: filteredConfirmed,
+        denied: filteredDenied,
+      };
+      try {
+        dtoOut = await this.datetimeDao.update(datetimeUpdateObject);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.UpdateParticipation.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    }
+
+    dtoOut.uuAppErrorMap;
     return dtoOut;
   }
 }

@@ -69,6 +69,20 @@ const UpdateFrequency = {
       this.message = "DtoIn is not valid.";
     }
   },
+  FrequencyCannotBeZero: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}frequencyCannotBeZero`;
+      this.message = "Frequency cannot be zero.";
+    }
+  },
+  DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateFrequency.UC_CODE}datetimeDaoGetFailed`;
+      this.message = "Get datetime by datetime DAO get failed.";
+    }
+  },
   ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -97,11 +111,12 @@ const UpdateFrequency = {
       this.message = "Update activity by activity DAO update failed.";
     }
   },
-  InvalidCombination: class extends AktivoMainUseCaseError {
+  InvalidFrequency: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${UpdateFrequency.UC_CODE}invalidCombination`;
-      this.message = "Invalid combination of frequency and notification offset.";
+      this.code = `${UpdateFrequency.UC_CODE}invalidFrequency`;
+      this.message =
+        "Frequency is not valid in regard to activity's notification offset. The notification date would be before the next datetime is created.";
     }
   },
   ActivityNotRecurrent: class extends AktivoMainUseCaseError {
@@ -169,6 +184,20 @@ const UpdateNotificationOffset = {
       super(...arguments);
       this.code = `${UpdateNotificationOffset.UC_CODE}activityDoesNotHaveDatetime`;
       this.message = "Activity does not have a datetime. Notification offset can't be updated.";
+    }
+  },
+  DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}datetimeDaoGetFailed`;
+      this.message = "Get datetime by datetime DAO get failed.";
+    }
+  },
+  InvalidNotificationOffset: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}invalidNotificationOffset`;
+      this.message = "Notification offset must be at least 1 hour.";
     }
   },
 };

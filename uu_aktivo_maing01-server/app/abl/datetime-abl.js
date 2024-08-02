@@ -293,6 +293,86 @@ class DatetimeAbl {
     dtoOut.uuAppErrorMap;
     return dtoOut;
   }
+
+  async delete(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeDeleteDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Delete),
+      Errors.Delete.InvalidDtoIn,
+    );
+
+    let datetime;
+    try {
+      datetime = await this.datetimeDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.DatetimeDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!datetime) {
+      throw new Errors.Delete.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, datetime.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Delete.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+      }
+      if (!activity) {
+        throw new Errors.Delete.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: datetime.activityId });
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+
+      if (activity.owner !== userUuIdentity) {
+        throw new Errors.Delete.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.datetimeDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.DatetimeDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    const activityUpdateObject = {
+      id: datetime.activityId,
+      awid,
+      datetimeId: null,
+      frequency: {},
+      notificationOffset: {},
+      recurrent: false,
+    };
+
+    try {
+      await this.activityDao.update(activityUpdateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut = dtoOut || {};
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new DatetimeAbl();

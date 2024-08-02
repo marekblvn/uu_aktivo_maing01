@@ -114,7 +114,7 @@ class DatetimeAbl {
       undecided: activity.members,
       confirmed: [],
       denied: [],
-      datetime: dtoIn.datetime,
+      datetime: new Date(dtoIn.datetime),
       notification: firstNotification,
     };
     let dtoOut;

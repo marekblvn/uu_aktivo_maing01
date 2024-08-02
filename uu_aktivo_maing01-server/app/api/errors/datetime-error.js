@@ -51,7 +51,7 @@ const Create = {
     constructor() {
       super(...arguments);
       this.code = `${Create.UC_CODE}invalidDatetime`;
-      this.message = "Provided datetime is not valid - notification would be in the past.";
+      this.message = "Provided datetime is not valid. Datetime must not be sooner than 12 hours from now.";
     }
   },
   InvalidNotificationOffset: class extends AktivoMainUseCaseError {
@@ -59,6 +59,13 @@ const Create = {
       super(...arguments);
       this.code = `${Create.UC_CODE}invalidNotificationOffset`;
       this.message = "Provided notification offset it not valid. Notification offset must be at least an hour.";
+    }
+  },
+  NotificationDateIsInPast: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}notificationDateIsInPast`;
+      this.message = "Notification offset is too high. The first notification date would be in the past from now.";
     }
   },
   InvalidFrequencyAndNotificationOffset: class extends AktivoMainUseCaseError {

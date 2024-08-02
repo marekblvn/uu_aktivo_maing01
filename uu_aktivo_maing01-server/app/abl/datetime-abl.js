@@ -234,15 +234,12 @@ class DatetimeAbl {
       throw new Errors.UpdateParticipation.UserNotAuthorized({ uuAppErrorMap });
     }
 
-    // const currentTimeMs = new Date();
-    // const datetimeTimeMs = new Date(datetime.datetime).getTime();
-    // currentTimeMs.setHours(currentTimeMs.getHours() + 2);
-    // console.log(currentTimeMs.getTime());
-    // console.log(datetimeTimeMs);
-    // const timeDiffMs = currentTimeMs - datetimeTimeMs;
-    // if (timeDiffMs >= 30_000) {
-    //   throw new Errors.UpdateParticipation.DatetimeHasPassed({ uuAppErrorMap });
-    // }
+    const currentTimeMs = new Date().getTime();
+    const datetimeTimeMs = new Date(datetime.datetime).getTime();
+    const timeDiffMs = currentTimeMs - datetimeTimeMs;
+    if (timeDiffMs >= 30_000) {
+      throw new Errors.UpdateParticipation.DatetimeHasPassed({ uuAppErrorMap });
+    }
 
     const filteredUndecided = datetime.undecided.filter((v) => v !== userUuIdentity);
     const filteredDenied = datetime.denied.filter((v) => v !== userUuIdentity);

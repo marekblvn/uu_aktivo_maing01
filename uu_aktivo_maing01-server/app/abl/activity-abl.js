@@ -339,19 +339,35 @@ class ActivityAbl {
       throw new Errors.UpdateNotificationOffset.ActivityDoesNotHaveDatetime({ uuAppErrorMap });
     }
 
+    const notificationOffsetInHours =
+      dtoIn.notificationOffset.days * 24 + dtoIn.notificationOffset.hours + dtoIn.notificationOffset.minutes / 60;
+
+    if (notificationOffsetInHours < 1) {
+      throw new Errors.UpdateNotificationOffset.InvalidNotificationOffset({ uuAppErrorMap });
+    }
+
     if (activity.frequency) {
-      let days = dtoIn.notificationOffset.days;
-      let hours = dtoIn.notificationOffset.hours;
-      let minutes = dtoIn.notificationOffset.minutes;
-      let now = new Date();
-      let dateStamp = new Date(now);
-      dateStamp.setDate(days + dateStamp.getDate());
-      dateStamp.setHours(hours + dateStamp.getHours(), minutes + dateStamp.getMinutes());
-      let freqDays = activity.frequency.days;
-      let freqMonths = activity.frequency.months;
-      dateStamp.setDate(dateStamp.getMonth() - freqMonths);
-      dateStamp.setDate(dateStamp.getDate() - freqDays);
-      if (dateStamp < now) {
+      let datetime;
+      try {
+        datetime = await this.datetimeDao.get(awid, activity.datetimeId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.UpdateNotificationOffset.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      const datetimeNext = new Date(datetime.datetime);
+      datetimeNext.setMonth(datetimeNext.getMonth() + activity.frequency.months);
+      datetimeNext.setDate(datetimeNext.getDate() + activity.frequency.days);
+      const notificationDate = new Date(datetimeNext);
+      notificationDate.setDate(notificationDate.getDate() - dtoIn.notificationOffset.days);
+      notificationDate.setHours(
+        notificationDate.getHours() - dtoIn.notificationOffset.hours,
+        notificationDate.getMinutes() - dtoIn.notificationOffset.minutes,
+      );
+
+      if (notificationDate <= datetime.datetime) {
         throw new Errors.UpdateNotificationOffset.InvalidCombination({ uuAppErrorMap });
       }
     }

@@ -144,6 +144,10 @@
       "datetime/updateParticipation": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "datetime/delete": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
       }
     }
   }

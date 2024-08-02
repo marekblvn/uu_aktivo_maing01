@@ -165,6 +165,11 @@
         "realization": "api/controllers/DatetimeController.updateParticipation",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "datetime/delete": {
+        "realization": "api/controllers/DatetimeController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

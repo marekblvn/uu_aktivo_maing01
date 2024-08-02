@@ -227,6 +227,7 @@ class ActivityAbl {
       }
       throw error;
     }
+
     if (!activity) {
       throw new Errors.UpdateFrequency.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
     }
@@ -254,21 +255,33 @@ class ActivityAbl {
       throw new Errors.UpdateFrequency.ActivityNotRecurrent({ uuAppErrorMap });
     }
 
-    if (activity.notificationOffset) {
-      let months = dtoIn.frequency.months;
-      let days = dtoIn.frequency.days;
-      let now = new Date();
-      let dateStamp = new Date(now);
-      dateStamp.setMonth(months + dateStamp.getMonth());
-      dateStamp.setDate(days + dateStamp.getDate());
-      let notifDays = activity.notificationOffset.days;
-      let notifHours = activity.notificationOffset.hours;
-      let notifMinutes = activity.notificationOffset.minutes;
-      dateStamp.setDate(dateStamp.getDate() - notifDays);
-      dateStamp.setHours(dateStamp.getHours() - notifHours, dateStamp.getMinutes() - notifMinutes);
-      if (dateStamp < now) {
-        throw new Errors.UpdateFrequency.InvalidCombination({ uuAppErrorMap });
+    if (dtoIn.frequency.days === 0 && dtoIn.frequency.months === 0) {
+      throw new Errors.UpdateFrequency.FrequencyCannotBeZero({ uuAppErrorMap });
+    }
+
+    let datetime;
+    try {
+      datetime = await this.datetimeDao.get(awid, activity.datetimeId);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateFrequency.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
       }
+      throw error;
+    }
+
+    const datetimeNext = new Date(datetime.datetime);
+    datetimeNext.setMonth(datetimeNext.getMonth() + dtoIn.frequency.months);
+    datetimeNext.setDate(datetimeNext.getDate() + dtoIn.frequency.days);
+    const notificationDate = new Date(datetimeNext);
+    notificationDate.setDate(notificationDate.getDate() - activity.notificationOffset.days);
+    notificationDate.setHours(
+      notificationDate.getHours() - activity.notificationOffset.hours,
+      notificationDate.getMinutes() - activity.notificationOffset.minutes,
+    );
+
+    // new frequency can NOT be "greater" than existing notification offset -> in that case, the notification date would be before the next datetime is calculated
+    if (notificationDate <= datetime.datetime) {
+      throw new Errors.UpdateFrequency.InvalidFrequency({ uuAppErrorMap });
     }
 
     let dtoOut;

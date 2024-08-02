@@ -273,7 +273,6 @@ class DatetimeAbl {
     }
 
     if (!dtoOut) {
-      console.log("no dtoout");
       const datetimeUpdateObject = {
         id: dtoIn.id,
         awid,

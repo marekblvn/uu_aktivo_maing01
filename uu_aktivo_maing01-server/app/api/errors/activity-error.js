@@ -186,6 +186,20 @@ const UpdateNotificationOffset = {
       this.message = "Activity does not have a datetime. Notification offset can't be updated.";
     }
   },
+  DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}datetimeDaoGetFailed`;
+      this.message = "Get datetime by datetime DAO get failed.";
+    }
+  },
+  InvalidNotificationOffset: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateNotificationOffset.UC_CODE}invalidNotificationOffset`;
+      this.message = "Notification offset must be at least 1 hour.";
+    }
+  },
 };
 
 const Get = {

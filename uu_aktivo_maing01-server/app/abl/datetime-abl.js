@@ -204,6 +204,94 @@ class DatetimeAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async updateParticipation(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeUpdateParticipationDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.UpdateParticipation),
+      Errors.UpdateParticipation.InvalidDtoIn,
+    );
+
+    let datetime;
+    try {
+      datetime = await this.datetimeDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateParticipation.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!datetime) {
+      throw new Errors.UpdateParticipation.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: dtoIn.id });
+    }
+
+    const members = [...datetime.undecided, ...datetime.confirmed, ...datetime.denied];
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+    if (!members.includes(userUuIdentity)) {
+      throw new Errors.UpdateParticipation.UserNotAuthorized({ uuAppErrorMap });
+    }
+
+    const currentTimeMs = new Date().getTime();
+    const datetimeTimeMs = new Date(datetime.datetime).getTime();
+    const timeDiffMs = currentTimeMs - datetimeTimeMs;
+    if (timeDiffMs >= 30_000) {
+      throw new Errors.UpdateParticipation.DatetimeHasPassed({ uuAppErrorMap });
+    }
+
+    const filteredUndecided = datetime.undecided.filter((v) => v !== userUuIdentity);
+    const filteredDenied = datetime.denied.filter((v) => v !== userUuIdentity);
+    const filteredConfirmed = datetime.confirmed.filter((v) => v !== userUuIdentity);
+
+    let dtoOut;
+    switch (dtoIn.type) {
+      case "confirmed":
+        if (datetime.confirmed.includes(userUuIdentity)) {
+          dtoOut = datetime;
+          break;
+        }
+        filteredConfirmed.push(userUuIdentity);
+        break;
+      case "denied":
+        if (datetime.denied.includes(userUuIdentity)) {
+          dtoOut = datetime;
+          break;
+        }
+        filteredDenied.push(userUuIdentity);
+        break;
+      case "undecided":
+        if (datetime.undecided.includes(userUuIdentity)) {
+          dtoOut = datetime;
+          break;
+        }
+        filteredUndecided.push(userUuIdentity);
+        break;
+    }
+
+    if (!dtoOut) {
+      console.log("no dtoout");
+      const datetimeUpdateObject = {
+        id: dtoIn.id,
+        awid,
+        undecided: filteredUndecided,
+        confirmed: filteredConfirmed,
+        denied: filteredDenied,
+      };
+      try {
+        dtoOut = await this.datetimeDao.update(datetimeUpdateObject);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.UpdateParticipation.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    }
+
+    dtoOut.uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new DatetimeAbl();

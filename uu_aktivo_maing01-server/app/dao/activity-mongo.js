@@ -73,7 +73,6 @@ class ActivityMongo extends UuObjectDao {
       awid,
       ...filterObject,
     };
-    console.log(filter);
     return await super.find(filter, pageInfo);
   }
 

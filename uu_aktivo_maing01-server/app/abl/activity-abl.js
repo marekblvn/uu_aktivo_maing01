@@ -119,7 +119,6 @@ class ActivityAbl {
     );
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
-    console.log("USER AUTHORIZED PROFILES: ", authorizedProfiles);
     let daoFilter = {};
     if (
       authorizedProfiles.includes(PROFILE_CODES.Authorities) ||

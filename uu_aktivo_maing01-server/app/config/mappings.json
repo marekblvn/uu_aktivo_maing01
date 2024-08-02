@@ -160,6 +160,11 @@
         "realization": "api/controllers/DatetimeController.get",
         "httpMethod": "GET",
         "type": "CMD"
+      },
+      "datetime/updateParticipation": {
+        "realization": "api/controllers/DatetimeController.updateParticipation",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

@@ -170,6 +170,11 @@
         "realization": "api/controllers/DatetimeController.delete",
         "httpMethod": "POST",
         "type": "CMD"
+      },
+      "datetime/createNext": {
+        "realization": "api/controllers/DatetimeController.createNext",
+        "httpMethod": "POST",
+        "type": "CMD"
       }
     }
   }

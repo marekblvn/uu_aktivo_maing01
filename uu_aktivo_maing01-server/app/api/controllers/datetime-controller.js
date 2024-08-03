@@ -24,7 +24,13 @@ class DatetimeController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return DatetimeAbl.updateParticipation(awid, dtoIn, session, authorizationResult);
   }
-  createNext() {}
+  createNext(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return DatetimeAbl.createNext(awid, dtoIn, session, authorizationResult);
+  }
   delete(ucEnv) {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();

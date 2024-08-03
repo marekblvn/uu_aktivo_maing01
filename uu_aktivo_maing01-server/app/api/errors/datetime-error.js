@@ -128,6 +128,20 @@ const CreateNext = {
       this.message = "Activity with provided id does not exist.";
     }
   },
+  ActivityNotRecurrent: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}activityNotRecurrent`;
+      this.message = "Activity is not recurrent. Next datetime cannot be created.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to create next datetime.";
+    }
+  },
   DatetimeDaoDeleteFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

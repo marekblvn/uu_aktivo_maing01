@@ -373,6 +373,101 @@ class DatetimeAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+  async createNext(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeCreateNextDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.CreateNext),
+      Errors.CreateNext.InvalidDtoIn,
+    );
+
+    let datetime;
+    try {
+      datetime = await this.datetimeDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!datetime) {
+      throw new Errors.CreateNext.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: dtoIn.id });
+    }
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, datetime.activityId);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.CreateNext.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: datetime.activityId });
+    }
+
+    if (activity.recurrent === false) {
+      throw new Errors.CreateNext.ActivityNotRecurrent({ uuAppErrorMap });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (activity.owner !== userUuIdentity) {
+        throw new Errors.CreateNext.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    const nextDatetime = new Date(datetime.datetime);
+    nextDatetime.setMonth(nextDatetime.getMonth() + activity.frequency.months);
+    nextDatetime.setDate(nextDatetime.getDate() + activity.frequency.days);
+
+    const nextNotification = new Date(nextDatetime);
+    nextNotification.setDate(nextNotification.getDate() - activity.notificationOffset.days);
+    nextNotification.setHours(
+      nextNotification.getHours() - activity.notificationOffset.hours,
+      nextNotification.getMinutes() - activity.notificationOffset.minutes,
+    );
+
+    try {
+      await this.datetimeDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.DatetimeDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    const nextDatetimeCreateObject = {
+      awid,
+      activityId: activity.id,
+      datetime: nextDatetime,
+      notification: nextNotification,
+      undecided: activity.members,
+      confirmed: [],
+      denied: [],
+    };
+
+    let dtoOut;
+    try {
+      dtoOut = await this.datetimeDao.create(nextDatetimeCreateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.DatetimeDaoCreateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new DatetimeAbl();

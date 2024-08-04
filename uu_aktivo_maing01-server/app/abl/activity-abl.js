@@ -521,6 +521,10 @@ class ActivityAbl {
       throw new Errors.TransferOwnership.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
     }
 
+    if (activity.datetimeId !== null) {
+      throw new Errors.TransferOwnership.ActivityHasDatetime({ uuAppErrorMap });
+    }
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&

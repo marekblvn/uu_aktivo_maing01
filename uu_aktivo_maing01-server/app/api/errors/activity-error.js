@@ -388,6 +388,13 @@ const TransferOwnership = {
       this.message = "Activity with provided id does not exist.";
     }
   },
+  ActivityHasDatetime: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${TransferOwnership.UC_CODE}activityHasDatetime`;
+      this.message = "Ownership cannot be transferred while the activity has a datetime.";
+    }
+  },
   UserNotAuthorized: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

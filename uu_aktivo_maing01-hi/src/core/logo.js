@@ -56,7 +56,7 @@ const Logo = createVisualComponent({
     return (
       <Box shape="interactiveElement" colorScheme="primary" onClick={() => setRoute("")} className={Css.box()}>
         <Text category="expose" segment="default" type="broad" className={Css.text()} autoFit>
-          Aktivo
+          ⚡Aktivo
         </Text>
       </Box>
     );

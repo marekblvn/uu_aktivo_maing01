@@ -31,6 +31,8 @@
   },
   "Menu": {
     "home": "Vítejte",
+    "my-activities": "Moje aktivity",
+    "invitations": "Pozvánky",
     "about": "O aplikaci"
   }
 }

@@ -47,6 +47,7 @@ let Home = createVisualComponent({
     return (
       <div {...attrs}>
         <RouteBar />
+        <div>Visual Component {Home.uu5Tag}</div>
       </div>
     );
     //@@viewOff:render

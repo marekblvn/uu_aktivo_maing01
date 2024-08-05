@@ -14,7 +14,6 @@ import Plus4U5App, { withRoute } from "uu_plus4u5g02-app";
 
 import Config from "./config/config.js";
 import AboutCfg from "../config/about.js";
-import RouteBar from "../core/route-bar.js";
 import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
@@ -124,7 +123,6 @@ let About = createVisualComponent({
     const attrs = Utils.VisualComponent.getAttrs(props);
     return legacyComponentsReady ? (
       <div {...attrs}>
-        <RouteBar />
         <div className={Css.content()}>
           <DynamicLibraryComponent
             uu5Tag="Plus4U5.App.About"

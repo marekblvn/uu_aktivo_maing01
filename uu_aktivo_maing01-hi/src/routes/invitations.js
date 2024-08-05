@@ -1,7 +1,6 @@
 //@@viewOn:imports
 import { createVisualComponent, Utils } from "uu5g05";
 import Config from "./config/config.js";
-import RouteBar from "../core/route-bar.js";
 import { withRoute } from "uu_plus4u5g02-app";
 //@@viewOff:imports
 
@@ -40,7 +39,6 @@ let Invitations = createVisualComponent({
 
     return (
       <div {...attrs}>
-        <RouteBar />
         <div>Visual Component {Invitations.uu5Tag}</div>
         {children}
       </div>

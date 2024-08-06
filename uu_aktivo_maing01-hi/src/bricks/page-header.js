@@ -43,7 +43,7 @@ const PageHeader = createVisualComponent({
         <Text
           category="interface"
           segment="title"
-          type={screenSize === "xs" ? "minor" : screenSize === "s" ? "common" : "major"}
+          type={screenSize === "xs" ? "common" : screenSize === "s" ? "major" : "main"}
           style={{ color: "#191919" }}
         >
           {content}

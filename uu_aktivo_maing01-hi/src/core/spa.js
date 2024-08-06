@@ -8,6 +8,7 @@ import Config from "./config/config.js";
 import Home from "../routes/home.js";
 import ActivityPage from "../routes/activity-page.js";
 import AppBar from "./app-bar.js";
+import { AuthorizationContextProvider } from "../contexts/authorization-context.js";
 
 const MyActivities = Utils.Component.lazy(() => import("../routes/my-activities.js"));
 const Invitations = Utils.Component.lazy(() => import("../routes/invitations.js"));
@@ -62,7 +63,9 @@ const Spa = createVisualComponent({
       <Plus4U5.SpaProvider initialLanguageList={["en", "cs"]}>
         <AppBar />
         <Uu5Elements.ModalBus>
-          <Plus4U5App.Spa routeMap={ROUTE_MAP} />
+          <AuthorizationContextProvider>
+            <Plus4U5App.Spa routeMap={ROUTE_MAP} />
+          </AuthorizationContextProvider>
         </Uu5Elements.ModalBus>
       </Plus4U5.SpaProvider>
     );

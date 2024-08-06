@@ -30,7 +30,7 @@ class AktivoMainAbl {
       dtoIn,
       validationResult,
       WARNINGS.initUnsupportedKeys.code,
-      Errors.Init.InvalidDtoIn
+      Errors.Init.InvalidDtoIn,
     );
 
     // HDS 2
@@ -84,7 +84,7 @@ class AktivoMainAbl {
           artifactUri: artifactUri.toString(),
           synchronizeArtifactBasicAttributes: false,
         },
-        session
+        session,
       );
     }
 
@@ -145,6 +145,11 @@ class AktivoMainAbl {
     // }
 
     // HDS 2
+    return dtoOut;
+  }
+  async getAuthorizedProfiles(authorizationResult) {
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    const dtoOut = { authorizedProfiles };
     return dtoOut;
   }
 }

@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, PropTypes, useScreenSize } from "uu5g05";
+import { createVisualComponent, PropTypes, useScreenSize, Utils } from "uu5g05";
 import Config from "./config/config.js";
 //@@viewOff:imports
 
@@ -30,24 +30,23 @@ const Container = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {
-    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-  },
+  propTypes: {},
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ children }, props) {
+  render(props) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const { children } = props;
+    const attrs = Utils.VisualComponent.getAttrs(props, Css.main(props));
     //@@viewOff:private
 
     //@@viewOn:render
-
     return (
-      <div className={Css.main(screenSize)} {...props}>
+      <div className={Css.main(screenSize)} {...attrs}>
         {children}
       </div>
     );

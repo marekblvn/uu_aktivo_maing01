@@ -9,7 +9,8 @@
     "uu_plus4u5g02_organizationBaseUri": null,
     "uu5loaderg01_initUuAppDisabled": false,
     "uu_plus4u5g02_uuApp": {
-      "name": "uuAktivo"
+      "name": "Aktivo",
+      "icon": "assets/app.svg"
     }
   }
 }

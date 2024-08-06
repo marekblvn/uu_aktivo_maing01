@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, PropTypes, useScreenSize } from "uu5g05";
+import { createVisualComponent, PropTypes, useScreenSize, Utils } from "uu5g05";
 import Config from "./config/config.js";
 //@@viewOff:imports
 
@@ -8,7 +8,7 @@ import Config from "./config/config.js";
 
 //@@viewOn:css
 const Css = {
-  main: (size) =>
+  main: (size, style) =>
     Config.Css.css({
       width: "100%",
       ...(["l", "xl"].includes(size) && {
@@ -16,6 +16,7 @@ const Css = {
       }),
       padding: "0 16px 0",
       margin: "0 auto",
+      ...style,
     }),
 };
 //@@viewOff:css
@@ -39,18 +40,13 @@ const Container = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ children }, props) {
+  render({ children, style }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     //@@viewOff:private
 
     //@@viewOn:render
-
-    return (
-      <div className={Css.main(screenSize)} {...props}>
-        {children}
-      </div>
-    );
+    return <div className={Css.main(screenSize, style)}>{children}</div>;
     //@@viewOff:render
   },
 });

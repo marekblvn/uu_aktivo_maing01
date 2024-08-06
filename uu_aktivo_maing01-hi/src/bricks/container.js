@@ -16,7 +16,6 @@ const Css = {
       }),
       padding: "0 16px 0",
       margin: "0 auto",
-      backgroundColor: "red",
     }),
 };
 //@@viewOff:css

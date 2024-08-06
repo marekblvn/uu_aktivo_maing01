@@ -16,6 +16,11 @@
         "httpMethod": "GET",
         "type": "CMD"
       },
+      "sys/uuAppWorkspace/getAuthorizedProfiles": {
+        "realization": "api/controllers/AktivoMainController.getAuthorizedProfiles",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
       "defaultUve": {
         "realization": "index.html",
         "httpMethod": "GET",

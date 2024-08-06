@@ -1,8 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useRoute, useScreenSize, useState, useEffect } from "uu5g05";
+import { createVisualComponent, Lsi, useRoute, useScreenSize, useState, useEffect, useSession } from "uu5g05";
 import Config from "./config/config.js";
 import Logo from "./logo.js";
-import { ActionGroup, Button, Drawer, Dropdown, MenuList } from "uu5g05-elements";
+import { ActionGroup, Button, Drawer, MenuList } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
@@ -47,6 +47,7 @@ const AppBar = createVisualComponent({
     //@@viewOn:private
     const [, setRoute] = useRoute();
     const [screenSize] = useScreenSize();
+    const { state } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
@@ -113,6 +114,13 @@ const AppBar = createVisualComponent({
     //@@viewOff:private
 
     //@@viewOn:render
+    if (state !== "authenticated") {
+      return (
+        <div className={Css.bar(screenSize)}>
+          <Logo />
+        </div>
+      );
+    }
 
     return (
       <>

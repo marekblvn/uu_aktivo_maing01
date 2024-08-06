@@ -8,7 +8,7 @@ import Config from "./config/config.js";
 
 //@@viewOn:css
 const Css = {
-  main: (size, style) =>
+  main: (size) =>
     Config.Css.css({
       width: "100%",
       ...(["l", "xl"].includes(size) && {
@@ -16,7 +16,6 @@ const Css = {
       }),
       padding: "0 16px 0",
       margin: "0 auto",
-      ...style,
     }),
 };
 //@@viewOff:css
@@ -31,22 +30,26 @@ const Container = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {
-    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-  },
+  propTypes: {},
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ children, style }) {
+  render(props) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const { children } = props;
+    const attrs = Utils.VisualComponent.getAttrs(props, Css.main(props));
     //@@viewOff:private
 
     //@@viewOn:render
-    return <div className={Css.main(screenSize, style)}>{children}</div>;
+    return (
+      <div className={Css.main(screenSize)} {...attrs}>
+        {children}
+      </div>
+    );
     //@@viewOff:render
   },
 });

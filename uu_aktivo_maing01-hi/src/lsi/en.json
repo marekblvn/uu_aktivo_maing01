@@ -1,7 +1,7 @@
 {
-  "appName": "Application uuAktivo",
+  "appName": "Application Aktivo",
   "About": {
-    "header": "About application uuAktivo",
+    "header": "About application Aktivo",
     "creatorsHeader": "Application creators",
     "termsOfUse": "Terms of use"
   },
@@ -31,6 +31,8 @@
   },
   "Menu": {
     "home": "Welcome",
+    "my-activities": "My Activities",
+    "invitations": "Invitations",
     "about": "About Application"
   }
 }

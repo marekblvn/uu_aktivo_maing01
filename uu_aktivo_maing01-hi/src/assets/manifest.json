@@ -1,5 +1,5 @@
 {
-  "name": "uuAktivo",
+  "name": "Aktivo",
   "icons": [
     {
       "src": "meta/android-chrome-192x192.png",
@@ -13,5 +13,6 @@
     }
   ],
   "theme_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "author": "Marek Balvín"
 }

@@ -6,7 +6,11 @@ import Plus4U5App from "uu_plus4u5g02-app";
 
 import Config from "./config/config.js";
 import Home from "../routes/home.js";
+import ActivityPage from "../routes/activity-page.js";
+import AppBar from "./app-bar.js";
 
+const MyActivities = Utils.Component.lazy(() => import("../routes/my-activities.js"));
+const Invitations = Utils.Component.lazy(() => import("../routes/invitations.js"));
 const About = Utils.Component.lazy(() => import("../routes/about.js"));
 const InitAppWorkspace = Utils.Component.lazy(() => import("../routes/init-app-workspace.js"));
 const ControlPanel = Utils.Component.lazy(() => import("../routes/control-panel.js"));
@@ -14,8 +18,11 @@ const ControlPanel = Utils.Component.lazy(() => import("../routes/control-panel.
 
 //@@viewOn:constants
 const ROUTE_MAP = {
-  "": { redirect: "home" },
+  "": { rewrite: "home" },
   home: (props) => <Home {...props} />,
+  "my-activities": (props) => <MyActivities {...props} />,
+  invitations: (props) => <Invitations {...props} />,
+  activity: ({ params }) => <ActivityPage id={params.id} />,
   about: (props) => <About {...props} />,
   "sys/uuAppWorkspace/initUve": (props) => <InitAppWorkspace {...props} />,
   controlPanel: (props) => <ControlPanel {...props} />,
@@ -53,6 +60,7 @@ const Spa = createVisualComponent({
     //@@viewOn:render
     return (
       <Plus4U5.SpaProvider initialLanguageList={["en", "cs"]}>
+        <AppBar />
         <Uu5Elements.ModalBus>
           <Plus4U5App.Spa routeMap={ROUTE_MAP} />
         </Uu5Elements.ModalBus>

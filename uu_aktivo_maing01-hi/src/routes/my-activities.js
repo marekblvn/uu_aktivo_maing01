@@ -43,6 +43,7 @@ let MyActivities = createVisualComponent({
     const createActivityRef = useRef();
     const [dialogProps, setDialogProps] = useState();
     const [openModal, setOpenModal] = useState(false);
+    const [noData, setNoData] = useState(true);
     //@@viewOff:private
 
     //@@viewOn:methods
@@ -118,6 +119,7 @@ let MyActivities = createVisualComponent({
 
     function renderReady(data) {
       if (!data.length) {
+        setNoData(true);
         return (
           <PlaceholderBox
             code="items"
@@ -128,23 +130,28 @@ let MyActivities = createVisualComponent({
             }}
             actionList={[
               {
-                children: <Lsi lsi={{ en: "Create Activity", cs: "Vytvořit aktivitu" }} />,
+                children: <Lsi lsi={{ en: "Create new Activity", cs: "Vytvořit novou aktivitu" }} />,
                 primary: true,
+                icon: "mdi-plus",
                 colorScheme: "primary",
                 significance: "common",
                 onClick: () => setOpenModal(true),
               },
             ]}
+            style={{ marginTop: "20%" }}
           />
         );
       }
+      setNoData(false);
       return <ActivityList itemList={data} onActivityLeave={handleLeaveActivity} />;
     }
 
     return (
       <>
-        <Container style={{ width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`, marginTop: "32px" }}>
-          <div style={{ display: "flex" }}>
+        <Container
+          style={{ width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`, marginTop: "32px", height: "90%" }}
+        >
+          <div style={{ display: "flex", marginBottom: "24px" }}>
             <Header
               title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
               icon={
@@ -160,31 +167,31 @@ let MyActivities = createVisualComponent({
               level={4}
               style={{ marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}` }}
             />
-            <ActionGroup
-              itemList={[
-                {
-                  children: <Lsi lsi={{ en: "Create new Activity", cs: "Vytvořit novou aktivitu" }} />,
+            {!noData && (
+              <ActionGroup
+                itemList={[
+                  {
+                    children: <Lsi lsi={{ en: "Create new Activity", cs: "Vytvořit novou aktivitu" }} />,
+                    colorScheme: "primary",
+                    significance: "common",
+                    onClick: () => setOpenModal(true),
+                    order: -1,
+                    icon: "mdi-plus",
+                    collapsed: false,
+                    size: screenSize,
+                  },
+                ]}
+                collapsedMenuProps={{
                   colorScheme: "primary",
                   significance: "common",
-                  onClick: () => setOpenModal(true),
-                  order: -1,
-                  icon: "mdi-plus",
-                  collapsed: false,
-                  size: screenSize,
-                },
-              ]}
-              collapsedMenuProps={{
-                colorScheme: "primary",
-                significance: "common",
-              }}
-            />
+                }}
+              />
+            )}
           </div>
           <ActivityListProvider>
             {({ state, data, errorData, pendingData, handlerMap }) => {
               reloadRef.current = handlerMap.load;
               createActivityRef.current = handlerMap.create;
-              console.log(state);
-              console.log(data);
               switch (state) {
                 case "pending":
                 case "pendingNoData":

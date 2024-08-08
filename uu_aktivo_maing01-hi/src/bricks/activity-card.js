@@ -126,16 +126,18 @@ const ActivityCard = createVisualComponent({
           </Button>
         }
       >
-        <Text
-          category="interface"
-          segment="content"
-          type={`${screenSize === "xs" ? "small" : screenSize === "s" ? "medium" : "large"}`}
-          autoFit
-          colorScheme="building"
-          style={{ textAlign: "justify" }}
-        >
-          {activity.description}
-        </Text>
+        {activity.description.length > 0 && (
+          <Text
+            category="interface"
+            segment="content"
+            type={`${screenSize === "xs" ? "small" : screenSize === "s" ? "medium" : "large"}`}
+            autoFit
+            colorScheme="building"
+            style={{ textAlign: "justify" }}
+          >
+            {activity.description}
+          </Text>
+        )}
       </Block>
     );
     //@@viewOff:render

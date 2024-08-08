@@ -1,11 +1,11 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, Utils } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useRef, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
-import PageHeader from "../bricks/page-header.js";
 import Container from "../bricks/container.js";
 import ActivityListProvider from "../providers/activity-list-provider.js";
-import { Pending } from "uu5g05-elements";
+import { Dialog, Header, Icon, Pending, useAlertBus } from "uu5g05-elements";
+import ActivityList from "../bricks/activity-list.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -36,11 +36,64 @@ let MyActivities = createVisualComponent({
   render(props) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const { identity } = useSession();
+    const { addAlert } = useAlertBus();
+    const reloadRef = useRef();
+    const [dialogProps, setDialogProps] = useState();
     //@@viewOff:private
 
-    //@@viewOn:render
-    const attrs = Utils.VisualComponent.getAttrs(props, Css.main(props));
+    //@@viewOn:methods
+    const showDialog = useCallback((onConfirm) => {
+      setDialogProps({
+        header: (
+          <Lsi
+            lsi={{ en: "Are you sure you want to leave this activity?", cs: "Opravdu chcete opustit tuto aktivitu?" }}
+          />
+        ),
+        icon: "mdi-exit-run",
+        info: (
+          <Lsi lsi={{ en: "This will make you lose access to the activity.", cs: "Ztratíte přístup do aktivity." }} />
+        ),
+        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+        actionList: [
+          {
+            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+            onClick: (e) => {
+              e.preventDefault();
+              setDialogProps(null);
+            },
+          },
+          {
+            children: <Lsi lsi={{ en: "Leave", cs: "Odejít" }} />,
+            onClick: async (e) => {
+              e.preventDefault();
+              try {
+                await onConfirm();
+                setDialogProps(null);
+                reloadRef.current({ filters: { members: [identity.uuIdentity] } });
+              } catch (error) {
+                addAlert({ header: "Error!", message: error.message, priority: "error" });
+                return;
+              }
+            },
+            colorScheme: "negative",
+            significance: "highlighted",
+          },
+        ],
+      });
+    }, []);
 
+    const handleLeaveActivity = useCallback(
+      (item) => {
+        showDialog(async () => {
+          return await item.handlerMap.leave(item.data.id);
+        });
+      },
+      [showDialog],
+    );
+    //@@viewOff:methods
+
+    //@@viewOn:render
     function renderLoading() {
       return <Pending size="max" colorScheme="primary" />;
     }
@@ -61,15 +114,20 @@ let MyActivities = createVisualComponent({
     }
 
     function renderReady(data) {
-      console.log(data);
-      return <div>ready</div>;
+      return <ActivityList itemList={data} onActivityLeave={handleLeaveActivity} />;
     }
 
     return (
-      <Container {...attrs} style={{ width: `${["xs", "s"].includes(screenSize) ? "95%" : "80%"}`, marginTop: "32px" }}>
-        <PageHeader content={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />} />
+      <Container style={{ width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`, marginTop: "32px" }}>
+        <Header
+          title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
+          icon={<Icon icon="mdi-star" colorScheme="primary" significance="common" />}
+          level={4}
+          style={{ marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}` }}
+        />
         <ActivityListProvider>
           {({ state, data, errorData, pendingData, handlerMap }) => {
+            reloadRef.current = handlerMap.load;
             switch (state) {
               case "pending":
               case "pendingNoData":
@@ -83,6 +141,7 @@ let MyActivities = createVisualComponent({
             }
           }}
         </ActivityListProvider>
+        <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
       </Container>
     );
     //@@viewOff:render

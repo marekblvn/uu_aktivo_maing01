@@ -40,7 +40,6 @@ const ActivityList = createVisualComponent({
 
     //@@viewOn:render
     function renderActivities(itemList) {
-      if (!itemList.length) return null; //TODO: Create component for no items
       return itemList.map((item) => {
         if (item.state === "ready") {
           const { data } = item;

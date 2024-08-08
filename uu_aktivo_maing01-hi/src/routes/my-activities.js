@@ -1,11 +1,12 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useRef, useScreenSize, useSession, useState } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi, useCallback, useRef, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
 import ActivityListProvider from "../providers/activity-list-provider.js";
-import { Dialog, Header, Icon, Pending, useAlertBus } from "uu5g05-elements";
+import { ActionGroup, Dialog, Header, Pending, PlaceholderBox, RichIcon, useAlertBus } from "uu5g05-elements";
 import ActivityList from "../bricks/activity-list.js";
+import CreateActivityModal from "../bricks/create-activity-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -38,8 +39,12 @@ let MyActivities = createVisualComponent({
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const { addAlert } = useAlertBus();
-    const reloadRef = useRef();
+    const loadRef = useRef();
+    const createActivityRef = useRef();
+    const loadNextRef = useRef();
     const [dialogProps, setDialogProps] = useState();
+    const [openModal, setOpenModal] = useState(false);
+    const [noData, setNoData] = useState(true);
     //@@viewOff:private
 
     //@@viewOn:methods
@@ -70,7 +75,7 @@ let MyActivities = createVisualComponent({
               try {
                 await onConfirm();
                 setDialogProps(null);
-                reloadRef.current({ filters: { members: [identity.uuIdentity] } });
+                loadRef.current({ filters: { members: [identity.uuIdentity] }, pageInfo: { pageSize: PAGE_SIZE } });
               } catch (error) {
                 addAlert({ header: "Error!", message: error.message, priority: "error" });
                 return;
@@ -91,6 +96,13 @@ let MyActivities = createVisualComponent({
       },
       [showDialog],
     );
+
+    const handleLoadNext = () => {
+      loadNextRef.current({ filters: { members: [identity.uuIdentity] } });
+    };
+
+    const showHeaderButton = () => setNoData(true);
+    const hideHeaderButton = () => setNoData(false);
     //@@viewOff:methods
 
     //@@viewOn:render
@@ -114,20 +126,84 @@ let MyActivities = createVisualComponent({
     }
 
     function renderReady(data) {
-      return <ActivityList itemList={data} onActivityLeave={handleLeaveActivity} />;
+      if (!data.length) {
+        showHeaderButton();
+        return (
+          <PlaceholderBox
+            code="items"
+            header={{ en: "You are not a member of any activity", cs: "Nejste členem žádné aktivity" }}
+            info={{
+              en: "Once you accept an invitation to an activity, or create your own activity, it will be shown here.",
+              cs: "Jakmile přijmete pozvánku do aktivity, nebo si vytvoříte vlastní aktivitu, najdete ji zde.",
+            }}
+            actionList={[
+              {
+                children: <Lsi lsi={{ en: "Create new Activity", cs: "Vytvořit novou aktivitu" }} />,
+                primary: true,
+                icon: "mdi-plus",
+                colorScheme: "primary",
+                significance: "common",
+                onClick: () => setOpenModal(true),
+              },
+            ]}
+            style={{ marginTop: "10%" }}
+          />
+        );
+      }
+      hideHeaderButton();
+      return (
+        <>
+          <ActivityList itemList={data} onActivityLeave={handleLeaveActivity} />
+          <AutoLoad data={data} handleLoadNext={handleLoadNext} distance={window.innerHeight} />
+        </>
+      );
     }
 
     return (
       <Container style={{ width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`, marginTop: "32px" }}>
-        <Header
-          title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
-          icon={<Icon icon="mdi-star" colorScheme="primary" significance="common" />}
-          level={4}
-          style={{ marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}` }}
-        />
+        <div style={{ display: "flex", marginBottom: "24px" }}>
+          <Header
+            title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
+            icon={
+              <RichIcon
+                icon="mdi-lightning-bolt"
+                colorScheme="orange"
+                significance="subdued"
+                borderRadius="moderate"
+                cssBackground="#f9f9f9"
+                size={screenSize === "xs" ? "l" : "xl"}
+              />
+            }
+            level={4}
+            style={{ marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}` }}
+          />
+          {!noData && (
+            <ActionGroup
+              itemList={[
+                {
+                  children: <Lsi lsi={{ en: "Create new Activity", cs: "Vytvořit novou aktivitu" }} />,
+                  colorScheme: "primary",
+                  significance: "common",
+                  onClick: () => setOpenModal(true),
+                  order: -1,
+                  icon: "mdi-plus",
+                  collapsed: false,
+                  size: screenSize === "xl" ? "l" : screenSize,
+                },
+              ]}
+              collapsedMenuProps={{
+                colorScheme: "primary",
+                significance: "common",
+              }}
+            />
+          )}
+        </div>
         <ActivityListProvider>
           {({ state, data, errorData, pendingData, handlerMap }) => {
-            reloadRef.current = handlerMap.load;
+            loadRef.current = handlerMap.load;
+            loadNextRef.current = handlerMap.loadNext;
+            createActivityRef.current = handlerMap.create;
+
             switch (state) {
               case "pending":
               case "pendingNoData":
@@ -142,6 +218,11 @@ let MyActivities = createVisualComponent({
           }}
         </ActivityListProvider>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
+        <CreateActivityModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          onSubmit={createActivityRef.current}
+        />
       </Container>
     );
     //@@viewOff:render

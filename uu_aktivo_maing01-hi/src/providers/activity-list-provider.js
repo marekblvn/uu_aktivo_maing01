@@ -5,7 +5,7 @@ import Calls from "../calls.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 //@@viewOff:constants
 
 //@@viewOn:css

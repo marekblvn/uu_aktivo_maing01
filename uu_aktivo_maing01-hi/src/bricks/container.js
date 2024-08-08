@@ -10,11 +10,11 @@ import Config from "./config/config.js";
 const Css = {
   main: (size) =>
     Config.Css.css({
-      width: "100%",
+      width: "100vw",
       ...(["l", "xl"].includes(size) && {
         maxWidth: "1000px",
       }),
-      padding: "0 16px 0",
+      padding: "0 8px 0",
       margin: "0 auto",
     }),
 };

@@ -1,6 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Utils } from "uu5g05";
+import { createVisualComponent } from "uu5g05";
 import Config from "./config/config.js";
+import { Grid } from "uu5g05-elements";
+import ActivityCard from "./activity-card.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -25,22 +27,37 @@ const ActivityList = createVisualComponent({
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    itemList: [],
+    children: null,
+  },
   //@@viewOff:defaultProps
 
   render(props) {
     //@@viewOn:private
-    const { children } = props;
+    const { itemList, onActivityLeave } = props;
     //@@viewOff:private
 
     //@@viewOn:render
-    const attrs = Utils.VisualComponent.getAttrs(props, Css.main(props));
+    function renderActivities(itemList) {
+      if (!itemList.length) return null; //TODO: Create component for no items
+      return itemList.map((item) => {
+        if (item.state === "ready") {
+          const { data } = item;
+          return <ActivityCard key={data.id} activity={data} onActivityLeave={() => onActivityLeave(item)} />;
+        }
+      });
+    }
 
     return (
-      <div {...attrs}>
-        <div>Visual Component {ActivityList.uu5Tag}</div>
-        {children}
-      </div>
+      <Grid
+        templateColumns={{ xs: "100%", l: "repeat(2, 2fr)" }}
+        columnGap={{ m: "16px", l: "32px" }}
+        rowGap={{ m: "16px", l: "32px" }}
+        style={{ marginTop: "16px", marginBottom: "16px" }}
+      >
+        {renderActivities(itemList)}
+      </Grid>
     );
     //@@viewOff:render
   },

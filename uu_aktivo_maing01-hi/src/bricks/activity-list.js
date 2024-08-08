@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent } from "uu5g05";
 import Config from "./config/config.js";
-import { Grid } from "uu5g05-elements";
+import { Grid, Skeleton } from "uu5g05-elements";
 import ActivityCard from "./activity-card.js";
 //@@viewOff:imports
 
@@ -44,6 +44,8 @@ const ActivityList = createVisualComponent({
         if (item.state === "ready") {
           const { data } = item;
           return <ActivityCard key={data.id} activity={data} onActivityLeave={() => onActivityLeave(item)} />;
+        } else {
+          return <Skeleton />;
         }
       });
     }

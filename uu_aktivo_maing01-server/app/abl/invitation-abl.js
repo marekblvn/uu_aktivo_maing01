@@ -44,6 +44,10 @@ class InvitationAbl {
       throw new Errors.Create.ActivityDoesNotExist({ uuAppErrorMap });
     }
 
+    if (activity.members.length >= 1_000) {
+      throw new Errors.Create.ActivityMemberLimitReached({ uuAppErrorMap });
+    }
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
 
@@ -221,6 +225,10 @@ class InvitationAbl {
 
     if (!activity) {
       throw new Errors.Accept.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: invitation.activityId });
+    }
+
+    if (activity.members.length >= 1_000) {
+      throw new Errors.Accept.ActivityMemberLimitReached({ uuAppErrorMap });
     }
 
     if (activity.members.includes(invitation.uuIdentity)) {

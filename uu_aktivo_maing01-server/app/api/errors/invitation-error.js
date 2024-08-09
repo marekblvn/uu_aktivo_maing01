@@ -33,6 +33,13 @@ const Create = {
       this.message = "User is not authorized to create invitation to this activity.";
     }
   },
+  ActivityMemberLimitReached: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}activityMemberLimitReached`;
+      this.message = "Activity's member limit has been reached. No more users can be invited.";
+    }
+  },
   TargetUserAlreadyMember: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -176,6 +183,13 @@ const Accept = {
       super(...arguments);
       this.code = `${Accept.UC_CODE}activityDoesNotExist`;
       this.message = "Activity with the provided id does not exist.";
+    }
+  },
+  ActivityMemberLimitReached: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Accept.UC_CODE}activityMemberLimitReached`;
+      this.message = "Activity's member limit has been reached. No more users can join.";
     }
   },
   UserAlreadyMember: class extends AktivoMainUseCaseError {

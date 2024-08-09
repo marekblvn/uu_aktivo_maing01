@@ -1,18 +1,18 @@
 /* eslint-disable */
 
 const activityCreateDtoInType = shape({
-  name: uu5String(1, 256).isRequired(),
-  description: uu5String(512),
-  location: uu5String(256),
+  name: uu5String(1, 48).isRequired(),
+  description: uu5String(256),
+  location: uu5String(60),
   idealParticipants: integer(0, 1000),
   minParticipants: integer(0, 1000),
 });
 
 const activityUpdateDtoInType = shape({
   id: id().isRequired(),
-  name: uu5String(1, 256),
-  description: uu5String(512),
-  location: uu5String(256),
+  name: uu5String(1, 48),
+  description: uu5String(256),
+  location: uu5String(60),
   idealParticipants: integer(0, 1000),
   minParticipants: integer(0, 1000),
 });
@@ -40,7 +40,6 @@ const activityGetDtoInType = shape({
 
 const activityListDtoInType = shape({
   filters: shape({
-    state: oneOf(["active", "suspended"]),
     recurrent: boolean(),
     owner: uuIdentity(),
     members: array(uuIdentity(), 1, 1000),

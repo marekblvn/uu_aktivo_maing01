@@ -206,6 +206,13 @@ const Accept = {
       this.message = "Update activity by activity DAO update failed.";
     }
   },
+  InvitationDaoDeleteFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Accept.UC_CODE}invitationDaoDeleteFailed`;
+      this.message = "Delete invitation by invitation DAO delete failed.";
+    }
+  },
   DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

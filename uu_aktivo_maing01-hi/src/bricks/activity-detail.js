@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useDevice, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Header, Tabs } from "uu5g05-elements";
+import { Header, PlaceholderBox, Tabs } from "uu5g05-elements";
 import ActivityNavigationBar from "./activity-navigation-bar.js";
 //@@viewOff:imports
 
@@ -88,10 +88,24 @@ const ActivityDetail = createVisualComponent({
       );
     }
 
+    function renderContent() {
+      switch (activeTab) {
+        case "info":
+          return <div>info</div>;
+        case "members":
+          return <div>members</div>;
+        case "settings":
+          return <div>settings</div>;
+        default:
+          return <PlaceholderBox code="items" header={{ en: "Not found", cs: "Nenalezeno" }} />;
+      }
+    }
+
     return (
       <>
         <Header title={name} level={4} style={{ marginBottom: "24px" }} />
         {renderNavigation()}
+        {renderContent()}
       </>
     );
     //@@viewOff:render

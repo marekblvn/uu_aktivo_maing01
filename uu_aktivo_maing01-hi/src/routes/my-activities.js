@@ -75,7 +75,7 @@ let MyActivities = createVisualComponent({
               try {
                 await onConfirm();
                 setDialogProps(null);
-                loadRef.current({ filters: { members: [identity.uuIdentity] }, pageInfo: { pageSize: PAGE_SIZE } });
+                loadRef.current({ filters: { members: [identity.uuIdentity] } });
               } catch (error) {
                 addAlert({ header: "Error!", message: error.message, priority: "error" });
                 return;

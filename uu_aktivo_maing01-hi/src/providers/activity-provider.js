@@ -26,7 +26,9 @@ const ActivityProvider = createVisualComponent({
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    activityId: "",
+  },
   //@@viewOff:defaultProps
 
   render({ activityId, children }) {
@@ -54,7 +56,6 @@ const ActivityProvider = createVisualComponent({
     //@@viewOff:private
 
     //@@viewOn:render
-
     return children({
       state,
       data,

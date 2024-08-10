@@ -173,13 +173,23 @@ class InvitationAbl {
     }
 
     let dtoOut;
+    const pageInfo = {
+      pageIndex: parseInt(dtoIn.pageInfo?.pageIndex) || 0,
+      pageSize: parseInt(dtoIn.pageInfo?.pageSize || 100),
+    };
     try {
-      dtoOut = await this.invitationDao.list(awid, dtoIn.filters, dtoIn.pageInfo);
+      [dtoOut] = await this.invitationDao.list(awid, dtoIn.filters, pageInfo);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.List.InvitationDaoListFailed({ uuAppErrorMap }, error);
       }
       throw error;
+    }
+    if (!dtoOut) {
+      dtoOut = {};
+      dtoOut.itemList = [];
+      dtoOut.pageInfo = pageInfo;
+      dtoOut.pageInfo.total = 0;
     }
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;

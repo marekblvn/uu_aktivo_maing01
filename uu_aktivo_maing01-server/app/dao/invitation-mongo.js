@@ -118,10 +118,11 @@ class InvitationMongo extends UuObjectDao {
               $addFields: {
                 activityName: "$activityDoc.name",
                 createdAt: "$sys.cts",
+                id: "$_id",
               },
             },
             {
-              $unset: ["activityDoc", "convertedId"],
+              $unset: ["activityDoc", "convertedId", "sys", "_id"],
             },
             {
               $skip: skip,

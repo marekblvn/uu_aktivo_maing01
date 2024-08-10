@@ -1,7 +1,12 @@
 //@@viewOn:imports
-import { createVisualComponent, PropTypes, Utils } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useRoute, useScreenSize } from "uu5g05";
+import { Pending, PlaceholderBox } from "uu5g05-elements";
+import { Error } from "uu_plus4u5g02-elements";
 import Config from "./config/config.js";
 import { withRoute } from "uu_plus4u5g02-app";
+import Container from "../bricks/container.js";
+import ActivityProvider from "../providers/activity-provider.js";
+import ActivityDetail from "../bricks/activity-detail.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -33,20 +38,67 @@ let ActivityPage = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ id, ...props }) {
+  render({ id }) {
     //@@viewOn:private
-    const { children } = props;
+    const [screenSize] = useScreenSize();
+    const [, setRoute] = useRoute();
     //@@viewOff:private
 
-    //@@viewOn:render
-    const attrs = Utils.VisualComponent.getAttrs(props, Css.main(props));
+    function renderLoading() {
+      return <Pending size="max" colorScheme="primary" />;
+    }
 
+    function renderError(errorData) {
+      switch (errorData.operation) {
+        case "load":
+        case "loadNext":
+        default:
+          return <Error title={errorData.error?.message} subtitle={errorData.error?.code} error={errorData.error} />;
+      }
+    }
+
+    function renderReady(data, handlerMap) {
+      if (!data || Object.keys(data).length === 0) {
+        return (
+          <PlaceholderBox
+            code="smile-sad"
+            header={{ en: "Something's not right.", cs: "Něco tu nehraje." }}
+            info={{ en: "That activity does not exist.", cs: "Tato aktivita neexistuje." }}
+            actionList={[
+              {
+                children: <Lsi lsi={{ en: "Back to home page", cs: "Zpátky na hlavní stránku" }} />,
+                icon: "mdi-home",
+                colorScheme: "steel",
+                significance: "common",
+                onClick: () => setRoute(""),
+              },
+            ]}
+            style={{ marginTop: "10%" }}
+          />
+        );
+      }
+      return <ActivityDetail data={data} />;
+    }
+
+    //@@viewOn:render
     return (
-      <div {...attrs}>
-        <div>Visual Component {ActivityPage.uu5Tag}</div>
-        <div>{id ? `id: ${id}` : "no id"}</div>
-        {children}
-      </div>
+      <Container style={{ width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`, marginTop: "32px" }}>
+        <ActivityProvider activityId={id}>
+          {({ state, data, errorData, pendingData, handlerMap }) => {
+            switch (state) {
+              case "pending":
+              case "pendingNoData":
+                return renderLoading();
+              case "error":
+              case "errorNoData":
+                return renderError(errorData);
+              case "ready":
+              case "readyNoData":
+                return renderReady(data, handlerMap);
+            }
+          }}
+        </ActivityProvider>
+      </Container>
     );
     //@@viewOff:render
   },

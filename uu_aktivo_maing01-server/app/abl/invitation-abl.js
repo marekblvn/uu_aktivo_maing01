@@ -246,6 +246,12 @@ class InvitationAbl {
       throw error;
     }
 
+    try {
+      await this.invitationDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      throw new Errors.Accept.InvitationDaoDeleteFailed({ uuAppErrorMap }, error);
+    }
+
     if (activity.datetimeId !== null) {
       let datetime;
       try {

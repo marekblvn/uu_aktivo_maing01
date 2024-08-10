@@ -144,7 +144,7 @@ let Invitations = createVisualComponent({
                 return;
               }
               setDialogProps(null);
-              await loadRef.current({ filters: { uuIdentity: identity.session } });
+              await loadRef.current({ filters: { uuIdentity: identity.uuIdentity } });
             },
           },
         ],

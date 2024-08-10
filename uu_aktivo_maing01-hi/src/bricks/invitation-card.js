@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize, useTimeZone } from "uu5g05";
 import Config from "./config/config.js";
-import { ActionGroup, Block, Box, Button, ButtonGroup, Header, InfoGroup, ListItem, Text } from "uu5g05-elements";
+import { ActionGroup, Box, ButtonGroup, DateTime, Text } from "uu5g05-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -32,6 +32,7 @@ const InvitationCard = createVisualComponent({
   render({ data, onInvitationAccept, onInvitationDelete }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const [timeZone] = useTimeZone();
     const buttonGroupList = [
       {
         children: <Lsi lsi={{ en: "Accept", cs: "Přijmout" }} />,
@@ -73,7 +74,7 @@ const InvitationCard = createVisualComponent({
       <Box
         style={{
           display: ["xs"].includes(screenSize) ? "grid" : "flex",
-          justifyContent: "space-between",
+          justifyContent: ["xs"].includes(screenSize) ? "center" : "space-between",
           alignItems: "center",
           padding: ["xs"].includes(screenSize) ? "16px 24px" : "10px 10px 10px 16px",
           borderRadius: "8px",
@@ -83,7 +84,14 @@ const InvitationCard = createVisualComponent({
         colorScheme="neutral"
         width="100%"
       >
-        <div style={{ display: "flex", alignItems: "center", columnGap: "16px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            columnGap: "16px",
+            justifyContent: ["xs"].includes(screenSize) ? "space-between" : "center",
+          }}
+        >
           <Text
             category="interface"
             segment="content"
@@ -93,16 +101,21 @@ const InvitationCard = createVisualComponent({
             colorScheme="neutral"
             significance="common"
           >
-            Lorem ipsum dolor sit amet, consectetuer adipisc
+            {data.activityName}
           </Text>
           <Text
             category="interface"
             segment="content"
             type={`${["xs", "s"].includes(screenSize) ? "small" : "medium"}`}
             autoFit
-            style={{ paddingRight: "8px", textAlign: ["xs"].includes(screenSize) ? "right" : "left" }}
           >
-            {new Date().toLocaleString()}
+            <DateTime
+              value={data.createdAt}
+              timeZone={timeZone}
+              timeFormat="short"
+              dateFormat="short"
+              style={{ paddingRight: "8px", textAlign: ["xs"].includes(screenSize) ? "right" : "left" }}
+            />
           </Text>
         </div>
         {["xl", "l", "m", "s"].includes(screenSize) ? (

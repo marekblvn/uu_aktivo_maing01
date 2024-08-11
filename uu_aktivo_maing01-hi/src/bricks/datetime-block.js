@@ -38,20 +38,26 @@ const DatetimeBlock = createVisualComponent({
     //@@viewOn:render
     return (
       <ListItem icon="uugdsstencil-time-calendar-time" colorScheme="secondary" significance="common">
+        {screenSize !== "xs" && (
+          <Text
+            category="interface"
+            segment="content"
+            type={`${["xl", "l"].includes(screenSize) ? "large" : "medium"}`}
+            bold
+            style={{ marginRight: "8px" }}
+          >
+            <Lsi lsi={{ en: "Activity date", cs: "Datum aktivity" }} />
+          </Text>
+        )}
         <Text
           category="interface"
           segment="content"
-          type={`${["xl", "l"].includes(screenSize) ? "large" : screenSize === "m" ? "medium" : "small"}`}
-          bold
-          style={{ marginRight: "8px" }}
-        >
-          <Lsi lsi={{ en: "Activity date", cs: "Datum aktivity" }} />
-        </Text>
-        <Text
-          category="interface"
-          segment="content"
-          type={`${["xl", "l"].includes(screenSize) ? "large" : screenSize === "m" ? "medium" : "small"}`}
-          style={{ textAlign: "right", marginLeft: "auto", marginRight: screenSize === "xs" ? "0" : "4px" }}
+          type={`${["xl", "l"].includes(screenSize) ? "large" : "medium"}`}
+          bold={screenSize === "xs"}
+          style={{
+            marginLeft: screenSize === "xs" ? "" : "auto",
+            marginRight: screenSize === "xs" ? "0" : "4px",
+          }}
         >
           <DateTime value={datetime} timeZone={timeZone} dateFormat="long" timeFormat="medium" />
         </Text>

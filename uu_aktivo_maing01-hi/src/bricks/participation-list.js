@@ -27,7 +27,11 @@ const ParticipationList = createVisualComponent({
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    confirmed: [],
+    undecided: [],
+    denied: [],
+  },
   //@@viewOff:defaultProps
 
   render({ confirmed, undecided, denied }) {
@@ -37,50 +41,48 @@ const ParticipationList = createVisualComponent({
 
     //@@viewOn:render
     return (
-      <Panel
-        header={<Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />}
-        effect="ground"
-        style={{ backgroundColor: "rgba(33, 33, 33, 0.02)" }}
-        colorScheme="neutral"
+      <ScrollableBox
+        maxHeight={400}
+        minHeight={400}
+        scrollbarWidth={10}
+        style={{ padding: "0px 8px 0px 0px", width: "100%" }}
       >
-        <ScrollableBox maxHeight={"180px"} scrollbarWidth={10} style={{ padding: "0px 8px 0px 0px" }}>
-          <div style={{ marginTop: "8px" }}>
-            {confirmed
-              .filter((item) => item !== identity.uuIdentity)
-              .map((item, idx) => {
-                return (
-                  <ParticipationItem
-                    key={idx}
-                    uuIdentity={item}
-                    colorScheme="positive"
-                    icon="uugdsstencil-communication-thumb-up"
-                  />
-                );
-              })}
-          </div>
-          <div style={{ margin: "8px 0 8px" }}>
-            {undecided
-              .filter((item) => item !== identity.uuIdentity)
-              .map((item, idx) => {
-                return <ParticipationItem key={idx} uuIdentity={item} colorScheme="neutral" icon="uugds-help" />;
-              })}
-          </div>
-          <div style={{ marginBottom: "8px" }}>
-            {denied
-              .filter((item) => item !== identity.uuIdentity)
-              .map((item, idx) => {
-                return (
-                  <ParticipationItem
-                    key={idx}
-                    uuIdentity={item}
-                    colorScheme="negative"
-                    icon="uugdsstencil-communication-thumb-down"
-                  />
-                );
-              })}
-          </div>
-        </ScrollableBox>
-      </Panel>
+        <div style={{ marginTop: "8px" }}>
+          {confirmed
+            .filter((item) => item !== identity.uuIdentity)
+            .map((item, idx) => {
+              return (
+                <ParticipationItem
+                  key={idx}
+                  uuIdentity={item}
+                  colorScheme="positive"
+                  icon="uugdsstencil-communication-thumb-up"
+                />
+              );
+            })}
+        </div>
+        <div style={{ margin: "8px 0 8px" }}>
+          {undecided
+            .filter((item) => item !== identity.uuIdentity)
+            .map((item, idx) => {
+              return <ParticipationItem key={idx} uuIdentity={item} colorScheme="neutral" icon="uugds-help" />;
+            })}
+        </div>
+        <div style={{ marginBottom: "8px" }}>
+          {denied
+            .filter((item) => item !== identity.uuIdentity)
+            .map((item, idx) => {
+              return (
+                <ParticipationItem
+                  key={idx}
+                  uuIdentity={item}
+                  colorScheme="negative"
+                  icon="uugdsstencil-communication-thumb-down"
+                />
+              );
+            })}
+        </div>
+      </ScrollableBox>
     );
     //@@viewOff:render
   },

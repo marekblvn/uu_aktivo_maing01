@@ -87,7 +87,7 @@ const DatetimeDetail = createVisualComponent({
           onChangeParticipation={handleChangeParticipation}
           userParticipationType={userCurrentParticipationType}
         />
-        {["xs", "s"].includes(screenSize) ? (
+        {["xs", "s", "m"].includes(screenSize) ? (
           <Panel
             header={<Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />}
             effect="ground"

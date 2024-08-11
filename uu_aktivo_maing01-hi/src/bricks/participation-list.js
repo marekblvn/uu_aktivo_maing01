@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, useSession } from "uu5g05";
+import { createVisualComponent, Lsi, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { ScrollableBox } from "uu5g05-elements";
+import { Panel, ScrollableBox } from "uu5g05-elements";
 import ParticipationItem from "./participation-item.js";
 //@@viewOff:imports
 
@@ -37,47 +37,50 @@ const ParticipationList = createVisualComponent({
 
     //@@viewOn:render
     return (
-      <ScrollableBox
-        maxHeight={"360px"}
-        scrollbarWidth={15}
-        style={{ padding: "0 12px", boxShadow: "inset 0 0 5px 2px rgb(11,11,11, 0.11)" }}
+      <Panel
+        header={<Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />}
+        effect="ground"
+        style={{ backgroundColor: "rgba(33, 33, 33, 0.02)" }}
+        colorScheme="neutral"
       >
-        <div style={{ marginTop: "8px" }}>
-          {confirmed
-            .filter((item) => item !== identity.uuIdentity)
-            .map((item, idx) => {
-              return (
-                <ParticipationItem
-                  key={idx}
-                  uuIdentity={item}
-                  colorScheme="positive"
-                  icon="uugdsstencil-communication-thumb-up"
-                />
-              );
-            })}
-        </div>
-        <div style={{ margin: "8px 0 8px" }}>
-          {undecided
-            .filter((item) => item !== identity.uuIdentity)
-            .map((item, idx) => {
-              return <ParticipationItem key={idx} uuIdentity={item} colorScheme="neutral" icon="uugds-help" />;
-            })}
-        </div>
-        <div style={{ marginBottom: "8px" }}>
-          {denied
-            .filter((item) => item !== identity.uuIdentity)
-            .map((item, idx) => {
-              return (
-                <ParticipationItem
-                  key={idx}
-                  uuIdentity={item}
-                  colorScheme="negative"
-                  icon="uugdsstencil-communication-thumb-down"
-                />
-              );
-            })}
-        </div>
-      </ScrollableBox>
+        <ScrollableBox maxHeight={"180px"} scrollbarWidth={10} style={{ padding: "0px 8px 0px 0px" }}>
+          <div style={{ marginTop: "8px" }}>
+            {confirmed
+              .filter((item) => item !== identity.uuIdentity)
+              .map((item, idx) => {
+                return (
+                  <ParticipationItem
+                    key={idx}
+                    uuIdentity={item}
+                    colorScheme="positive"
+                    icon="uugdsstencil-communication-thumb-up"
+                  />
+                );
+              })}
+          </div>
+          <div style={{ margin: "8px 0 8px" }}>
+            {undecided
+              .filter((item) => item !== identity.uuIdentity)
+              .map((item, idx) => {
+                return <ParticipationItem key={idx} uuIdentity={item} colorScheme="neutral" icon="uugds-help" />;
+              })}
+          </div>
+          <div style={{ marginBottom: "8px" }}>
+            {denied
+              .filter((item) => item !== identity.uuIdentity)
+              .map((item, idx) => {
+                return (
+                  <ParticipationItem
+                    key={idx}
+                    uuIdentity={item}
+                    colorScheme="negative"
+                    icon="uugdsstencil-communication-thumb-down"
+                  />
+                );
+              })}
+          </div>
+        </ScrollableBox>
+      </Panel>
     );
     //@@viewOff:render
   },

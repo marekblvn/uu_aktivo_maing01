@@ -99,7 +99,13 @@ const ParticipationInfoText = createVisualComponent({
           {colorScheme !== "neutral" && (
             <RichIcon icon={icon} colorScheme={colorScheme} significance="subdued" size={iconSize} />
           )}
-          <Text category="interface" segment="content" type={leftTextType} bold>
+          <Text
+            category="interface"
+            segment="content"
+            type={leftTextType}
+            bold
+            style={{ marginLeft: colorScheme === "neutral" ? "24px" : "0" }}
+          >
             <Lsi
               lsi={{ en: `${confirmedCount} member${confirmedCount === 1 ? "" : "s"} will come`, cs: conditionalCsLsi }}
             />

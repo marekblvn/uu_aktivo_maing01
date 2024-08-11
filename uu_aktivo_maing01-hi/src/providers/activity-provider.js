@@ -48,7 +48,6 @@ const ActivityProvider = createVisualComponent({
         transferOwnership: Calls.Activity.transferOwnership,
         invite: Calls.Invitation.create,
         createDatetime: Calls.Datetime.create,
-        getDatetime: Calls.Datetime.get,
       },
     });
 

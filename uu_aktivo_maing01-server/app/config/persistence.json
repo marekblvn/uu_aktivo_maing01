@@ -18,7 +18,7 @@
         },
         "post": {
           "realization": "dao/PostMongo",
-          "maxNoi": 100000
+          "maxNoi": 10000
         },
         "attendance": {
           "realization": "dao/AttendanceMongo"

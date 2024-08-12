@@ -46,7 +46,7 @@ const DatetimeBlock = createVisualComponent({
             bold
             style={{ marginRight: "8px" }}
           >
-            <Lsi lsi={{ en: "Activity date", cs: "Datum aktivity" }} />
+            <Lsi lsi={{ en: "Upcoming date", cs: "Nadcházející datum" }} />
           </Text>
         )}
         <Text

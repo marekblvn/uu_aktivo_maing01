@@ -66,6 +66,7 @@ class PostAbl {
     dtoIn.awid = awid;
     dtoIn.uuIdentity = userUuIdentity;
     dtoIn.uuIdentityName = session.getIdentity().getName();
+    dtoIn.createdAt = new Date();
 
     let dtoOut;
     try {
@@ -117,15 +118,18 @@ class PostAbl {
       Errors.List.InvalidDtoIn,
     );
 
+    let filters = dtoIn.filters;
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
     if (
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
       !authorizedProfiles.includes(PROFILE_CODES.Executives)
     ) {
-      if (!dtoIn.activityId) {
+      if (!dtoIn.filters || !dtoIn.filters?.activityId) {
         throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
       }
+
+      filters = { activityId: dtoIn.filters.activityId };
 
       let activity;
       try {
@@ -147,25 +151,16 @@ class PostAbl {
     }
 
     let dtoOut;
-    if (dtoIn.activityId) {
-      try {
-        dtoOut = await this.postDao.listByActivityId(awid, dtoIn.activityId, dtoIn.pageInfo);
-      } catch (error) {
-        if (error instanceof ObjectStoreError) {
-          throw new Errors.List.PostDaoListByActivityIdFailed({ uuAppErrorMap }, error);
-        }
-        throw error;
+
+    try {
+      dtoOut = await this.postDao.list(awid, filters, dtoIn.pageInfo, dtoIn.sort);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.List.PostDaoListFailed({ uuAppErrorMap }, error);
       }
-    } else {
-      try {
-        dtoOut = await this.postDao.list(awid, dtoIn.pageInfo);
-      } catch (error) {
-        if (error instanceof ObjectStoreError) {
-          throw new Errors.List.PostDaoListFailed({ uuAppErrorMap }, error);
-        }
-        throw error;
-      }
+      throw error;
     }
+
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

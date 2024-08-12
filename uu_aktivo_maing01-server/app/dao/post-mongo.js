@@ -65,28 +65,15 @@ class PostMongo extends UuObjectDao {
    * Returns an object consisting of itemList - list of matched uuObjects based on awid, and pageInfo - object with pageIndex, pageSize and total.
    * @param {string} awid
    * @param {object} pageInfo
+   * @param {object} sort
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, pageInfo = {}) {
+  async list(awid, filterObject = {}, pageInfo = {}, sort = {}) {
     let filter = {
       awid,
+      ...filterObject,
     };
-    return await super.find(filter, pageInfo);
-  }
-
-  /**
-   * Returns an object consisting of itemList - list of matched uuObjects based on awid and activityId, and pageInfo - object with pageIndex, pageSize and total.
-   * @param {string} awid
-   * @param {string} activityId
-   * @param {object} pageInfo
-   * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
-   */
-  async listByActivityId(awid, activityId, pageInfo = {}) {
-    let filter = {
-      awid,
-      activityId,
-    };
-    return await super.find(filter, pageInfo);
+    return await super.find(filter, pageInfo, sort);
   }
 
   /**

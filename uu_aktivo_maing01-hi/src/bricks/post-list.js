@@ -15,6 +15,8 @@ const Css = {
       padding: "4px 16px",
       display: "grid",
       rowGap: "8px",
+      alignItems: "start",
+      alignContent: "start",
     }),
   placeholderDiv: () =>
     Config.Css.css({
@@ -22,6 +24,7 @@ const Css = {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+      minHeight: "563px",
     }),
 };
 //@@viewOff:css
@@ -48,7 +51,7 @@ const PostList = createVisualComponent({
 
     //@@viewOn:render
 
-    if (!data.length) {
+    if (!data || !data.length) {
       return (
         <div className={Css.placeholderDiv()}>
           <PlaceholderBox code="items" header={{ en: "Activity has no posts", cs: "Aktivita nemá žádné příspěvky" }} />
@@ -57,7 +60,7 @@ const PostList = createVisualComponent({
     }
 
     return (
-      <ScrollableBox className={Css.main()} height="100%" maxHeight={563} minHeight={400} scrollbarWidth={10}>
+      <ScrollableBox className={Css.main()} maxHeight={563} minHeight={563} scrollbarWidth={10} initialScrollY={0}>
         {data.map((item) => {
           const { id, content, type, uuIdentity, uuIdentityName, sys } = item.data;
           return (

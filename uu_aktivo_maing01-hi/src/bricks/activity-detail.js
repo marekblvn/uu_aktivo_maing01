@@ -1,8 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useDevice, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Header, PlaceholderBox, Tabs } from "uu5g05-elements";
-import ActivityNavigationBar from "./activity-navigation-bar.js";
+import ActivityInformationView from "./activity-information-view.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -39,10 +39,9 @@ const ActivityDetail = createVisualComponent({
 
   render({ data }) {
     //@@viewOn:private
-    const { name, location, description, owner } = data;
+    const { id, name, location, description, owner, idealParticipants, minParticipants, datetimeId } = data;
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
-    const { isMobileOrTablet } = useDevice();
     const [activeTab, setActiveTab] = useState("info");
 
     const tabItemList = [
@@ -72,9 +71,6 @@ const ActivityDetail = createVisualComponent({
 
     //@@viewOn:render
     function renderNavigation() {
-      if (isMobileOrTablet && screenSize === "xs") {
-        return <ActivityNavigationBar itemList={tabItemList} activeCode={activeTab} onChange={handleChangeTab} />;
-      }
       return (
         <Tabs
           block
@@ -91,7 +87,16 @@ const ActivityDetail = createVisualComponent({
     function renderContent() {
       switch (activeTab) {
         case "info":
-          return <div>info</div>;
+          return (
+            <ActivityInformationView
+              description={description}
+              location={location}
+              activityId={id}
+              datetimeId={datetimeId}
+              minParticipants={minParticipants}
+              idealParticipants={idealParticipants}
+            />
+          );
         case "members":
           return <div>members</div>;
         case "settings":
@@ -102,11 +107,17 @@ const ActivityDetail = createVisualComponent({
     }
 
     return (
-      <>
-        <Header title={name} level={4} style={{ marginBottom: "24px" }} />
+      <div style={{ position: "relative" }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Header
+            title={name}
+            level={4}
+            style={{ marginBottom: screenSize === "xs" ? "4px" : "24px", textAlign: "center" }}
+          />
+        </div>
         {renderNavigation()}
         {renderContent()}
-      </>
+      </div>
     );
     //@@viewOff:render
   },

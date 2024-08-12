@@ -2,10 +2,9 @@
 import { createVisualComponent, useDataList } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
-import { Grid, Pending } from "uu5g05-elements";
+import { Grid, Pending, useAlertBus } from "uu5g05-elements";
 import { Error } from "uu_plus4u5g02-elements";
 import PostList from "../bricks/post-list.js";
-import PostCreateBlock from "../bricks/post-create-block.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -36,6 +35,7 @@ const PostListProvider = createVisualComponent({
 
   render({ activityId }) {
     //@@viewOn:private
+    const { addAlert } = useAlertBus();
     const dataList = useDataList({
       pageSize: PAGE_SIZE,
       itemIdentifier: "id",
@@ -59,7 +59,7 @@ const PostListProvider = createVisualComponent({
         await handlerMap.create({ activityId, type: "normal", content: value });
         await handlerMap.load({ activityId });
       } catch (error) {
-        console.log(error);
+        addAlert({ priority: "error" });
       }
     };
 
@@ -83,8 +83,7 @@ const PostListProvider = createVisualComponent({
     function renderReady(data) {
       return (
         <Grid templateRows="10fr auto" rowGap={0} style={{ maxHeight: "655px", borderRadius: "8px" }}>
-          <PostList data={data} />
-          <PostCreateBlock onSubmit={handleCreatePost} />
+          <PostList data={data} onPostCreate={handleCreatePost} />
         </Grid>
       );
     }

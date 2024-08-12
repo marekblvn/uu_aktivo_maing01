@@ -7,6 +7,7 @@ import { withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
 import ActivityProvider from "../providers/activity-provider.js";
 import ActivityDetail from "../bricks/activity-detail.js";
+import { ActivityAuthorizationContextProvider } from "../contexts/activity-authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -77,7 +78,11 @@ let ActivityPage = createVisualComponent({
           />
         );
       }
-      return <ActivityDetail data={data} handlerMap={handlerMap} />;
+      return (
+        <ActivityAuthorizationContextProvider activity={data}>
+          <ActivityDetail data={data} handlerMap={handlerMap} />;
+        </ActivityAuthorizationContextProvider>
+      );
     }
 
     //@@viewOn:render

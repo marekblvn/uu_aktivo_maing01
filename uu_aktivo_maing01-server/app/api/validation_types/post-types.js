@@ -2,7 +2,7 @@
 
 const postCreateDtoInType = shape({
   activityId: id().isRequired(),
-  content: uu5String(1, 2048).isRequired(),
+  content: uu5String(1, 256).isRequired(),
   type: oneOf(["normal", "important"]),
 });
 
@@ -11,7 +11,13 @@ const postGetDtoInType = shape({
 });
 
 const postListDtoInType = shape({
-  activityId: id(),
+  filters: shape({
+    activityId: id(),
+    uuIdentity: uuIdentity(),
+  }),
+  sort: shape({
+    createdAt: integer(),
+  }),
   pageInfo: shape({
     pageIndex: integer(),
     pageSize: integer(),
@@ -20,7 +26,7 @@ const postListDtoInType = shape({
 
 const postUpdateDtoInType = shape({
   id: id().isRequired(),
-  content: uu5String(1, 2048),
+  content: uu5String(1, 256),
   type: oneOf(["normal", "important"]),
 });
 

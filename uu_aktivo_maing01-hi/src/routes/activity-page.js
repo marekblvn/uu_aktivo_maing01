@@ -80,7 +80,7 @@ let ActivityPage = createVisualComponent({
       }
       return (
         <ActivityAuthorizationContextProvider activity={data}>
-          <ActivityDetail data={data} handlerMap={handlerMap} />;
+          <ActivityDetail data={data} handlerMap={handlerMap} />
         </ActivityAuthorizationContextProvider>
       );
     }

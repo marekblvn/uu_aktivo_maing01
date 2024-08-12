@@ -102,8 +102,6 @@ const PostList = createVisualComponent({
 
     //@@viewOn:render
 
-    console.log(data);
-
     if (!data || !data.length) {
       return (
         <div className={Css.placeholderDiv()}>

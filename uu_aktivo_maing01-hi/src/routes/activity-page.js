@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, PropTypes, useRoute, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useDevice, useRoute, useScreenSize } from "uu5g05";
 import { Pending, PlaceholderBox } from "uu5g05-elements";
 import { Error } from "uu_plus4u5g02-elements";
 import Config from "./config/config.js";
@@ -77,12 +77,17 @@ let ActivityPage = createVisualComponent({
           />
         );
       }
-      return <ActivityDetail data={data} />;
+      return <ActivityDetail data={data} handlerMap={handlerMap} />;
     }
 
     //@@viewOn:render
     return (
-      <Container style={{ width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`, marginTop: "32px" }}>
+      <Container
+        style={{
+          width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`,
+          marginTop: "32px",
+        }}
+      >
         <ActivityProvider activityId={id}>
           {({ state, data, errorData, pendingData, handlerMap }) => {
             switch (state) {

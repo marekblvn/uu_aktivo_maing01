@@ -17,14 +17,14 @@ const Css = {
     Config.Css.css({
       display: "grid",
       padding: 0,
-      borderRadius: "16px",
+      borderRadius: "8px",
     }),
   text: (props) =>
     Config.Css.css({
       padding: "16px 16px 16px 24px",
       backgroundColor: "rgba(117, 117, 117, 0.08)",
-      borderTopRightRadius: "16px",
-      borderTopLeftRadius: "16px",
+      borderTopRightRadius: "8px",
+      borderTopLeftRadius: "8px",
     }),
 };
 //@@viewOff:css

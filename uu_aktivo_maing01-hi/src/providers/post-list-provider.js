@@ -54,8 +54,21 @@ const PostListProvider = createVisualComponent({
     let { state, data, errorData, pendingData, handlerMap } = dataList;
     //@@viewOff:private
 
+    const handleCreatePost = async (value) => {
+      try {
+        await handlerMap.create({ activityId, type: "normal", content: value });
+        await handlerMap.load({ activityId });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     function renderLoading() {
-      return <Pending size="l" colorScheme="secondary" />;
+      return (
+        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Pending size="xl" type="horizontal" colorScheme="secondary" />
+        </div>
+      );
     }
 
     function renderError(errorData) {
@@ -71,7 +84,7 @@ const PostListProvider = createVisualComponent({
       return (
         <Grid templateRows="10fr auto" rowGap={0} style={{ maxHeight: "655px", borderRadius: "8px" }}>
           <PostList data={data} />
-          <PostCreateBlock onSubmit={() => {}} />
+          <PostCreateBlock onSubmit={handleCreatePost} />
         </Grid>
       );
     }

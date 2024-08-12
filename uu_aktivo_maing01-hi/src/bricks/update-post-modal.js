@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, Utils } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
-import { CancelButton, Form, FormCheckbox, FormRadios, FormTextArea, SubmitButton } from "uu5g05-forms";
+import { CancelButton, Form, FormRadios, FormTextArea, SubmitButton } from "uu5g05-forms";
 import { Grid, Modal } from "uu5g05-elements";
 //@@viewOff:imports
 

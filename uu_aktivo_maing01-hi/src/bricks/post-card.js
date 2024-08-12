@@ -46,28 +46,10 @@ const PostCard = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ id, content, type, createdAt, uuIdentity, uuIdentityName }) {
+  render({ id, content, type, createdAt, uuIdentity, uuIdentityName, onEdit, onDelete }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
-    const itemList = [
-      {
-        children: <Lsi lsi={{ en: "Edit", cs: "Upravit" }} />,
-        icon: "mdi-pencil",
-        collapsed: true,
-        order: -1,
-        onClick: () => {},
-        colorScheme: "steel",
-      },
-      { divider: true },
-      {
-        children: <Lsi lsi={{ en: "Delete", cs: "Smazat" }} />,
-        icon: "mdi-delete",
-        collapsed: true,
-        onClick: () => {},
-        colorScheme: "negative",
-      },
-    ];
 
     const contentTextType = (() => {
       switch (screenSize) {
@@ -93,7 +75,29 @@ const PostCard = createVisualComponent({
             subtitle={<DateTime value={createdAt} timeFormat="short" dateFormat="medium" />}
             direction={screenSize === "xs" ? "vertical" : "horizontal"}
           />
-          {uuIdentity === identity.uuIdentity && <ActionGroup size="s" itemList={itemList} />}
+          {uuIdentity === identity.uuIdentity && (
+            <ActionGroup
+              size="s"
+              itemList={[
+                {
+                  children: <Lsi lsi={{ en: "Edit", cs: "Upravit" }} />,
+                  icon: "mdi-pencil",
+                  collapsed: true,
+                  order: -1,
+                  onClick: onEdit,
+                  colorScheme: "steel",
+                },
+                { divider: true },
+                {
+                  children: <Lsi lsi={{ en: "Delete", cs: "Smazat" }} />,
+                  icon: "mdi-delete",
+                  collapsed: true,
+                  onClick: onDelete,
+                  colorScheme: "negative",
+                },
+              ]}
+            />
+          )}
         </div>
         <Text className={Css.text()} autoFit category="interface" segment="content" type={contentTextType}>
           {content}

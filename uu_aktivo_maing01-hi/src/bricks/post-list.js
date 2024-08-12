@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useCallback, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Dialog, PlaceholderBox, ScrollableBox } from "uu5g05-elements";
+import { Dialog, PlaceholderBox, ScrollableBox, Text } from "uu5g05-elements";
 import PostCard from "./post-card.js";
 import PostCreateBlock from "./post-create-block.js";
 import UpdatePostModal from "./update-post-modal.js";
@@ -102,6 +102,8 @@ const PostList = createVisualComponent({
 
     //@@viewOn:render
 
+    console.log(data);
+
     if (!data || !data.length) {
       return (
         <div className={Css.placeholderDiv()}>
@@ -112,23 +114,28 @@ const PostList = createVisualComponent({
 
     return (
       <>
-        <ScrollableBox className={Css.main()} maxHeight={563} minHeight={563} scrollbarWidth={10} initialScrollY={0}>
-          {data.map((item) => {
-            const { id, content, type, uuIdentity, uuIdentityName, sys } = item.data;
-            return (
-              <PostCard
-                key={id}
-                id={id}
-                content={content}
-                type={type}
-                uuIdentity={uuIdentity}
-                uuIdentityName={uuIdentityName}
-                createdAt={sys.cts}
-                onDelete={() => handlePostDelete(item)}
-                onEdit={() => handlePostUpdate(item)}
-              />
-            );
-          })}
+        <Text category="interface" segment="title" type="common" style={{ padding: "8px" }}>
+          <Lsi lsi={{ en: "Posts", cs: "Příspěvky" }} />
+        </Text>
+        <ScrollableBox className={Css.main()} maxHeight={520} minHeight={520} scrollbarWidth={10} initialScrollY={0}>
+          {data
+            .filter((item) => item !== null && item !== undefined)
+            .map((item) => {
+              const { id, content, type, uuIdentity, uuIdentityName, sys } = item.data;
+              return (
+                <PostCard
+                  key={id}
+                  id={id}
+                  content={content}
+                  type={type}
+                  uuIdentity={uuIdentity}
+                  uuIdentityName={uuIdentityName}
+                  createdAt={sys.cts}
+                  onDelete={() => handlePostDelete(item)}
+                  onEdit={() => handlePostUpdate(item)}
+                />
+              );
+            })}
         </ScrollableBox>
         <PostCreateBlock onSubmit={onPostCreate} />
         <Dialog {...dialogProps} open={!!dialogProps} onClose={closeDialog} />

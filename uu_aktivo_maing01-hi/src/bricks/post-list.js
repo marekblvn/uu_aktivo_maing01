@@ -1,10 +1,9 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useCallback, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Dialog, Grid, Modal, PlaceholderBox, ScrollableBox } from "uu5g05-elements";
+import { Dialog, PlaceholderBox, ScrollableBox } from "uu5g05-elements";
 import PostCard from "./post-card.js";
 import PostCreateBlock from "./post-create-block.js";
-import { CancelButton, Form, FormTextArea, SubmitButton } from "uu5g05-forms";
 import UpdatePostModal from "./update-post-modal.js";
 //@@viewOff:imports
 

@@ -44,7 +44,7 @@ class InvitationAbl {
       throw new Errors.Create.ActivityDoesNotExist({ uuAppErrorMap });
     }
 
-    if (activity.members.length >= 1_000) {
+    if (activity.members.length >= 100) {
       throw new Errors.Create.ActivityMemberLimitReached({ uuAppErrorMap });
     }
 
@@ -237,7 +237,7 @@ class InvitationAbl {
       throw new Errors.Accept.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: invitation.activityId });
     }
 
-    if (activity.members.length >= 1_000) {
+    if (activity.members.length >= 100) {
       throw new Errors.Accept.ActivityMemberLimitReached({ uuAppErrorMap });
     }
 

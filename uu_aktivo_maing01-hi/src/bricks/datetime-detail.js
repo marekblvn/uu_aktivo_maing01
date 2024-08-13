@@ -1,11 +1,13 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { ListItem, Panel, Text, useAlertBus } from "uu5g05-elements";
+import { ListItem, Panel, Pending, Text, useAlertBus } from "uu5g05-elements";
 import ParticipationList from "./participation-list.js";
 import DatetimeBlock from "./datetime-block.js";
 import UserParticipationBlock from "./user-participation-block.js";
 import ParticipationInfoText from "./participation-info-text.js";
+import { Error } from "uu_plus4u5g02-elements";
+import DatetimeProvider from "../providers/datetime-provider.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -43,81 +45,124 @@ const DatetimeDetail = createVisualComponent({
 
   //@@viewOn:defaultProps
   defaultProps: {
-    data: {},
     onUpdateParticipation: () => {},
     idealParticipants: 0,
     minParticipants: 0,
   },
   //@@viewOff:defaultProps
 
-  render({ data, idealParticipants, minParticipants, onUpdateParticipation }) {
+  render({ idealParticipants, minParticipants, datetimeId }) {
     //@@viewOn:private
-    let { id, datetime, undecided, confirmed, denied } = data;
     const { identity } = useSession();
     const { addAlert } = useAlertBus();
     const [screenSize] = useScreenSize();
 
-    const userCurrentParticipationType = (() => {
-      if (confirmed.includes(identity.uuIdentity)) return "confirmed";
-      if (denied.includes(identity.uuIdentity)) return "denied";
-      return "undecided";
-    })();
-    //@@viewOff:private
+    function renderLoading() {
+      return <Pending size="l" colorScheme="secondary" />;
+    }
 
-    const handleChangeParticipation = async ({ data }) => {
-      try {
-        await onUpdateParticipation({ id, type: data.value });
-      } catch (error) {
-        addAlert({ priority: "error", header: "Error", message: "", durationMs: 2000 });
+    function renderError(errorData) {
+      switch (errorData.operation) {
+        case "load":
+        case "loadNext":
+        default:
+          return <Error title={errorData.error?.message} subtitle={errorData.error?.code} error={errorData.error} />;
       }
-    };
+    }
+
+    function renderReady(data, handlerMap) {
+      if (!data) return null;
+      const { id, datetime, undecided, confirmed, denied } = data;
+      const userCurrentParticipationType = (() => {
+        if (confirmed.includes(identity.uuIdentity)) return "confirmed";
+        if (denied.includes(identity.uuIdentity)) return "denied";
+        return "undecided";
+      })();
+      const handleChangeParticipation = async ({ data }) => {
+        try {
+          await handlerMap.updateParticipation({ id, type: data.value });
+        } catch (error) {
+          addAlert({
+            priority: "error",
+            header: {
+              en: "Error",
+              cs: "Chyba",
+            },
+            message: error.message,
+            durationMs: 3000,
+          });
+        }
+      };
+      return (
+        <div style={{ display: "grid", rowGap: "16px" }}>
+          <DatetimeBlock datetime={datetime} />
+          <ParticipationInfoText
+            idealParticipants={idealParticipants}
+            minParticipants={minParticipants}
+            confirmedCount={confirmed.length}
+            deniedCount={denied.length}
+            undecidedCount={undecided.length}
+          />
+          <UserParticipationBlock
+            onChangeParticipation={handleChangeParticipation}
+            userParticipationType={userCurrentParticipationType}
+          />
+          {["xs", "s", "m"].includes(screenSize) ? (
+            <Panel
+              header={
+                <Text category="interface" segment="content" type={screenSize === "m" ? "medium" : "small"}>
+                  <Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />
+                </Text>
+              }
+              effect="ground"
+              style={{ backgroundColor: "rgba(33, 33, 33, 0.02)" }}
+              colorScheme="neutral"
+            >
+              <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
+            </Panel>
+          ) : (
+            <ListItem colorScheme="neutral" className={Css.listItem()}>
+              <Text
+                category="interface"
+                segment="interactive"
+                type="medium"
+                colorScheme="neutral"
+                significance="common"
+                className={Css.text()}
+              >
+                <Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />
+              </Text>
+              <div style={{ padding: "0 20px" }}>
+                <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
+              </div>
+            </ListItem>
+          )}
+        </div>
+      );
+    }
+
+    //@@viewOn:render
+
+    //@@viewOff:private
 
     //@@viewOn:render
     return (
-      <div style={{ display: "grid", rowGap: "16px" }}>
-        <DatetimeBlock datetime={datetime} />
-        <ParticipationInfoText
-          idealParticipants={idealParticipants}
-          minParticipants={minParticipants}
-          confirmedCount={confirmed.length}
-          deniedCount={denied.length}
-          undecidedCount={undecided.length}
-        />
-        <UserParticipationBlock
-          onChangeParticipation={handleChangeParticipation}
-          userParticipationType={userCurrentParticipationType}
-        />
-        {["xs", "s", "m"].includes(screenSize) ? (
-          <Panel
-            header={
-              <Text category="interface" segment="content" type={screenSize === "m" ? "medium" : "small"}>
-                <Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />
-              </Text>
-            }
-            effect="ground"
-            style={{ backgroundColor: "rgba(33, 33, 33, 0.02)" }}
-            colorScheme="neutral"
-          >
-            <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
-          </Panel>
-        ) : (
-          <ListItem colorScheme="neutral" className={Css.listItem()}>
-            <Text
-              category="interface"
-              segment="interactive"
-              type="medium"
-              colorScheme="neutral"
-              significance="common"
-              className={Css.text()}
-            >
-              How did the other members decide?
-            </Text>
-            <div style={{ padding: "0 20px" }}>
-              <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
-            </div>
-          </ListItem>
-        )}
-      </div>
+      <DatetimeProvider datetimeId={datetimeId}>
+        {({ state, data, pendingData, errorData, handlerMap }) => {
+          switch (state) {
+            case "pending":
+              return renderReady(data, handlerMap);
+            case "pendingNoData":
+              return renderLoading();
+            case "error":
+            case "errorNoData":
+              return renderError(errorData);
+            case "ready":
+            case "readyNoData":
+              return renderReady(data, handlerMap);
+          }
+        }}
+      </DatetimeProvider>
     );
     //@@viewOff:render
   },

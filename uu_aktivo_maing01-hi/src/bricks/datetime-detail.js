@@ -89,7 +89,11 @@ const DatetimeDetail = createVisualComponent({
         />
         {["xs", "s", "m"].includes(screenSize) ? (
           <Panel
-            header={<Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />}
+            header={
+              <Text category="interface" segment="content" type={screenSize === "m" ? "medium" : "small"}>
+                <Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />
+              </Text>
+            }
             effect="ground"
             style={{ backgroundColor: "rgba(33, 33, 33, 0.02)" }}
             colorScheme="neutral"

@@ -180,15 +180,17 @@ let Invitations = createVisualComponent({
     function renderReady(data) {
       if (!data.length) {
         return (
-          <PlaceholderBox
-            code="items"
-            header={{ en: "You don't have any invitations at the moment", cs: "Momentálně nemáte žádné pozvánky" }}
-            info={{
-              en: "Once you are invited to an activity, the invitation will be shown here.",
-              cs: "Jakmile budete pozván do nějaké aktivity, najdete zde pozvánku.",
-            }}
-            style={{ marginTop: "10%" }}
-          />
+          <div>
+            <PlaceholderBox
+              code="items"
+              header={{ en: "You don't have any invitations at the moment", cs: "Momentálně nemáte žádné pozvánky" }}
+              info={{
+                en: "Once you are invited to an activity, the invitation will be shown here.",
+                cs: "Jakmile budete pozván do nějaké aktivity, najdete zde pozvánku.",
+              }}
+              style={{ marginTop: "10%" }}
+            />
+          </div>
         );
       }
       return (
@@ -203,22 +205,32 @@ let Invitations = createVisualComponent({
     //@@viewOn:render
 
     return (
-      <Container style={{ width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`, marginTop: "32px" }}>
-        <Header
-          title={<Lsi lsi={{ en: "Invitations", cs: "Pozvánky" }} />}
-          icon={
-            <RichIcon
-              icon="mdi-email"
-              colorScheme="steel"
-              significance="subdued"
-              borderRadius="moderate"
-              cssBackground="#ffffff"
-              size={screenSize === "xs" ? "l" : "xl"}
-            />
-          }
-          level={4}
-          style={{ marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}`, marginBottom: "24px" }}
-        />
+      <Container
+        style={{
+          width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`,
+          marginTop: "32px",
+          height: "calc(100vh - 88px)",
+        }}
+      >
+        <div style={{ display: "flex", marginBottom: "24px" }}>
+          <Header
+            title={<Lsi lsi={{ en: "Invitations", cs: "Pozvánky" }} />}
+            icon={
+              <RichIcon
+                icon="mdi-email"
+                colorScheme="steel"
+                significance="subdued"
+                borderRadius="moderate"
+                cssBackground="#ffffff"
+                size={screenSize === "xs" ? "l" : "xl"}
+              />
+            }
+            level={4}
+            style={{
+              marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}`,
+            }}
+          />
+        </div>
         <InvitationListProvider>
           {({ state, data, errorData, pendingData, handlerMap }) => {
             loadRef.current = handlerMap.load;

@@ -1,8 +1,9 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useEffect, useRoute, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Header, PlaceholderBox, Tabs } from "uu5g05-elements";
 import ActivityInformationView from "./activity-information-view.js";
+import ActivityMembersView from "./activity-members-view.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -37,12 +38,35 @@ const ActivityDetail = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ data }) {
+  render({ data, handlerMap }) {
     //@@viewOn:private
-    const { id, name, location, description, owner, idealParticipants, minParticipants, datetimeId } = data;
+    const {
+      id,
+      name,
+      location,
+      description,
+      members,
+      administrators,
+      owner,
+      idealParticipants,
+      minParticipants,
+      datetimeId,
+    } = data;
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
+    const [, setRoute] = useRoute();
     const [activeTab, setActiveTab] = useState("info");
+
+    useEffect(() => {
+      const lastTab = sessionStorage.getItem("lastTab");
+      if (lastTab) {
+        setActiveTab(lastTab);
+      }
+    }, []);
+
+    useEffect(() => {
+      sessionStorage.setItem("lastTab", activeTab);
+    }, [activeTab]);
 
     const tabItemList = [
       {
@@ -68,6 +92,24 @@ const ActivityDetail = createVisualComponent({
     function handleChangeTab({ activeCode }) {
       setActiveTab(activeCode);
     }
+
+    const handleAddAdministrator = async (uuIdentity) => {
+      return await handlerMap.addAdministrator({ id, uuIdentity });
+    };
+
+    const handleRemoveMember = async (uuIdentity) => {
+      return await handlerMap.removeMember({ id, uuIdentity });
+    };
+
+    const handleRemoveAdministrator = async (uuIdentity) => {
+      return await handlerMap.removeAdministrator({ id, uuIdentity });
+    };
+
+    const handleLeaveActivity = async () => {
+      handlerMap.leave({ id }).then(() => {
+        setRoute("my-activities");
+      });
+    };
 
     //@@viewOn:render
     function renderNavigation() {
@@ -98,7 +140,17 @@ const ActivityDetail = createVisualComponent({
             />
           );
         case "members":
-          return <div>members</div>;
+          return (
+            <ActivityMembersView
+              members={members}
+              administrators={administrators}
+              owner={owner}
+              onRemoveMember={handleRemoveMember}
+              onPromoteAdmin={handleAddAdministrator}
+              onDemoteAdmin={handleRemoveAdministrator}
+              onLeaveActivity={handleLeaveActivity}
+            />
+          );
         case "settings":
           return <div>settings</div>;
         default:

@@ -160,7 +160,13 @@ let MyActivities = createVisualComponent({
     }
 
     return (
-      <Container style={{ width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`, marginTop: "32px" }}>
+      <Container
+        style={{
+          width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`,
+          height: "calc(100vh - 88px)",
+          marginTop: "32px",
+        }}
+      >
         <div style={{ display: "flex", marginBottom: "24px" }}>
           <Header
             title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
@@ -170,7 +176,7 @@ let MyActivities = createVisualComponent({
                 colorScheme="orange"
                 significance="subdued"
                 borderRadius="moderate"
-                cssBackground="#f9f9f9"
+                cssBackground="#ffffff"
                 size={screenSize === "xs" ? "l" : "xl"}
               />
             }
@@ -188,7 +194,7 @@ let MyActivities = createVisualComponent({
                   order: -1,
                   icon: "mdi-plus",
                   collapsed: false,
-                  size: screenSize === "xl" ? "l" : screenSize,
+                  size: screenSize === "xl" ? "l" : screenSize === "xs" ? "s" : screenSize,
                 },
               ]}
               collapsedMenuProps={{

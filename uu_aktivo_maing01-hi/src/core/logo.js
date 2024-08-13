@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useRoute, useScreenSize } from "uu5g05";
+import { createVisualComponent, useRoute } from "uu5g05";
 import Config from "./config/config.js";
 import { Box, Text } from "uu5g05-elements";
 //@@viewOff:imports
@@ -13,8 +13,7 @@ const Css = {
     Config.Css.css({
       display: "flex",
       alignItems: "center",
-      height: "56px",
-      padding: "8px 16px",
+      backgroundColor: "transparent",
     }),
   text: () =>
     Config.Css.css({
@@ -23,8 +22,7 @@ const Css = {
       fontWeight: 500,
       fontStyle: "normal",
       color: "#fafafa",
-      letterSpacing: "1.5px",
-      marginTop: "4px",
+      lineHeight: "40px",
     }),
 };
 //@@viewOff:css
@@ -48,14 +46,13 @@ const Logo = createVisualComponent({
   render() {
     //@@viewOn:private
     const [, setRoute] = useRoute();
-    const [screenSize] = useScreenSize();
     //@@viewOff:private
 
     //@@viewOn:render
 
     return (
-      <Box shape="interactiveElement" colorScheme="primary" onClick={() => setRoute("")} className={Css.box()}>
-        <Text category="expose" segment="default" type="broad" className={Css.text()} autoFit>
+      <Box onClick={() => setRoute("")} className={Css.box()} shape="background">
+        <Text category="interface" segment="title" type="main" className={Css.text()}>
           ⚡Aktivo
         </Text>
       </Box>

@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Box, Icon } from "uu5g05-elements";
+import { Box, Icon, RichIcon } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
 //@@viewOff:imports
 
@@ -43,9 +43,15 @@ const ParticipationItem = createVisualComponent({
         colorScheme={colorScheme}
         significance="common"
         borderRadius="moderate"
-        style={{ padding: "6px 4px 6px 12px", margin: "4px 0" }}
+        style={{ padding: "3px 4px 3px 12px", margin: "4px 0" }}
       >
-        <Icon icon={icon} margin={{ right: "12px" }} />
+        <RichIcon
+          size={["xl", "l", "m", "s"].includes(screenSize) ? "xs" : "xxs"}
+          icon={icon}
+          margin={{ right: "12px" }}
+          colorScheme={colorScheme}
+          significance="subdued"
+        />
         <PersonItem size={["xl", "l", "m", "s"].includes(screenSize) ? "s" : "xxs"} uuIdentity={uuIdentity} />
       </Box>
     );

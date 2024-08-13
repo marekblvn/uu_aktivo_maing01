@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Utils } from "uu5g05";
+import { createVisualComponent, Lsi, useRoute, useState, Utils } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Plus4U5 from "uu_plus4u5g02";
 import Plus4U5App from "uu_plus4u5g02-app";
@@ -9,6 +9,8 @@ import Home from "../routes/home.js";
 import ActivityPage from "../routes/activity-page.js";
 import AppBar from "./app-bar.js";
 import { AuthorizationContextProvider } from "../contexts/authorization-context.js";
+import importLsi from "../lsi/import-lsi.js";
+import SideMenuDrawer from "./side-menu-drawer.js";
 
 const MyActivities = Utils.Component.lazy(() => import("../routes/my-activities.js"));
 const Invitations = Utils.Component.lazy(() => import("../routes/invitations.js"));
@@ -56,15 +58,62 @@ const Spa = createVisualComponent({
 
   render() {
     //@@viewOn:private
+    const [, setRoute] = useRoute();
+    const [menuOpen, setMenuOpen] = useState(false);
     //@@viewOff:private
+
+    const itemList = [
+      {
+        children: <Lsi import={importLsi} path={["Menu", "my-activities"]} />,
+        onClick: () => {
+          setMenuOpen(false);
+          setRoute("my-activities");
+        },
+        icon: "uugdsstencil-weather-bolt",
+        colorScheme: "building",
+      },
+      {
+        children: <Lsi import={importLsi} path={["Menu", "invitations"]} />,
+        onClick: () => {
+          setMenuOpen(false);
+          setRoute("invitations");
+        },
+        icon: "uugds-email",
+        colorScheme: "building",
+      },
+      { divider: true },
+      {
+        children: <Lsi import={importLsi} path={["Menu", "about"]} />,
+        onClick: () => {
+          setMenuOpen(false);
+          setRoute("about");
+        },
+        icon: "uugds-info",
+        colorScheme: "building",
+        collapsed: true,
+      },
+    ];
 
     //@@viewOn:render
     return (
       <Plus4U5.SpaProvider initialLanguageList={["en", "cs"]}>
-        <AppBar />
         <Uu5Elements.ModalBus>
           <AuthorizationContextProvider>
-            <Plus4U5App.Spa routeMap={ROUTE_MAP} />
+            <Plus4U5App.Top.View
+              topBgColor="rgb(33, 150, 243)"
+              textBackground="full"
+              unitName={
+                <AppBar
+                  handleCloseSideMenu={() => setMenuOpen(false)}
+                  handleOpenSideMenu={() => setMenuOpen(true)}
+                  sideMenuOpen={menuOpen}
+                  menuItems={itemList.filter((item) => !item.divider)}
+                />
+              }
+            />
+            <SideMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)} itemList={itemList}>
+              <Plus4U5App.Spa routeMap={ROUTE_MAP} displayTop={false} />
+            </SideMenuDrawer>
           </AuthorizationContextProvider>
         </Uu5Elements.ModalBus>
       </Plus4U5.SpaProvider>

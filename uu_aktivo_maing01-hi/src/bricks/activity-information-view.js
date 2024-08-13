@@ -3,8 +3,8 @@ import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
 import { Box, Grid, Line, ListItem, PlaceholderBox, Text } from "uu5g05-elements";
-import DatetimeProvider from "../providers/datetime-provider.js";
 import PostListProvider from "../providers/post-list-provider.js";
+import DatetimeDetail from "./datetime-detail.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -105,7 +105,7 @@ const ActivityInformationView = createVisualComponent({
             colorScheme="secondary"
           >
             {datetimeId !== null ? (
-              <DatetimeProvider
+              <DatetimeDetail
                 datetimeId={datetimeId}
                 idealParticipants={idealParticipants}
                 minParticipants={minParticipants}

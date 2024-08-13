@@ -97,6 +97,7 @@ let ActivityPage = createVisualComponent({
           {({ state, data, errorData, pendingData, handlerMap }) => {
             switch (state) {
               case "pending":
+                return renderReady(data, handlerMap);
               case "pendingNoData":
                 return renderLoading();
               case "error":

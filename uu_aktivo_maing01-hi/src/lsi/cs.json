@@ -32,5 +32,29 @@
     "my-activities": "Moje aktivity",
     "invitations": "Pozvánky",
     "about": "O aplikaci"
+  },
+  "Dialog": {
+    "activity": {
+      "addAdministrator": {
+        "header": "Opravdu chcete tohoto člena povýšit na správce?",
+        "info": "Správci mohou odstranit obyčejné členy z aktivity, editovat informace o aktivitě, zvát další uživatele a mazat příspěvky.",
+        "submit": "Povýšit"
+      },
+      "removeAdministrator": {
+        "header": "Opravdu chcete tomuto členovi odebrat správcovství?",
+        "info": "",
+        "submit": "Odebrat"
+      },
+      "removeMember": {
+        "header": "Opravdu chcete tohoto člena odebrat z aktivity?",
+        "info": "Uživatel ztratí přístup do této aktivity. Toto rozhodnutí nelze vrátit zpět.",
+        "submit": "Odebrat"
+      },
+      "leave": {
+        "header": "Opravdu chcete opustit aktivitu?",
+        "info": "Tímto ztratíte přístup do aktivity.  Toto rozhodnutí nelze vrátit zpět.",
+        "submit": "Opustit"
+      }
+    }
   }
 }

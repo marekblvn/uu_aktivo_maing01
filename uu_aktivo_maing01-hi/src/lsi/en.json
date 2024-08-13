@@ -32,5 +32,29 @@
     "my-activities": "My Activities",
     "invitations": "Invitations",
     "about": "About Application"
+  },
+  "Dialog": {
+    "activity": {
+      "addAdministrator": {
+        "header": "Do you want to promote this member to an administrator?",
+        "info": "Administrators can remove regular members, update activity information, invite other users and delete posts.",
+        "submit": "Promote"
+      },
+      "removeAdministrator": {
+        "header": "Do you want to demote this member to regular member?",
+        "info": "",
+        "submit": "Demote"
+      },
+      "removeMember": {
+        "header": "Do you want to remove this member from the activity?",
+        "info": "This user will lose access to this activity. This decision cannot be reversed.",
+        "submit": "Remove"
+      },
+      "leave": {
+        "header": "Are you sure you want to leave this activity?",
+        "info": "You will lose access to the activity. This decision cannot be reversed.",
+        "submit": "Leave"
+      }
+    }
   }
 }

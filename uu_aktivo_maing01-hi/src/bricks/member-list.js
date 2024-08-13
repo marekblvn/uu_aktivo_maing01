@@ -1,6 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Utils } from "uu5g05";
+import { createVisualComponent, Lsi, useState } from "uu5g05";
 import Config from "./config/config.js";
+import { Box, CollapsibleBox, Grid, Icon, Text } from "uu5g05-elements";
+import MemberItem from "./member-item.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -25,22 +27,72 @@ const MemberList = createVisualComponent({
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    collapsible: false,
+  },
   //@@viewOff:defaultProps
 
-  render(props) {
+  render({
+    items,
+    lsiTitle,
+    colorScheme,
+    icon,
+    iconColor,
+    collapsible,
+    onRemoveMember,
+    onPromoteAdmin,
+    onDemoteAdmin,
+    onLeaveActivity,
+  }) {
     //@@viewOn:private
-    const { children } = props;
+    const [collapsed, setCollapsed] = useState(collapsible);
+    const titleProps = collapsible ? { onClick: () => setCollapsed(!collapsed) } : {};
     //@@viewOff:private
 
     //@@viewOn:render
-    const attrs = Utils.VisualComponent.getAttrs(props, Css.main(props));
+
+    function renderItems() {
+      if (items) {
+        const itemComponents = items.map((item, idx) => (
+          <MemberItem
+            key={idx}
+            uuIdentity={item}
+            colorScheme={colorScheme}
+            onLeaveActivity={onLeaveActivity}
+            onRemoveMember={onRemoveMember}
+            onPromoteAdmin={onPromoteAdmin}
+            onDemoteAdmin={onDemoteAdmin}
+          />
+        ));
+        if (collapsible) {
+          return (
+            <CollapsibleBox style={{ display: "grid", rowGap: "4px" }} collapsed={collapsed}>
+              {itemComponents}
+            </CollapsibleBox>
+          );
+        } else return itemComponents;
+      }
+      return null;
+    }
 
     return (
-      <div {...attrs}>
-        <div>Visual Component {MemberList.uu5Tag}</div>
-        {children}
-      </div>
+      <Grid rowGap="8px" templateColumns="1fr" templateRows="auto auto">
+        <Box
+          style={{ display: "flex", columnGap: "4px", alignItems: "center" }}
+          shape="interactiveItem"
+          significance="common"
+          colorScheme="building"
+          {...titleProps}
+        >
+          <Icon icon={icon} style={{ color: iconColor }} />
+          <Text category="interface" segment="highlight" type="common" autoFit>
+            <Lsi lsi={lsiTitle} />
+            {items && items.length > 1 ? ` (${items.length})` : ""}
+          </Text>
+          {collapsible && items.length > 0 && <Icon icon={collapsed ? "mdi-chevron-down" : "mdi-chevron-up"} />}
+        </Box>
+        <Grid templateColumns="1fr">{renderItems()}</Grid>
+      </Grid>
     );
     //@@viewOff:render
   },

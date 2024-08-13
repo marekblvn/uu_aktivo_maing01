@@ -36,9 +36,14 @@ export const ActivityAuthorizationContextProvider = createComponent({
     const isAdministrator = activity.administrators.includes(identity.uuIdentity);
     const isOwner = activity.owner === identity.uuIdentity;
 
+    const checkIfAdministrator = (uuIdentity) => activity.administrators.includes(uuIdentity);
+    const checkIfOwner = (uuIdentity) => activity.owner === uuIdentity;
+
     const activityAuthorization = {
       isAdministrator,
       isOwner,
+      checkIfAdministrator,
+      checkIfOwner,
     };
     //@@viewOff:private
 

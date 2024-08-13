@@ -112,7 +112,7 @@ const ActivityDetail = createVisualComponent({
           <Header
             title={name}
             level={4}
-            style={{ marginBottom: screenSize === "xs" ? "4px" : "24px", textAlign: "center" }}
+            style={{ marginBottom: screenSize === "xs" ? "4px" : "8px", textAlign: "center" }}
           />
         </div>
         {renderNavigation()}

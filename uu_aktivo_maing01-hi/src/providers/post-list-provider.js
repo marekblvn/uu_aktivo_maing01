@@ -40,7 +40,8 @@ const PostListProvider = createVisualComponent({
       pageSize: PAGE_SIZE,
       itemIdentifier: "id",
       initialDtoIn: {
-        activityId: activityId,
+        filters: { activityId: activityId },
+        sort: { createdAt: 1 },
       },
       handlerMap: {
         load: Calls.Post.list,
@@ -83,7 +84,11 @@ const PostListProvider = createVisualComponent({
     function renderReady(data) {
       return (
         <Grid templateRows="10fr auto" rowGap={0} style={{ maxHeight: "655px", borderRadius: "8px" }}>
-          <PostList data={data} onPostCreate={handleCreatePost} />
+          <PostList
+            data={data}
+            onPostCreate={handleCreatePost}
+            onLoadNext={() => handlerMap.loadNext({ filters: { activityId }, sort: { createdAt: 1 } })}
+          />
         </Grid>
       );
     }
@@ -91,6 +96,7 @@ const PostListProvider = createVisualComponent({
     //@@viewOn:render
     switch (state) {
       case "pending":
+        renderReady(data);
       case "pendingNoData":
         return renderLoading();
       case "error":

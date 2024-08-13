@@ -42,8 +42,8 @@ const ParticipationList = createVisualComponent({
     //@@viewOn:render
     return (
       <ScrollableBox
-        maxHeight={400}
-        minHeight={400}
+        maxHeight={292}
+        minHeight={292}
         scrollbarWidth={10}
         style={{ padding: "0px 8px 0px 0px", width: "100%" }}
       >

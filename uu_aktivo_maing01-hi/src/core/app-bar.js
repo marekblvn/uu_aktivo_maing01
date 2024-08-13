@@ -1,8 +1,9 @@
 //@@viewOn:imports
-import { createVisualComponent, useScreenSize, useEffect, useSession } from "uu5g05";
+import { createVisualComponent, useScreenSize, useEffect, useSession, useRoute, Lsi } from "uu5g05";
 import Config from "./config/config.js";
 import Logo from "./logo.js";
 import { ActionGroup, RichIcon } from "uu5g05-elements";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -30,9 +31,10 @@ const AppBar = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ handleCloseSideMenu, handleOpenSideMenu, sideMenuOpen, menuItems }) {
+  render({ handleCloseSideMenu, handleOpenSideMenu, sideMenuOpen }) {
     //@@viewOn:private
     const { state } = useSession();
+    const [, setRoute] = useRoute();
     const [screenSize] = useScreenSize();
 
     useEffect(() => {
@@ -41,6 +43,37 @@ const AppBar = createVisualComponent({
       }
     }, [screenSize]);
     //@@viewOff:private
+
+    const itemList = [
+      {
+        children: <Lsi import={importLsi} path={["Menu", "my-activities"]} />,
+        onClick: () => {
+          handleCloseSideMenu();
+          setRoute("my-activities");
+        },
+        icon: "uugdsstencil-weather-bolt",
+        colorScheme: "building",
+      },
+      {
+        children: <Lsi import={importLsi} path={["Menu", "invitations"]} />,
+        onClick: () => {
+          handleCloseSideMenu();
+          setRoute("invitations");
+        },
+        icon: "uugds-email",
+        colorScheme: "building",
+      },
+      {
+        children: <Lsi import={importLsi} path={["Menu", "about"]} />,
+        onClick: () => {
+          handleCloseSideMenu();
+          setRoute("about");
+        },
+        icon: "uugds-info",
+        colorScheme: "building",
+        collapsed: true,
+      },
+    ];
 
     //@@viewOn:render
     if (state !== "authenticated") {
@@ -68,7 +101,7 @@ const AppBar = createVisualComponent({
           <>
             <Logo />
             <ActionGroup
-              itemList={menuItems}
+              itemList={itemList}
               collapsedMenuProps={{
                 colorScheme: "building",
               }}

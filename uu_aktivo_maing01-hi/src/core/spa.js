@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useRoute, useState, Utils } from "uu5g05";
+import { createVisualComponent, useState, Utils } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Plus4U5 from "uu_plus4u5g02";
 import Plus4U5App from "uu_plus4u5g02-app";
@@ -9,7 +9,6 @@ import Home from "../routes/home.js";
 import ActivityPage from "../routes/activity-page.js";
 import AppBar from "./app-bar.js";
 import { AuthorizationContextProvider } from "../contexts/authorization-context.js";
-import importLsi from "../lsi/import-lsi.js";
 import SideMenuDrawer from "./side-menu-drawer.js";
 
 const MyActivities = Utils.Component.lazy(() => import("../routes/my-activities.js"));
@@ -58,41 +57,8 @@ const Spa = createVisualComponent({
 
   render() {
     //@@viewOn:private
-    const [, setRoute] = useRoute();
     const [menuOpen, setMenuOpen] = useState(false);
     //@@viewOff:private
-
-    const itemList = [
-      {
-        children: <Lsi import={importLsi} path={["Menu", "my-activities"]} />,
-        onClick: () => {
-          setMenuOpen(false);
-          setRoute("my-activities");
-        },
-        icon: "uugdsstencil-weather-bolt",
-        colorScheme: "building",
-      },
-      {
-        children: <Lsi import={importLsi} path={["Menu", "invitations"]} />,
-        onClick: () => {
-          setMenuOpen(false);
-          setRoute("invitations");
-        },
-        icon: "uugds-email",
-        colorScheme: "building",
-      },
-      { divider: true },
-      {
-        children: <Lsi import={importLsi} path={["Menu", "about"]} />,
-        onClick: () => {
-          setMenuOpen(false);
-          setRoute("about");
-        },
-        icon: "uugds-info",
-        colorScheme: "building",
-        collapsed: true,
-      },
-    ];
 
     //@@viewOn:render
     return (
@@ -107,11 +73,10 @@ const Spa = createVisualComponent({
                   handleCloseSideMenu={() => setMenuOpen(false)}
                   handleOpenSideMenu={() => setMenuOpen(true)}
                   sideMenuOpen={menuOpen}
-                  menuItems={itemList.filter((item) => !item.divider)}
                 />
               }
             />
-            <SideMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)} itemList={itemList}>
+            <SideMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
               <Plus4U5App.Spa routeMap={ROUTE_MAP} displayTop={false} />
             </SideMenuDrawer>
           </AuthorizationContextProvider>

@@ -43,7 +43,7 @@ const UpdateActivityInformationModal = createVisualComponent({
         <Modal
           open={open}
           onClose={onClose}
-          header={<Lsi lsi={{ en: "Edit activity information", cs: "Upravit informace o aktivitě" }} />}
+          header={<Lsi lsi={{ en: "Edit Activity information", cs: "Upravit informace o aktivitě" }} />}
           footer={
             <Grid templateColumns={{ xs: "repeat(2, 1fr)", s: "repeat(2, auto)" }} justifyContent={{ s: "end" }}>
               <CancelButton onClick={onClose} />

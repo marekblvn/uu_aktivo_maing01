@@ -5,6 +5,7 @@ import { Button, Dialog, Icon, ListItem, Panel, PlaceholderBox, ScrollableBox, T
 import PostCard from "./post-card.js";
 import PostCreateBlock from "./post-create-block.js";
 import UpdatePostModal from "./update-post-modal.js";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -44,12 +45,8 @@ const PostList = createVisualComponent({
 
     const showDialog = useCallback((onSubmit) => {
       setDialogProps({
-        header: (
-          <Lsi
-            lsi={{ en: "Are you sure you want to delete this post?", cs: "Opravdu chcete smazat tento příspěvek?" }}
-          />
-        ),
-        info: <Lsi lsi={{ en: "This action cannot be reverted.", cs: "Tato akce nelze vrátit zpět" }} />,
+        header: <Lsi import={importLsi} path={["Dialog", "post", "delete", "header"]} />,
+        info: <Lsi import={importLsi} path={["Dialog", "post", "delete", "info"]} />,
         icon: "mdi-delete",
         actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
         actionList: [
@@ -58,7 +55,7 @@ const PostList = createVisualComponent({
             onClick: closeDialog,
           },
           {
-            children: <Lsi lsi={{ en: "Delete", cs: "Smazat" }} />,
+            children: <Lsi import={importLsi} path={["Dialog", "post", "delete", "submit"]} />,
             colorScheme: "negative",
             onClick: onSubmit,
           },

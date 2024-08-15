@@ -7,6 +7,7 @@ import ActivityListProvider from "../providers/activity-list-provider.js";
 import { ActionGroup, Dialog, Header, Pending, PlaceholderBox, RichIcon, useAlertBus } from "uu5g05-elements";
 import ActivityList from "../bricks/activity-list.js";
 import CreateActivityModal from "../bricks/create-activity-modal.js";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -50,15 +51,9 @@ let MyActivities = createVisualComponent({
     //@@viewOn:methods
     const showDialog = useCallback((onConfirm) => {
       setDialogProps({
-        header: (
-          <Lsi
-            lsi={{ en: "Are you sure you want to leave this activity?", cs: "Opravdu chcete opustit tuto aktivitu?" }}
-          />
-        ),
+        header: <Lsi import={importLsi} path={["Dialog", "activity", "leave", "header"]} />,
         icon: "mdi-exit-run",
-        info: (
-          <Lsi lsi={{ en: "This will make you lose access to the activity.", cs: "Ztratíte přístup do aktivity." }} />
-        ),
+        info: <Lsi import={importLsi} path={["Dialog", "activity", "leave", "info"]} />,
         actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
         actionList: [
           {
@@ -69,7 +64,7 @@ let MyActivities = createVisualComponent({
             },
           },
           {
-            children: <Lsi lsi={{ en: "Leave", cs: "Odejít" }} />,
+            children: <Lsi import={importLsi} path={["Dialog", "activity", "leave", "submit"]} />,
             onClick: async (e) => {
               e.preventDefault();
               try {

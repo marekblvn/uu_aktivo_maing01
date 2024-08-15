@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Block, Grid, Text } from "uu5g05-elements";
 //@@viewOff:imports
@@ -31,6 +31,7 @@ const ActivityInformationBlock = createVisualComponent({
 
   render({ onClickEdit, data }) {
     //@@viewOn:private
+    const [screenSize] = useScreenSize();
     const { name, location, description, minParticipants, idealParticipants } = data;
     //@@viewOff:private
 
@@ -40,7 +41,7 @@ const ActivityInformationBlock = createVisualComponent({
       <Block
         card="full"
         header={
-          <Text category="interface" segment="title" type="micro">
+          <Text category="interface" segment="title" type={["xs", "s"].includes(screenSize) ? "micro" : "minor"}>
             <Lsi lsi={{ en: "Activity information", cs: "Informace o aktivitě" }} />
           </Text>
         }
@@ -50,7 +51,7 @@ const ActivityInformationBlock = createVisualComponent({
             icon: "mdi-pencil",
             colorScheme: "neutral",
             significance: "common",
-            size: "m",
+            size: ["xs", "s"].includes(screenSize) ? "s" : "m",
             onClick: onClickEdit,
           },
         ]}
@@ -63,27 +64,50 @@ const ActivityInformationBlock = createVisualComponent({
           >
             <Grid templateRows={{ xs: "auto auto", m: "auto" }} templateColumns={{ xs: "100%", m: "1fr 1fr" }}>
               <div style={{ display: "grid" }}>
-                <Text category="interface" segment="content" type="medium" bold>
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                  bold
+                >
                   <Lsi lsi={{ en: "Name", cs: "Název" }} />
                 </Text>
-                <Text category="interface" segment="content" type="medium">
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                >
                   {name || "-"}
                 </Text>
               </div>
               <div style={{ display: "grid" }}>
-                <Text category="interface" segment="content" type="medium" bold>
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                  bold
+                >
                   <Lsi lsi={{ en: "Location", cs: "Lokace" }} />
                 </Text>
-                <Text category="interface" segment="content" type="medium">
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                >
                   {location || "-"}
                 </Text>
               </div>
             </Grid>
             <div style={{ display: "grid" }}>
-              <Text category="interface" segment="content" type="medium" bold>
+              <Text
+                category="interface"
+                segment="content"
+                type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                bold
+              >
                 <Lsi lsi={{ en: "Description", cs: "Popis" }} />
               </Text>
-              <Text category="interface" segment="content" type="medium">
+              <Text category="interface" segment="content" type={["xs", "s"].includes(screenSize) ? "small" : "medium"}>
                 {description || "-"}
               </Text>
             </div>
@@ -93,24 +117,50 @@ const ActivityInformationBlock = createVisualComponent({
               rowGap="8px"
             >
               <div style={{ display: "flex", columnGap: "4px" }}>
-                <Text category="interface" segment="content" type="medium" bold>
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                  bold
+                >
                   <Lsi lsi={{ en: "Min. number of participants", cs: "Minimální počet účastníků" }} />
                 </Text>
-                <Text category="interface" segment="content" type="medium">
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                >
                   —
                 </Text>
-                <Text category="interface" segment="content" type="medium">
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                >
                   {minParticipants}
                 </Text>
               </div>
               <div style={{ display: "flex", columnGap: "4px" }}>
-                <Text category="interface" segment="content" type="medium" bold>
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                  bold
+                >
                   <Lsi lsi={{ en: "Ideal number of participants", cs: "Ideální počet účastníků" }} />
                 </Text>
-                <Text category="interface" segment="content" type="medium">
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                >
                   —
                 </Text>
-                <Text category="interface" segment="content" type="medium">
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                >
                   {idealParticipants}
                 </Text>
               </div>

@@ -1,5 +1,14 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useEffect, useRoute, useScreenSize, useSession, useState } from "uu5g05";
+import {
+  createVisualComponent,
+  Lsi,
+  useEffect,
+  useRoute,
+  useRouteLeave,
+  useScreenSize,
+  useSession,
+  useState,
+} from "uu5g05";
 import Config from "./config/config.js";
 import { Header, PlaceholderBox, Tabs } from "uu5g05-elements";
 import ActivityInformationView from "./activity-information-view.js";
@@ -51,19 +60,27 @@ const ActivityDetail = createVisualComponent({
     } = data;
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
-    const [, setRoute] = useRoute();
+    const [route, setRoute] = useRoute();
+    const { nextRoute, allow } = useRouteLeave();
     const [activeTab, setActiveTab] = useState("info");
 
     useEffect(() => {
-      const lastTab = sessionStorage.getItem("lastTab");
+      const lastTab = sessionStorage.getItem("lastTabCode");
       if (lastTab) {
         setActiveTab(lastTab);
       }
     }, []);
 
     useEffect(() => {
-      sessionStorage.setItem("lastTab", activeTab);
+      sessionStorage.setItem("lastTabCode", activeTab);
     }, [activeTab]);
+
+    useEffect(() => {
+      if (nextRoute) {
+        sessionStorage.removeItem("lastTabCode");
+        allow();
+      }
+    }, [nextRoute]);
 
     const tabItemList = [
       {

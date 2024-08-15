@@ -33,42 +33,60 @@
     "invitations": "Invitations",
     "about": "About Application"
   },
+  "Placeholder": {
+    "notFound": {
+      "header": "Not Found",
+      "info": "Looks like the thing you're looking for does not exist."
+    },
+    "noDatetime": {
+      "header": "Activity does not have an active date"
+    },
+    "noPosts": {
+      "header": "Activity has no posts"
+    },
+    "noActivity": {
+      "header": "Activity not found",
+      "info": "That activity does not exist."
+    },
+    "noActivityList": {
+      "header": "You are not a member of any activity",
+      "info": "Once you accept an invitation to an activity, or create your own activity, it will be shown here."
+    },
+    "noInvitations": {
+      "header": "You don't have any invitations at the moment",
+      "info": "Once you are invited to any activity, the invitation will be shown here."
+    }
+  },
   "Dialog": {
-    "activity": {
-      "addAdministrator": {
-        "header": "Do you want to promote this member to an administrator?",
-        "info": "Administrators can remove regular members, update activity information, invite other users and delete posts.",
-        "submit": "Promote"
-      },
-      "removeAdministrator": {
-        "header": "Do you want to demote this member to regular member?",
-        "info": "",
-        "submit": "Demote"
-      },
-      "removeMember": {
-        "header": "Do you want to remove this member from the activity?",
-        "info": "This user will lose access to this activity.",
-        "submit": "Remove"
-      },
-      "leave": {
-        "header": "Are you sure you want to leave this activity?",
-        "info": "You will lose access to the activity.",
-        "submit": "Leave"
-      }
+    "addAdministrator": {
+      "header": "Do you want to promote this member to an administrator?",
+      "info": "Administrators can remove regular members, update activity information, invite other users and delete posts.",
+      "submit": "Promote"
     },
-    "post": {
-      "delete": {
-        "header": "Are you sure you want to delete this post?",
-        "info": "This decision is irreversible.",
-        "submit": "Delete"
-      }
+    "removeAdministrator": {
+      "header": "Do you want to demote this member to regular member?",
+      "info": "",
+      "submit": "Demote"
     },
-    "invitation": {
-      "decline": {
-        "header": "Are you sure you want to decline invitation to %s?",
-        "info": "The invitation will be deleted.",
-        "submit": "Decline"
-      }
+    "removeMember": {
+      "header": "Do you want to remove this member from the activity?",
+      "info": "This user will lose access to this activity.",
+      "submit": "Remove"
+    },
+    "leaveActivity": {
+      "header": "Are you sure you want to leave this activity?",
+      "info": "You will lose access to the activity.",
+      "submit": "Leave"
+    },
+    "deletePost": {
+      "header": "Are you sure you want to delete this post?",
+      "info": "This decision is irreversible.",
+      "submit": "Delete"
+    },
+    "declineInvitation": {
+      "header": "Are you sure you want to decline invitation to %s?",
+      "info": "The invitation will be deleted.",
+      "submit": "Decline"
     }
   }
 }

@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, useCallback, useScreenSize, useState } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Button, Dialog, Icon, ListItem, Panel, PlaceholderBox, ScrollableBox, Text } from "uu5g05-elements";
 import PostCard from "./post-card.js";
@@ -41,12 +41,13 @@ const PostList = createVisualComponent({
     const [dialogProps, setDialogProps] = useState();
     const [modalProps, setModalProps] = useState();
     const firstNotYetLoadedIndex = data ? data.findIndex((item) => item == null) : 0;
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noPosts"] });
     //@@viewOff:private
 
     const showDialog = useCallback((onSubmit) => {
       setDialogProps({
-        header: <Lsi import={importLsi} path={["Dialog", "post", "delete", "header"]} />,
-        info: <Lsi import={importLsi} path={["Dialog", "post", "delete", "info"]} />,
+        header: <Lsi import={importLsi} path={["Dialog", "deletePost", "header"]} />,
+        info: <Lsi import={importLsi} path={["Dialog", "deletePost", "info"]} />,
         icon: "mdi-delete",
         actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
         actionList: [
@@ -55,7 +56,7 @@ const PostList = createVisualComponent({
             onClick: closeDialog,
           },
           {
-            children: <Lsi import={importLsi} path={["Dialog", "post", "delete", "submit"]} />,
+            children: <Lsi import={importLsi} path={["Dialog", "deletePost", "submit"]} />,
             colorScheme: "negative",
             onClick: onSubmit,
           },
@@ -134,10 +135,7 @@ const PostList = createVisualComponent({
                   );
                 })
             ) : (
-              <PlaceholderBox
-                code="items"
-                header={{ en: "Activity has no posts", cs: "Aktivita nemá žádné příspěvky" }}
-              />
+              <PlaceholderBox code="items" header={placeholderLsi.header} />
             )}
           </ScrollableBox>
           <PostCreateBlock onSubmit={onPostCreate} />

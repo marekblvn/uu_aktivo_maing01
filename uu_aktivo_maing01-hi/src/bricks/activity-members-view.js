@@ -1,11 +1,11 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
 import { Dialog, Grid, useAlertBus } from "uu5g05-elements";
 import MemberList from "./member-list.js";
 import importLsi from "../lsi/import-lsi.js";
-import { PersonItem } from "uu_plus4u5g02-elements";
+import { useAlertBus, PersonItem } from "uu_plus4u5g02-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -49,6 +49,7 @@ const ActivityMembersView = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { addAlert } = useAlertBus();
+    const {} = useAlertBus();
     const [dialogProps, setDialogProps] = useState();
     const membersFiltered = members.filter((item) => !administrators.includes(item) && item !== owner);
     //@@viewOff:private
@@ -56,8 +57,8 @@ const ActivityMembersView = createVisualComponent({
     const handleCloseDialog = () => setDialogProps(null);
     const handleOpenDialog = useCallback((cmdCode, uuIdentity = "", onConfirm) => {
       setDialogProps({
-        header: <Lsi import={importLsi} path={["Dialog", "activity", cmdCode, "header"]} />,
-        info: <Lsi import={importLsi} path={["Dialog", "activity", cmdCode, "info"]} />,
+        header: <Lsi import={importLsi} path={["Dialog", cmdCode, "header"]} />,
+        info: <Lsi import={importLsi} path={["Dialog", cmdCode, "info"]} />,
         icon: DIALOG_ICONS[cmdCode],
         children: uuIdentity.length ? (
           <div style={{ padding: "8px" }}>
@@ -71,7 +72,7 @@ const ActivityMembersView = createVisualComponent({
             onClick: handleCloseDialog,
           },
           {
-            children: <Lsi import={importLsi} path={["Dialog", "activity", cmdCode, "submit"]} />,
+            children: <Lsi import={importLsi} path={["Dialog", cmdCode, "submit"]} />,
             colorScheme: DIALOG_COLOR[cmdCode],
             onClick: onConfirm,
           },
@@ -152,6 +153,22 @@ const ActivityMembersView = createVisualComponent({
     };
 
     //@@viewOn:render
+
+    addAlert({
+      priority: "error",
+      header: "Error",
+      message: "err",
+      error: {
+        name: "erro",
+        message: "error",
+      },
+      controlList: [
+        {
+          colorScheme: "negative",
+          significance: "distinct",
+        },
+      ],
+    });
 
     return (
       <Container

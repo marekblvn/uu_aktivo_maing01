@@ -1,5 +1,15 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, useCallback, useRef, useScreenSize, useSession, useState } from "uu5g05";
+import {
+  AutoLoad,
+  createVisualComponent,
+  Lsi,
+  useCallback,
+  useLsi,
+  useRef,
+  useScreenSize,
+  useSession,
+  useState,
+} from "uu5g05";
 import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
@@ -46,14 +56,15 @@ let MyActivities = createVisualComponent({
     const [dialogProps, setDialogProps] = useState();
     const [openModal, setOpenModal] = useState(false);
     const [noData, setNoData] = useState(true);
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noActivityList"] });
     //@@viewOff:private
 
     //@@viewOn:methods
     const showDialog = useCallback((onConfirm) => {
       setDialogProps({
-        header: <Lsi import={importLsi} path={["Dialog", "activity", "leave", "header"]} />,
+        header: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "header"]} />,
         icon: "mdi-exit-run",
-        info: <Lsi import={importLsi} path={["Dialog", "activity", "leave", "info"]} />,
+        info: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "info"]} />,
         actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
         actionList: [
           {
@@ -64,7 +75,7 @@ let MyActivities = createVisualComponent({
             },
           },
           {
-            children: <Lsi import={importLsi} path={["Dialog", "activity", "leave", "submit"]} />,
+            children: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "submit"]} />,
             onClick: async (e) => {
               e.preventDefault();
               try {
@@ -126,11 +137,8 @@ let MyActivities = createVisualComponent({
         return (
           <PlaceholderBox
             code="items"
-            header={{ en: "You are not a member of any activity", cs: "Nejste členem žádné aktivity" }}
-            info={{
-              en: "Once you accept an invitation to an activity, or create your own activity, it will be shown here.",
-              cs: "Jakmile přijmete pozvánku do aktivity, nebo si vytvoříte vlastní aktivitu, najdete ji zde.",
-            }}
+            header={placeholderLsi.header}
+            info={placeholderLsi.info}
             actionList={[
               {
                 children: <Lsi lsi={{ en: "Create new Activity", cs: "Vytvořit novou aktivitu" }} />,

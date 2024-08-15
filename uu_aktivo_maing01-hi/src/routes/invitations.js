@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useRef, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useRef, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
@@ -41,18 +41,15 @@ let Invitations = createVisualComponent({
     const { addAlert } = useAlertBus();
     const loadRef = useRef();
     const [dialogProps, setDialogProps] = useState();
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noInvitations"] });
     //@@viewOff:private
 
     const showDeleteDialog = useCallback((invitation = {}, onConfirm) => {
       setDialogProps({
         header: (
-          <Lsi
-            import={importLsi}
-            path={["Dialog", "invitation", "decline", "header"]}
-            params={[invitation.activityName]}
-          />
+          <Lsi import={importLsi} path={["Dialog", "declineInvitation", "header"]} params={[invitation.activityName]} />
         ),
-        info: <Lsi import={importLsi} path={["Dialog", "invitation", "decline", "info"]} />,
+        info: <Lsi import={importLsi} path={["Dialog", "declineInvitation", "info"]} />,
         icon: "mdi-email-remove",
         actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
         actionList: [
@@ -64,7 +61,7 @@ let Invitations = createVisualComponent({
             },
           },
           {
-            children: <Lsi import={importLsi} path={["Dialog", "invitation", "decline", "submit"]} />,
+            children: <Lsi import={importLsi} path={["Dialog", "declineInvitation", "submit"]} />,
             onClick: async (e) => {
               e.preventDefault();
               try {
@@ -181,11 +178,8 @@ let Invitations = createVisualComponent({
           <div>
             <PlaceholderBox
               code="items"
-              header={{ en: "You don't have any invitations at the moment", cs: "Momentálně nemáte žádné pozvánky" }}
-              info={{
-                en: "Once you are invited to an activity, the invitation will be shown here.",
-                cs: "Jakmile budete pozván do nějaké aktivity, najdete zde pozvánku.",
-              }}
+              header={placeholderLsi.header}
+              info={placeholderLsi.info}
               style={{ marginTop: "10%" }}
             />
           </div>

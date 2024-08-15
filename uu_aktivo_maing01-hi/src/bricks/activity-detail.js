@@ -3,6 +3,7 @@ import {
   createVisualComponent,
   Lsi,
   useEffect,
+  useLsi,
   useRoute,
   useRouteLeave,
   useScreenSize,
@@ -14,6 +15,7 @@ import { Header, PlaceholderBox, Tabs } from "uu5g05-elements";
 import ActivityInformationView from "./activity-information-view.js";
 import ActivityMembersView from "./activity-members-view.js";
 import ActivitySettingsView from "./activity-settings-view.js";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -63,6 +65,7 @@ const ActivityDetail = createVisualComponent({
     const [route, setRoute] = useRoute();
     const { nextRoute, allow } = useRouteLeave();
     const [activeTab, setActiveTab] = useState("info");
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "notFound"] });
 
     useEffect(() => {
       const lastTab = sessionStorage.getItem("lastTabCode");
@@ -190,7 +193,7 @@ const ActivityDetail = createVisualComponent({
             />
           );
         default:
-          return <PlaceholderBox code="items" header={{ en: "Not found", cs: "Nenalezeno" }} />;
+          return <PlaceholderBox code="items" header={placeholderLsi.header} info={placeholderLsi.info} />;
       }
     }
 

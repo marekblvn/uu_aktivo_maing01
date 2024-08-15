@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, PropTypes, useDevice, useRoute, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useDevice, useLsi, useRoute, useScreenSize } from "uu5g05";
 import { Pending, PlaceholderBox } from "uu5g05-elements";
 import { Error } from "uu_plus4u5g02-elements";
 import Config from "./config/config.js";
@@ -8,6 +8,7 @@ import Container from "../bricks/container.js";
 import ActivityProvider from "../providers/activity-provider.js";
 import ActivityDetail from "../bricks/activity-detail.js";
 import { ActivityAuthorizationContextProvider } from "../contexts/activity-authorization-context.js";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -43,6 +44,7 @@ let ActivityPage = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const [, setRoute] = useRoute();
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noActivity"] });
     //@@viewOff:private
 
     function renderLoading() {
@@ -63,8 +65,8 @@ let ActivityPage = createVisualComponent({
         return (
           <PlaceholderBox
             code="smile-sad"
-            header={{ en: "Something's not right.", cs: "Něco tu nehraje." }}
-            info={{ en: "That activity does not exist.", cs: "Tato aktivita neexistuje." }}
+            header={placeholderLsi.info}
+            info={placeholderLsi.info}
             actionList={[
               {
                 children: <Lsi lsi={{ en: "Back to home page", cs: "Zpátky na hlavní stránku" }} />,

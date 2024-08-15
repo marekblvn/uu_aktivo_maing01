@@ -1,8 +1,9 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, useLsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Block, Grid, PlaceholderBox, RichIcon, Text } from "uu5g05-elements";
 import { Checkbox } from "uu5g05-forms";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -41,6 +42,7 @@ const DatetimeSettingsBlock = createVisualComponent({
   }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
 
     const formattedFrequencyCs = (() => {
       if (!frequency) return "";
@@ -227,8 +229,8 @@ const DatetimeSettingsBlock = createVisualComponent({
         ) : (
           <PlaceholderBox
             code="calendar"
-            header={{ en: "Activity does not have an upcoming date", cs: "Aktivita nemá probíhající datum" }}
-            info={{ en: "The settings cannot be changed.", cs: "Nelze změnit nastavení data." }}
+            header={placeholderLsi.header}
+            info={{ en: "Date settings cannot be changed.", cs: "Nelze změnit nastavení data." }}
           />
         )}
       </Block>

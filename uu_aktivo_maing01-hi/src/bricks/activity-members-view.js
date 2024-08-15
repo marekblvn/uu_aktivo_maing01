@@ -49,7 +49,6 @@ const ActivityMembersView = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { addAlert } = useAlertBus();
-    const {} = useAlertBus();
     const [dialogProps, setDialogProps] = useState();
     const membersFiltered = members.filter((item) => !administrators.includes(item) && item !== owner);
     //@@viewOff:private

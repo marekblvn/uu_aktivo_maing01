@@ -88,5 +88,339 @@
       "info": "The invitation will be deleted.",
       "submit": "Decline"
     }
+  },
+  "Errors": {
+    "uu-aktivo-main/activity/create/invalidDtoIn": {
+      "header": "Error occurred while creating activity",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/create/activityDaoCreateFailed": {
+      "header": "Error occurred while creating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/update/invalidDtoIn": {
+      "header": "Error occurred while updating activity",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/update/activityDaoGetFailed": {
+      "header": "Error occurred while updating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/update/activityDoesNotExist": {
+      "header": "Error occurred while updating activity",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/update/userNotAuthorized": {
+      "header": "Error occurred while updating activity",
+      "message": "You are not authorized to update this activity."
+    },
+    "uu-aktivo-main/activity/update/activityDaoUpdateFailed": {
+      "header": "Error occurred while updating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/updateFrequency/invalidDtoIn": {
+      "header": "Error occurred while updating activity",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/updateFrequency/frequencyCannotBeZero": {
+      "header": "Error occurred while updating activity",
+      "message": "Frequency cannot be zero."
+    },
+    "uu-aktivo-main/activity/updateFrequency/datetimeDaoGetFailed": {
+      "header": "Error occurred while updating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityDaoGetFailed": {
+      "header": "Error occurred while updating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityDoesNotExist": {
+      "header": "Error occurred while updating activity",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/updateFrequency/userNotAuthorized": {
+      "header": "Error occurred while updating activity",
+      "message": "You are not authorized to update frequency in this activity."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityDaoUpdateFailed": {
+      "header": "Error occurred while updating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/updateFrequency/invalidFrequency": {
+      "header": "Error occurred while updating activity",
+      "message": "Frequency is not valid in regard to activity's notification offset. The notification date would be before the next datetime is created. Please check the entered values again."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityNotRecurrent": {
+      "header": "Error occurred while updating activity",
+      "message": "The frequency cannot be updated because the activity is not recurrent."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityDoesNotHaveDatetime": {
+      "header": "Error occurred while updating activity",
+      "message": "The frequency cannot be updated because the activity does not have an active date."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/invalidDtoIn": {
+      "header": "Error occurred while updating activity",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/activityDaoGetFailed": {
+      "header": "Error occurred while updating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/activityDoesNotExist": {
+      "header": "Error occurred while updating activity",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/userNotAuthorized": {
+      "header": "Error occurred while updating activity",
+      "message": "You are not authorized to update notificationOffset in this activity."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/activityDaoUpdateFailed": {
+      "header": "Error occurred while updating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/invalidCombination": {
+      "header": "Error occurred while updating activity",
+      "message": "The notification offset you provided results in a conflict of scheduling with the next date and the notification date."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/activityDoesNotHaveDatetime": {
+      "header": "Error occurred while updating activity",
+      "message": "The notification offset cannot be updated because the activity does not have an active date."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/datetimeDaoGetFailed": {
+      "header": "Error occurred while updating activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/invalidNotificationOffset": {
+      "header": "Error occurred while updating activity",
+      "message": "Notification offset must be at least 1 hour."
+    },
+    "uu-aktivo-main/activity/get/invalidDtoIn": {
+      "header": "Error occurred while trying to retrieve activity",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/get/activityDaoGetFailed": {
+      "header": "Error occurred while trying to retrieve activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/get/activityDoesNotExist": {
+      "header": "Error occurred while trying to retrieve activity",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/get/userNotAuthorized": {
+      "header": "Error occurred while trying to retrieve activity",
+      "message": "You are not authorized to access this activity."
+    },
+    "uu-aktivo-main/activity/list/invalidDtoIn": {
+      "header": "Error occurred while trying to retrieve activities",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/list/activityDaoListFailed": {
+      "header": "Error occurred while trying to retrieve activities",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/addAdministrator/invalidDtoIn": {
+      "header": "Error ocurred while trying to add administrator",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/addAdministrator/activityDaoGetFailed": {
+      "header": "Error ocurred while trying to add administrator",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/addAdministrator/activityDoesNotExist": {
+      "header": "Error ocurred while trying to add administrator",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/addAdministrator/userNotAuthorized": {
+      "header": "Error ocurred while trying to add administrator",
+      "message": "You are not authorized to add an administrator in this activity."
+    },
+    "uu-aktivo-main/activity/addAdministrator/targetUserIsNotMember": {
+      "header": "Error ocurred while trying to add administrator",
+      "message": "The user you want to make an administrator is not a member of the activity."
+    },
+    "uu-aktivo-main/activity/addAdministrator/targetUserAlreadyAdministrator": {
+      "header": "Error ocurred while trying to add administrator",
+      "message": "The user you want to make an administrator is already an administrator of the activity."
+    },
+    "uu-aktivo-main/activity/addAdministrator/activityDaoUpdateFailed": {
+      "header": "Error ocurred while trying to add administrator",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/addAdministrator/ownerCannotBeAdministrator": {
+      "header": "Error ocurred while trying to add administrator",
+      "message": "Owner cannot be added as an administrator."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/invalidDtoIn": {
+      "header": "Error occurred while trying to remove administrator",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/activityDaoGetFailed": {
+      "header": "Error occurred while trying to remove administrator",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/activityDoesNotExist": {
+      "header": "Error occurred while trying to remove administrator",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/userNotAuthorized": {
+      "header": "Error occurred while trying to remove administrator",
+      "message": "You are not authorized to remove administrator in this activity."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/targetUserIsNotMember": {
+      "header": "Error occurred while trying to remove administrator",
+      "message": "The user you want to remove as an administrator is not a member of the activity."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/targetUserNotAdministrator": {
+      "header": "Error occurred while trying to remove administrator",
+      "message": "The user you want to remove as an administrator is not an administrator in the activity."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/activityDaoUpdateFailed": {
+      "header": "Error occurred while trying to remove administrator",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/transferOwnership/invalidDtoIn": {
+      "header": "Error occurred while trying to transfer activity ownership",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/transferOwnership/activityDaoGetFailed": {
+      "header": "Error occurred while trying to transfer activity ownership",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/transferOwnership/activityDoesNotExist": {
+      "header": "Error occurred while trying to transfer activity ownership",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/transferOwnership/activityHasDatetime": {
+      "header": "Error occurred while trying to transfer activity ownership",
+      "message": "Ownership cannot be transferred while the activity has an active date. If you want to transfer ownership, please delete the activity's date first."
+    },
+    "uu-aktivo-main/activity/transferOwnership/userNotAuthorized": {
+      "header": "Error occurred while trying to transfer activity ownership",
+      "message": "You are not authorized to transfer ownership of this activity."
+    },
+    "uu-aktivo-main/activity/transferOwnership/targetUserIsNotMember": {
+      "header": "Error occurred while trying to transfer activity ownership",
+      "message": "The user you want to make an owner is not a member of the activity."
+    },
+    "uu-aktivo-main/activity/transferOwnership/activityDaoUpdateFailed": {
+      "header": "Error occurred while trying to transfer activity ownership",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/removeMember/invalidDtoIn": {
+      "header": "Error occurred while trying to remove member",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/removeMember/activityDaoGetFailed": {
+      "header": "Error occurred while trying to remove member",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/removeMember/activityDoesNotExist": {
+      "header": "Error occurred while trying to remove member",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/removeMember/userNotAuthorized": {
+      "header": "Error occurred while trying to remove member",
+      "message": "You are not authorized to remove member from this activity."
+    },
+    "uu-aktivo-main/activity/removeMember/targetUserIsAdministrator": {
+      "header": "Error occurred while trying to remove member",
+      "message": "The user you want to remove is an administrator and can only be removed by the owner."
+    },
+    "uu-aktivo-main/activity/removeMember/targetUserIsOwner": {
+      "header": "Error occurred while trying to remove member",
+      "message": "The user you want to remove is the owner and thus they cannot be removed."
+    },
+    "uu-aktivo-main/activity/removeMember/targetUserIsNotMember": {
+      "header": "Error occurred while trying to remove member",
+      "message": "The user you want to remove is not a member of the activity."
+    },
+    "uu-aktivo-main/activity/removeMember/activityDaoUpdateFailed": {
+      "header": "Error occurred while trying to remove member",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/removeMember/datetimeDaoGetFailed": {
+      "header": "Error occurred while trying to remove member",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/removeMember/datetimeDoesNotExist": {
+      "header": "Error occurred while trying to remove member",
+      "message": "There appears to be some inconsistency in the application's data. Please contact the support team."
+    },
+    "uu-aktivo-main/activity/removeMember/datetimeDaoUpdateFailed": {
+      "header": "Error occurred while trying to remove member",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/leave/invalidDtoIn": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/leave/activityDaoGetFailed": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/leave/activityDoesNotExist": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/leave/userNotAuthorized": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "You are not a member of the activity that you are trying to leave."
+    },
+    "uu-aktivo-main/activity/leave/userIsOwner": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "You cannot leave this activity because you are the owner."
+    },
+    "uu-aktivo-main/activity/leave/activityDaoUpdateFailed": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/leave/datetimeDaoGetFailed": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/leave/datetimeDoesNotExist": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "There appears to be some inconsistency in the application's data. Please contact the support team."
+    },
+    "uu-aktivo-main/activity/leave/datetimeDaoUpdateFailed": {
+      "header": "Error occurred while trying to leave activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/delete/invalidDtoIn": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "Input data is not valid."
+    },
+    "uu-aktivo-main/activity/delete/activityDaoGetFailed": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/delete/activityDoesNotExist": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "It appears that this activity does not exist."
+    },
+    "uu-aktivo-main/activity/delete/userNotAuthorized": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "You are not authorized to delete this activity."
+    },
+    "uu-aktivo-main/activity/delete/attendanceDaoDeleteFailed": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/delete/postDaoDeleteByActivityIdFailed": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/delete/invitationDaoDeleteByActivityIdFailed": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/delete/datetimeDaoDeleteByActivityIdFailed": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "Something went wrong on the server. Please try again later."
+    },
+    "uu-aktivo-main/activity/delete/activityDaoDeleteFailed": {
+      "header": "Error occurred while trying to delete the activity",
+      "message": "Something went wrong on the server. The activity could not be deleted. Please try again later."
+    }
   }
 }

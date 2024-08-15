@@ -4,6 +4,7 @@ import Config from "./config/config.js";
 import { Header, PlaceholderBox, Tabs } from "uu5g05-elements";
 import ActivityInformationView from "./activity-information-view.js";
 import ActivityMembersView from "./activity-members-view.js";
+import ActivitySettingsView from "./activity-settings-view.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -29,12 +30,8 @@ const ActivityDetail = createVisualComponent({
 
   //@@viewOn:defaultProps
   defaultProps: {
-    data: {
-      name: "Activity name",
-      description: "Activity description",
-      location: "Activity location",
-      owner: "3857-7491-1",
-    },
+    data: {},
+    handlerMap: {},
   },
   //@@viewOff:defaultProps
 
@@ -111,6 +108,20 @@ const ActivityDetail = createVisualComponent({
       });
     };
 
+    const handleUpdateActivityInfo = async ({ value }) => {
+      return await handlerMap.update({ id, ...value });
+    };
+
+    const handleChangeRecurrence = async () => {};
+
+    const handleUpdateFrequency = async ({ value }) => {
+      return await handlerMap.updateFrequency({ id, frequency: value });
+    };
+
+    const handleUpdateNotificationOffset = async ({ value }) => {
+      return await handlerMap.updateNotificationOffset({ id, notificationOffset: value });
+    };
+
     //@@viewOn:render
     function renderNavigation() {
       return (
@@ -152,7 +163,15 @@ const ActivityDetail = createVisualComponent({
             />
           );
         case "settings":
-          return <div>settings</div>;
+          return (
+            <ActivitySettingsView
+              {...data}
+              onUpdateActivityInfo={handleUpdateActivityInfo}
+              onChangeRecurrence={handleChangeRecurrence}
+              onUpdateFrequency={handleUpdateFrequency}
+              onUpdateNotificationOffset={handleUpdateNotificationOffset}
+            />
+          );
         default:
           return <PlaceholderBox code="items" header={{ en: "Not found", cs: "Nenalezeno" }} />;
       }

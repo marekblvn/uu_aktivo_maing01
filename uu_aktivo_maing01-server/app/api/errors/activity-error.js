@@ -253,7 +253,7 @@ const List = {
 };
 
 const AddAdministrator = {
-  UC_CODE: `${ERR_PREFIX}addAdministrator`,
+  UC_CODE: `${ERR_PREFIX}addAdministrator/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -313,7 +313,7 @@ const AddAdministrator = {
 };
 
 const RemoveAdministrator = {
-  UC_CODE: `${ERR_PREFIX}removeAdministrator`,
+  UC_CODE: `${ERR_PREFIX}removeAdministrator/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -366,7 +366,7 @@ const RemoveAdministrator = {
 };
 
 const TransferOwnership = {
-  UC_CODE: `${ERR_PREFIX}transferOwnership`,
+  UC_CODE: `${ERR_PREFIX}transferOwnership/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -419,7 +419,7 @@ const TransferOwnership = {
 };
 
 const RemoveMember = {
-  UC_CODE: `${ERR_PREFIX}removeMember`,
+  UC_CODE: `${ERR_PREFIX}removeMember/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -500,7 +500,7 @@ const RemoveMember = {
 };
 
 const Leave = {
-  UC_CODE: `${ERR_PREFIX}leave`,
+  UC_CODE: `${ERR_PREFIX}leave/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -567,7 +567,7 @@ const Leave = {
 };
 
 const Delete = {
-  UC_CODE: `${ERR_PREFIX}delete`,
+  UC_CODE: `${ERR_PREFIX}delete/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);

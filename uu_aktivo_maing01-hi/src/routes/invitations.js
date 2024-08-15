@@ -6,6 +6,7 @@ import Container from "../bricks/container.js";
 import { Dialog, Header, Pending, PlaceholderBox, RichIcon, useAlertBus } from "uu5g05-elements";
 import InvitationListProvider from "../providers/invitation-list-provider.js";
 import InvitationList from "../bricks/invitation-list.js";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -46,15 +47,12 @@ let Invitations = createVisualComponent({
       setDialogProps({
         header: (
           <Lsi
-            lsi={{
-              en: `Are you sure you want to decline invitation to ${invitation.activityName || "Activity name"}?`,
-              cs: `Opravdu chcete odmítnout pozvánku do ${invitation.activityName || "Activity name"}?`,
-            }}
+            import={importLsi}
+            path={["Dialog", "invitation", "decline", "header"]}
+            params={[invitation.activityName]}
           />
         ),
-        info: (
-          <Lsi lsi={{ en: "This invitation will be deleted permanently.", cs: "Tato pozvánka bude trvale smazána." }} />
-        ),
+        info: <Lsi import={importLsi} path={["Dialog", "invitation", "decline", "info"]} />,
         icon: "mdi-email-remove",
         actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
         actionList: [
@@ -66,7 +64,7 @@ let Invitations = createVisualComponent({
             },
           },
           {
-            children: <Lsi lsi={{ en: "Decline", cs: "Odmítnout" }} />,
+            children: <Lsi import={importLsi} path={["Dialog", "invitation", "decline", "submit"]} />,
             onClick: async (e) => {
               e.preventDefault();
               try {

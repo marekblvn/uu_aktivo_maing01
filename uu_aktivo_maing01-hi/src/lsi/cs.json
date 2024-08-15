@@ -55,6 +55,20 @@
         "info": "Tímto ztratíte přístup do aktivity.  Toto rozhodnutí nelze vrátit zpět.",
         "submit": "Opustit"
       }
+    },
+    "post": {
+      "delete": {
+        "header": "Opravdu chcete smazat tento příspěvek?",
+        "info": "Příspěvek bude navždy smazán.",
+        "submit": "Smazat"
+      }
+    },
+    "invitation": {
+      "decline": {
+        "header": "Opravdu chcete odmítnout pozvánku do %s?",
+        "info": "Pozvánka bude smazána.",
+        "submit": "Odmítnout"
+      }
     }
   }
 }

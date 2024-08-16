@@ -1,13 +1,14 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
+import { createVisualComponent, Lsi, useLsi, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { ListItem, Panel, Pending, Text, useAlertBus } from "uu5g05-elements";
+import { ListItem, Panel, Pending, Text } from "uu5g05-elements";
 import ParticipationList from "./participation-list.js";
 import DatetimeBlock from "./datetime-block.js";
 import UserParticipationBlock from "./user-participation-block.js";
 import ParticipationInfoText from "./participation-info-text.js";
-import { Error } from "uu_plus4u5g02-elements";
+import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import DatetimeProvider from "../providers/datetime-provider.js";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -54,11 +55,12 @@ const DatetimeDetail = createVisualComponent({
   render({ idealParticipants, minParticipants, datetimeId }) {
     //@@viewOn:private
     const { identity } = useSession();
-    const { addAlert } = useAlertBus();
+    const { showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const [screenSize] = useScreenSize();
+    const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
 
     function renderLoading() {
-      return <Pending size="l" colorScheme="secondary" />;
+      return <Pending size="l" colorScheme="secondary" type="horizontal" />;
     }
 
     function renderError(errorData) {
@@ -66,33 +68,36 @@ const DatetimeDetail = createVisualComponent({
         case "load":
         case "loadNext":
         default:
-          return <Error title={errorData.error?.message} subtitle={errorData.error?.code} error={errorData.error} />;
+          const errorCode = errorData.error?.code;
+          return (
+            <Error
+              title={errorLsi[errorCode]?.header || { en: "Something went wrong", cs: "Něco se pokazilo" }}
+              subtitle={errorLsi[errorCode]?.message || errorData.error?.code}
+              error={errorData.error}
+            />
+          );
       }
     }
 
     function renderReady(data, handlerMap) {
       if (!data) return null;
+
       const { id, datetime, undecided, confirmed, denied } = data;
+
       const userCurrentParticipationType = (() => {
         if (confirmed.includes(identity.uuIdentity)) return "confirmed";
         if (denied.includes(identity.uuIdentity)) return "denied";
         return "undecided";
       })();
+
       const handleChangeParticipation = async ({ data }) => {
         try {
           await handlerMap.updateParticipation({ id, type: data.value });
         } catch (error) {
-          addAlert({
-            priority: "error",
-            header: {
-              en: "Error",
-              cs: "Chyba",
-            },
-            message: error.message,
-            durationMs: 3000,
-          });
+          showError(e);
         }
       };
+
       return (
         <div style={{ display: "grid", rowGap: "16px" }}>
           <DatetimeBlock datetime={datetime} />
@@ -155,6 +160,7 @@ const DatetimeDetail = createVisualComponent({
             case "pendingNoData":
               return renderLoading();
             case "error":
+              return renderReady(data, handlerMap);
             case "errorNoData":
               return renderError(errorData);
             case "ready":

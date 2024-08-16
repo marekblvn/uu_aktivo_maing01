@@ -1,8 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
-import { Dialog, Grid, useAlertBus } from "uu5g05-elements";
+import { Dialog, Grid } from "uu5g05-elements";
 import MemberList from "./member-list.js";
 import importLsi from "../lsi/import-lsi.js";
 import { useAlertBus, PersonItem } from "uu_plus4u5g02-elements";
@@ -48,8 +48,7 @@ const ActivityMembersView = createVisualComponent({
   render({ members, owner, administrators, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
-    const { addAlert } = useAlertBus();
-    const {} = useAlertBus();
+    const { showError, showSuccess } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const [dialogProps, setDialogProps] = useState();
     const membersFiltered = members.filter((item) => !administrators.includes(item) && item !== owner);
     //@@viewOff:private
@@ -81,94 +80,54 @@ const ActivityMembersView = createVisualComponent({
     }, []);
 
     const handlePromoteAdmin = (uuIdentity) => {
-      handleOpenDialog("addAdministrator", uuIdentity, async () => {
+      handleOpenDialog("addAdministrator", uuIdentity, async (event) => {
+        event.preventDefault();
         try {
           await onPromoteAdmin(uuIdentity);
+          handleCloseDialog();
         } catch (error) {
-          addAlert({
-            priority: "error",
-            header: {
-              en: "Error occurred while promoting user to administrator",
-              cs: "Při udělování správcovství nastala chyba",
-            },
-            message: error.message,
-            durationMs: 3000,
-          });
+          showError(error);
         }
       });
     };
 
     const handleDemoteAdmin = (uuIdentity) => {
-      handleOpenDialog("removeAdministrator", uuIdentity, async () => {
+      handleOpenDialog("removeAdministrator", uuIdentity, async (event) => {
+        event.preventDefault();
         try {
           await onDemoteAdmin(uuIdentity);
+          handleCloseDialog();
         } catch (error) {
-          addAlert({
-            priority: "error",
-            header: {
-              en: "Error occurred while demoting administrator",
-              cs: "Při odebírání správcovství nastala chyba",
-            },
-            message: error.message,
-            durationMs: 3000,
-          });
+          showError(error);
         }
       });
     };
 
     const handleRemoveMember = (uuIdentity) => {
-      handleOpenDialog("removeMember", uuIdentity, async () => {
+      handleOpenDialog("removeMember", uuIdentity, async (event) => {
+        event.preventDefault();
         try {
           await onRemoveMember(uuIdentity);
+          handleCloseDialog();
         } catch (error) {
-          addAlert({
-            priority: "error",
-            header: {
-              en: "Error occurred while trying to remove member",
-              cs: "Při odebírání člena z aktivity nastala chyba",
-            },
-            message: error.message,
-            durationMs: 3000,
-          });
+          showError(error);
         }
       });
     };
 
     const handleLeaveActivity = () => {
-      handleOpenDialog("leave", "", async () => {
+      handleOpenDialog("leave", null, async (event) => {
+        event.preventDefault();
         try {
           await onLeaveActivity();
+          handleCloseDialog();
         } catch (error) {
-          addAlert({
-            priority: "error",
-            header: {
-              en: "Error occurred while trying to leave activity",
-              cs: "Při pokusu o opuštění aktivity nastala chyba",
-            },
-            message: error.message,
-            durationMs: 3000,
-          });
+          showError(error);
         }
       });
     };
 
     //@@viewOn:render
-
-    addAlert({
-      priority: "error",
-      header: "Error",
-      message: "err",
-      error: {
-        name: "erro",
-        message: "error",
-      },
-      controlList: [
-        {
-          colorScheme: "negative",
-          significance: "distinct",
-        },
-      ],
-    });
 
     return (
       <Container

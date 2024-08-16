@@ -39,7 +39,7 @@
       "info": "Vypadá to, že to co hledáte neexistuje."
     },
     "noDatetime": {
-      "header": "Aktivita nemá probíhající datum"
+      "header": "Aktivita nemá aktivní termín."
     },
     "noPosts": {
       "header": "Aktivita nemá žádné příspěvky"
@@ -87,6 +87,504 @@
       "header": "Opravdu chcete odmítnout pozvánku do %s?",
       "info": "Pozvánka bude smazána.",
       "submit": "Odmítnout"
+    }
+  },
+  "Errors": {
+    "uu-aktivo-main/activity/create/invalidDtoIn": {
+      "header": "Při pokusu o vytvoření aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/create/activityDaoCreateFailed": {
+      "header": "Při pokusu o vytvoření aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/update/invalidDtoIn": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/update/activityDaoGetFailed": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/update/activityDoesNotExist": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/update/userNotAuthorized": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Nejste oprávněni měnit informace této aktivity."
+    },
+    "uu-aktivo-main/activity/update/activityDaoUpdateFailed": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/updateFrequency/invalidDtoIn": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/updateFrequency/frequencyCannotBeZero": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Frekvence nemůže být nula."
+    },
+    "uu-aktivo-main/activity/updateFrequency/datetimeDaoGetFailed": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityDaoGetFailed": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityDoesNotExist": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/updateFrequency/userNotAuthorized": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Nejste oprávněni měnit frekvenci této aktivity."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityDaoUpdateFailed": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/updateFrequency/invalidFrequency": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Frekvence není kompatibilní s posunem upozornění. Upozornění by bylo odesláno před vytvořením dalšího termínu. Zkontrolujte prosím zadané hodnoty znovu."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityNotRecurrent": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Frekvenci aktivity nelze měnit, protože se aktivita neopakuje."
+    },
+    "uu-aktivo-main/activity/updateFrequency/activityDoesNotHaveDatetime": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Frekvenci aktivity nelze měnit, protože aktivita nemá probíhající termín."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/invalidDtoIn": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/activityDaoGetFailed": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/activityDoesNotExist": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/userNotAuthorized": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Nejste oprávněni měnit posun upozornění této aktivity."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/activityDaoUpdateFailed": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/invalidCombination": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Zadaný posun upozornění by vedl ke kolizi plánování upozornění a dalšího termínu."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/activityDoesNotHaveDatetime": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Posun upozornění nelze změnit, protože aktivita nemá probíhající termín."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/datetimeDaoGetFailed": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/updateNotificationOffset/invalidNotificationOffset": {
+      "header": "Při pokusu o úpravu aktivity nastala chyba",
+      "message": "Posun upozornění musí být aspoň 1 hodina."
+    },
+    "uu-aktivo-main/activity/get/invalidDtoIn": {
+      "header": "Při pokusu o načtení aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/get/activityDaoGetFailed": {
+      "header": "Při pokusu o načtení aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/get/activityDoesNotExist": {
+      "header": "Při pokusu o načtení aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/get/userNotAuthorized": {
+      "header": "Při pokusu o načtení aktivity nastala chyba",
+      "message": "Nejste oprávněni k přístupu k této aktivitě."
+    },
+    "uu-aktivo-main/activity/list/invalidDtoIn": {
+      "header": "Při pokusu o načtení aktivit nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/list/activityDaoListFailed": {
+      "header": "Při pokusu o načtení aktivit nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/addAdministrator/invalidDtoIn": {
+      "header": "Při pokusu o přidání správce aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/addAdministrator/activityDaoGetFailed": {
+      "header": "Při pokusu o přidání správce aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/addAdministrator/activityDoesNotExist": {
+      "header": "Při pokusu o přidání správce aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/addAdministrator/userNotAuthorized": {
+      "header": "Při pokusu o přidání správce aktivity nastala chyba",
+      "message": "Nejste oprávněni přidávat správce v této aktivitě."
+    },
+    "uu-aktivo-main/activity/addAdministrator/targetUserIsNotMember": {
+      "header": "Při pokusu o přidání správce aktivity nastala chyba",
+      "message": "Uživatel, kterého chcete učinit správcem není členem této aktivity."
+    },
+    "uu-aktivo-main/activity/addAdministrator/targetUserAlreadyAdministrator": {
+      "header": "Při pokusu o přidání správce aktivity nastala chyba",
+      "message": "Uživatel, kterého chcete učinit správcem už je správcem této aktivity."
+    },
+    "uu-aktivo-main/activity/addAdministrator/activityDaoUpdateFailed": {
+      "header": "Při pokusu o přidání správce aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/addAdministrator/ownerCannotBeAdministrator": {
+      "header": "Při pokusu o přidání správce aktivity nastala chyba",
+      "message": "Uživatel, kterého chcete učinit správcem je vlastníkem této aktivity a nemůže být zároveň správcem."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/invalidDtoIn": {
+      "header": "Při pokusu odebrání správcovství nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/activityDaoGetFailed": {
+      "header": "Při pokusu odebrání správcovství nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/activityDoesNotExist": {
+      "header": "Při pokusu odebrání správcovství nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/userNotAuthorized": {
+      "header": "Při pokusu odebrání správcovství nastala chyba",
+      "message": "Nejste oprávněni odebírat správcovství v této aktivitě."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/targetUserIsNotMember": {
+      "header": "Při pokusu odebrání správcovství nastala chyba",
+      "message": "Uživatel, kterému chcete odebrat správcovství není členem této aktivity."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/targetUserNotAdministrator": {
+      "header": "Při pokusu odebrání správcovství nastala chyba",
+      "message": "Uživatel, kterému chcete odebrat správcovství není správcem této aktivity."
+    },
+    "uu-aktivo-main/activity/removeAdministrator/activityDaoUpdateFailed": {
+      "header": "Při pokusu odebrání správcovství nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/transferOwnership/invalidDtoIn": {
+      "header": "Při pokusu o změnu vlastnictví aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/transferOwnership/activityDaoGetFailed": {
+      "header": "Při pokusu o změnu vlastnictví aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/transferOwnership/activityDoesNotExist": {
+      "header": "Při pokusu o změnu vlastnictví aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/transferOwnership/activityHasDatetime": {
+      "header": "Při pokusu o změnu vlastnictví aktivity nastala chyba",
+      "message": "Vlastnictví nelze převést dokud má aktivita probíhající termín. Pokud chcete převést vlastnictví, nejprve smažte termín aktivity."
+    },
+    "uu-aktivo-main/activity/transferOwnership/userNotAuthorized": {
+      "header": "Při pokusu o změnu vlastnictví aktivity nastala chyba",
+      "message": "Nejste oprávněni převést vlastnictví této aktivity."
+    },
+    "uu-aktivo-main/activity/transferOwnership/targetUserIsNotMember": {
+      "header": "Při pokusu o změnu vlastnictví aktivity nastala chyba",
+      "message": "Uživatel, na kterého chcete převést vlastnictví není členem aktivity."
+    },
+    "uu-aktivo-main/activity/transferOwnership/activityDaoUpdateFailed": {
+      "header": "Při pokusu o změnu vlastnictví aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/removeMember/invalidDtoIn": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/removeMember/activityDaoGetFailed": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/removeMember/activityDoesNotExist": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/removeMember/userNotAuthorized": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Nejste oprávněni odebírat členy této aktivity."
+    },
+    "uu-aktivo-main/activity/removeMember/targetUserIsAdministrator": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Uživatel, kterého chcete odebrat je správcem této aktivity a nemůžete jej odebrat."
+    },
+    "uu-aktivo-main/activity/removeMember/targetUserIsOwner": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Uživatel, kterého chcete odebrat je vlastníkem této aktivity a nemůžete jej odebrat."
+    },
+    "uu-aktivo-main/activity/removeMember/targetUserIsNotMember": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Uživatel, kterého chcete odebrat není členem této aktivity."
+    },
+    "uu-aktivo-main/activity/removeMember/activityDaoUpdateFailed": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/removeMember/datetimeDaoGetFailed": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/removeMember/datetimeDoesNotExist": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Zdá se, že v aplikaci nastala nečekaná chyba. Obraťte se prosím na podporu."
+    },
+    "uu-aktivo-main/activity/removeMember/datetimeDaoUpdateFailed": {
+      "header": "Při pokusu o odebrání člena aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/leave/invalidDtoIn": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/leave/activityDaoGetFailed": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/leave/activityDoesNotExist": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/leave/userNotAuthorized": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Nejste členem této aktivity."
+    },
+    "uu-aktivo-main/activity/leave/userIsOwner": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Nemůžete opustit aktivitu kterou vlastníte."
+    },
+    "uu-aktivo-main/activity/leave/activityDaoUpdateFailed": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/leave/datetimeDaoGetFailed": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/leave/datetimeDoesNotExist": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Zdá se, že v aplikaci nastala nečekaná chyba. Obraťte se prosím na podporu."
+    },
+    "uu-aktivo-main/activity/leave/datetimeDaoUpdateFailed": {
+      "header": "Při pokusu o opuštění aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/delete/invalidDtoIn": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/activity/delete/activityDaoGetFailed": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/delete/activityDoesNotExist": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/activity/delete/userNotAuthorized": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Nejste oprávněni smazat tuto aktivitu."
+    },
+    "uu-aktivo-main/activity/delete/attendanceDaoDeleteFailed": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/delete/postDaoDeleteByActivityIdFailed": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/delete/invitationDaoDeleteByActivityIdFailed": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/delete/datetimeDaoDeleteByActivityIdFailed": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/activity/delete/activityDaoDeleteFailed": {
+      "header": "Při pokusu o smazání aktivity nastala chyba",
+      "message": "Něco se pokazilo a aktivitu nebylo možné smazat. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/create/invalidDtoIn": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/datetime/create/frequencyIsRequired": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Frekvence je povinný parametr, prosím zkontrolujte, že jste vyplnili příslušné políčko."
+    },
+    "uu-aktivo-main/datetime/create/activityDaoGetFailed": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/create/activityDoesNotExist": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Zdá se, že tato aktivita neexistuje."
+    },
+    "uu-aktivo-main/datetime/create/datetimeAlreadyExists": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Tato aktivita už má vytvořený termín. Nelze vytvořit další."
+    },
+    "uu-aktivo-main/datetime/create/userNotAuthorized": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Nejste oprávněni k vytvoření termínu v této aktivitě."
+    },
+    "uu-aktivo-main/datetime/create/invalidDatetime": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Termín nesmí být dříve než 12 hodin od teď. Prosím zkontrolujte, zda zadané datum a čas neporušují tuto podmínku."
+    },
+    "uu-aktivo-main/datetime/create/invalidNotificationOffset": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Posun upozornění musí být aspoň 1 hodina."
+    },
+    "uu-aktivo-main/datetime/create/notificationDateIsInPast": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Posun upozornění je moc velký a způsobil by, že datum prvního upozornění by bylo v minulosti od teď a oznámení by tak nebylo odesláno."
+    },
+    "uu-aktivo-main/datetime/create/invalidFrequencyAndNotificationOffset": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Posun upozornění nemůže být větší než frekvence."
+    },
+    "uu-aktivo-main/datetime/create/datetimeDaoCreateFailed": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/create/activityDaoUpdateFailed": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/createNext/invalidDtoIn": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/datetime/createNext/datetimeDaoGetFailed": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/createNext/datetimeDoesNotExist": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Zdá se, že tento termín neexistuje."
+    },
+    "uu-aktivo-main/datetime/createNext/activityDaoGetFailed": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/createNext/activityDoesNotExist": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Zdá se, že aktivita přiřazena k tomuto termínu neexistuje."
+    },
+    "uu-aktivo-main/datetime/createNext/activityNotRecurrent": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Aktivita není nastavena jako opakující se. Nelze vytvořit příští termín."
+    },
+    "uu-aktivo-main/datetime/createNext/userNotAuthorized": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Nejste oprávněni k vytvoření příštího termínu."
+    },
+    "uu-aktivo-main/datetime/createNext/datetimeDaoDeleteFailed": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/createNext/datetimeDaoCreateFailed": {
+      "header": "Při pokusu o vytvoření termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/get/invalidDtoIn": {
+      "header": "Při pokusu o načtení termínu nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/datetime/get/datetimeDaoGetFailed": {
+      "header": "Při pokusu o načtení termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/get/datetimeDoesNotExist": {
+      "header": "Při pokusu o načtení termínu nastala chyba",
+      "message": "Zdá se, že tento termín neexistuje."
+    },
+    "uu-aktivo-main/datetime/get/activityDaoGetFailed": {
+      "header": "Při pokusu o načtení termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/get/activityDoesNotExist": {
+      "header": "Při pokusu o načtení termínu nastala chyba",
+      "message": "Zdá se, že aktivita přiřazena k tomuto termínu neexistuje."
+    },
+    "uu-aktivo-main/datetime/get/userNotAuthorized": {
+      "header": "Při pokusu o načtení termínu nastala chyba",
+      "message": "Nejste oprávněni k přístupu k tomuto termínu."
+    },
+    "uu-aktivo-main/datetime/updateParticipation/invalidDtoIn": {
+      "header": "Při pokusu o změnu účasti na termínu nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/datetime/updateParticipation/datetimeDaoGetFailed": {
+      "header": "Při pokusu o změnu účasti na termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/updateParticipation/datetimeDoesNotExist": {
+      "header": "Při pokusu o změnu účasti na termínu nastala chyba",
+      "message": "Zdá se, že tento termín neexistuje."
+    },
+    "uu-aktivo-main/datetime/updateParticipation/userNotAuthorized": {
+      "header": "Při pokusu o změnu účasti na termínu nastala chyba",
+      "message": "Nejste oprávněni měnit účast na termínu v této aktivitě."
+    },
+    "uu-aktivo-main/datetime/updateParticipation/datetimeHasPassed": {
+      "header": "Při pokusu o změnu účasti na termínu nastala chyba",
+      "message": "Termín vypršel a nelze tak změnit účast."
+    },
+    "uu-aktivo-main/datetime/updateParticipation/datetimeDaoUpdateFailed": {
+      "header": "Při pokusu o změnu účasti na termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/delete/invalidDtoIn": {
+      "header": "Při pokusu o smazání termínu nastala chyba",
+      "message": "Poskytnutá vstupní data jsou špatná."
+    },
+    "uu-aktivo-main/datetime/delete/datetimeDaoGetFailed": {
+      "header": "Při pokusu o smazání termínu nastala chyba",
+      "message": "The datetime has passed and the participation can not be updated anymore."
+    },
+    "uu-aktivo-main/datetime/delete/datetimeDoesNotExist": {
+      "header": "Při pokusu o smazání termínu nastala chyba",
+      "message": "Zdá se, že tento termín neexistuje."
+    },
+    "uu-aktivo-main/datetime/delete/activityDaoGetFailed": {
+      "header": "Při pokusu o smazání termínu nastala chyba",
+      "message": "The datetime has passed and the participation can not be updated anymore."
+    },
+    "uu-aktivo-main/datetime/delete/activityDoesNotExist": {
+      "header": "Při pokusu o smazání termínu nastala chyba",
+      "message": "Zdá se, že aktivita přiřazena k tomuto termínu neexistuje."
+    },
+    "uu-aktivo-main/datetime/delete/userNotAuthorized": {
+      "header": "Při pokusu o smazání termínu nastala chyba",
+      "message": "Nejste oprávněni ke smazání tohoto termínu."
+    },
+    "uu-aktivo-main/datetime/delete/datetimeDaoDeleteFailed": {
+      "header": "Při pokusu o smazání termínu nastala chyba",
+      "message": "Něco se pokazilo a termín nebylo možné smazat. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/datetime/delete/activityDaoUpdateFailed": {
+      "header": "Při pokusu o smazání termínu nastala chyba",
+      "message": "Něco se pokazilo. Zkuste to prosím později."
     }
   }
 }

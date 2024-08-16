@@ -35,42 +35,9 @@ const UpdateNotificationOffsetModal = createVisualComponent({
     //@@viewOn:private
     //@@viewOff:private
 
-    function compareOffsetWithFrequency(days, hours, minutes) {
-      const date = new Date();
-      const notificationOffset = new Date(date);
-      notificationOffset.setMonth(notificationOffset.getMonth() + frequency.months);
-      notificationOffset.setDate(notificationOffset.getDate() + frequency.days - days);
-      notificationOffset.setHours(notificationOffset.getHours() - hours, notificationOffset.getMinutes() - minutes);
-
-      return notificationOffset > date;
-    }
-
     //@@viewOn:render
     return (
-      <Form.Provider
-        onSubmit={onSubmit}
-        onValidate={async (e) => {
-          const { days, hours, minutes } = e.data.value;
-          const offsetLessThanFrequency = compareOffsetWithFrequency(days, hours, minutes);
-          if (!offsetLessThanFrequency) {
-            return {
-              feedback: "error",
-              message: {
-                en: "Notification offset cannot be greater than frequency.",
-                cs: "Posun oznámení nemůže být větší než frekvence.",
-              },
-            };
-          }
-          try {
-            await Calls.Activity.updateNotificationOffset({ id: activityId, notificationOffset: e.data.value });
-          } catch (error) {
-            return {
-              feedback: "error",
-              message: error.message,
-            };
-          }
-        }}
-      >
+      <Form.Provider onSubmit={onSubmit}>
         <Modal
           open={open}
           onClose={onClose}

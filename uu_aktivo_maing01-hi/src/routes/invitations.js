@@ -3,10 +3,11 @@ import { createVisualComponent, Lsi, useCallback, useLsi, useRef, useScreenSize,
 import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
-import { Dialog, Header, Pending, PlaceholderBox, RichIcon, useAlertBus } from "uu5g05-elements";
+import { Dialog, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
 import InvitationListProvider from "../providers/invitation-list-provider.js";
 import InvitationList from "../bricks/invitation-list.js";
 import importLsi from "../lsi/import-lsi.js";
+import { useAlertBus } from "uu_plus4u5g02-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -38,7 +39,7 @@ let Invitations = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
-    const { addAlert } = useAlertBus();
+    const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const loadRef = useRef();
     const [dialogProps, setDialogProps] = useState();
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noInvitations"] });
@@ -66,6 +67,8 @@ let Invitations = createVisualComponent({
               e.preventDefault();
               try {
                 await onConfirm();
+                setDialogProps(null);
+                await loadRef.current({ filters: { uuIdentity: identity.uuIdentity } });
                 addAlert({
                   header: { en: "Invitation denied", cs: "Pozvánka odmítnuta" },
                   message: {
@@ -76,11 +79,9 @@ let Invitations = createVisualComponent({
                   durationMs: 2_000,
                 });
               } catch (error) {
-                addAlert({ header: "Error!", message: error.message, priority: "error" });
+                showError(error);
                 return;
               }
-              setDialogProps(null);
-              await loadRef.current({ filters: { uuIdentity: identity.uuIdentity } });
             },
             colorScheme: "negative",
             significance: "highlighted",
@@ -135,7 +136,7 @@ let Invitations = createVisualComponent({
                   durationMs: 3_000,
                 });
               } catch (error) {
-                addAlert({ header: "Error!", message: error.message, priority: "error" });
+                showError(error);
                 return;
               }
               setDialogProps(null);
@@ -231,6 +232,7 @@ let Invitations = createVisualComponent({
               case "pendingData":
                 return renderLoading();
               case "error":
+                renderReady(data);
               case "errorNoData":
                 return renderError(errorData);
               case "ready":

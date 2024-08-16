@@ -2,9 +2,10 @@
 import { createVisualComponent, useDataList } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
-import { Grid, Pending, useAlertBus } from "uu5g05-elements";
-import { Error } from "uu_plus4u5g02-elements";
+import { Grid, Pending } from "uu5g05-elements";
+import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import PostList from "../bricks/post-list.js";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -35,7 +36,7 @@ const PostListProvider = createVisualComponent({
 
   render({ activityId }) {
     //@@viewOn:private
-    const { addAlert } = useAlertBus();
+    const { showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const dataList = useDataList({
       pageSize: PAGE_SIZE,
       itemIdentifier: "id",
@@ -60,7 +61,7 @@ const PostListProvider = createVisualComponent({
         await handlerMap.create({ activityId, type: "normal", content: value });
         await handlerMap.load({ activityId });
       } catch (error) {
-        addAlert({ priority: "error" });
+        showError(error);
       }
     };
 
@@ -100,6 +101,7 @@ const PostListProvider = createVisualComponent({
       case "pendingNoData":
         return renderLoading();
       case "error":
+        renderReady(data);
       case "errorNoData":
         return renderError(errorData);
       case "ready":

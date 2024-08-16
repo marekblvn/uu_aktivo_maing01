@@ -14,10 +14,11 @@ import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
 import ActivityListProvider from "../providers/activity-list-provider.js";
-import { ActionGroup, Dialog, Header, Pending, PlaceholderBox, RichIcon, useAlertBus } from "uu5g05-elements";
+import { ActionGroup, Dialog, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
 import ActivityList from "../bricks/activity-list.js";
 import CreateActivityModal from "../bricks/create-activity-modal.js";
 import importLsi from "../lsi/import-lsi.js";
+import { useAlertBus } from "uu_plus4u5g02-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -49,7 +50,7 @@ let MyActivities = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
-    const { addAlert } = useAlertBus();
+    const { showError } = useAlertBus({ import: importLsi, path: ["Error"] });
     const loadRef = useRef();
     const createActivityRef = useRef();
     const loadNextRef = useRef();
@@ -83,7 +84,7 @@ let MyActivities = createVisualComponent({
                 setDialogProps(null);
                 loadRef.current({ filters: { members: [identity.uuIdentity] } });
               } catch (error) {
-                addAlert({ header: "Error!", message: error.message, priority: "error" });
+                showError(error);
                 return;
               }
             },
@@ -103,12 +104,8 @@ let MyActivities = createVisualComponent({
       [showDialog],
     );
 
-    const handleLoadNext = () => {
-      loadNextRef.current({ filters: { members: [identity.uuIdentity] } });
-    };
-
-    const showHeaderButton = () => setNoData(true);
-    const hideHeaderButton = () => setNoData(false);
+    const hideHeaderButton = () => setNoData(true);
+    const showHeaderButton = () => setNoData(false);
     //@@viewOff:methods
 
     //@@viewOn:render
@@ -131,9 +128,9 @@ let MyActivities = createVisualComponent({
       }
     }
 
-    function renderReady(data) {
+    function renderReady(data, handlerMap) {
       if (!data.length) {
-        showHeaderButton();
+        hideHeaderButton();
         return (
           <PlaceholderBox
             code="items"
@@ -153,11 +150,12 @@ let MyActivities = createVisualComponent({
           />
         );
       }
-      hideHeaderButton();
+
+      showHeaderButton();
       return (
         <>
           <ActivityList itemList={data} onActivityLeave={handleLeaveActivity} />
-          <AutoLoad data={data} handleLoadNext={handleLoadNext} distance={window.innerHeight} />
+          <AutoLoad data={data} handleLoadNext={handlerMap.loadNext} distance={window.innerHeight} />
         </>
       );
     }
@@ -218,11 +216,12 @@ let MyActivities = createVisualComponent({
               case "pendingNoData":
                 return renderLoading();
               case "error":
+                renderReady(data, handlerMap);
               case "errorNoData":
                 return renderError(errorData);
               case "ready":
               case "readyNoData":
-                return renderReady(data);
+                return renderReady(data, handlerMap);
             }
           }}
         </ActivityListProvider>

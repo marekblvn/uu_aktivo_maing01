@@ -2,8 +2,7 @@
 import { createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
 import { CancelButton, Form, FormNumber, ResetButton, SubmitButton } from "uu5g05-forms";
-import { Grid, Modal, Text } from "uu5g05-elements";
-import Calls from "../calls.js";
+import { Grid, Modal } from "uu5g05-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -37,20 +36,7 @@ const UpdateFrequencyModal = createVisualComponent({
 
     //@@viewOn:render
     return (
-      <Form.Provider
-        onSubmit={onSubmit}
-        onValidate={async (e) => {
-          try {
-            await Calls.Activity.updateFrequency({ id: activityId, frequency: e.data.value });
-          } catch (error) {
-            const validationResult = {
-              feedback: "error",
-              message: error.message,
-            };
-            return validationResult;
-          }
-        }}
-      >
+      <Form.Provider onSubmit={onSubmit}>
         <Modal
           open={open}
           onClose={onClose}

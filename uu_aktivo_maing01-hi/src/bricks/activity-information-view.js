@@ -40,7 +40,6 @@ const ActivityInformationView = createVisualComponent({
   render({ description, location, minParticipants, idealParticipants, activityId, datetimeId }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
-    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
 
     const textType = (() => {
       switch (screenSize) {
@@ -106,15 +105,11 @@ const ActivityInformationView = createVisualComponent({
             borderRadius="moderate"
             colorScheme="secondary"
           >
-            {datetimeId !== null ? (
-              <DatetimeDetail
-                datetimeId={datetimeId}
-                idealParticipants={idealParticipants}
-                minParticipants={minParticipants}
-              />
-            ) : (
-              <PlaceholderBox code="calendar" header={placeholderLsi.header} style={{ padding: "16px" }} />
-            )}
+            <DatetimeDetail
+              datetimeId={datetimeId}
+              idealParticipants={idealParticipants}
+              minParticipants={minParticipants}
+            />
           </Box>
           {["xs", "s"].includes(screenSize) && <Line margin="-4px -9px" colorScheme="neutral" significance="subdued" />}
           <Box

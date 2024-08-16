@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useLsi, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { ListItem, Panel, Pending, Text } from "uu5g05-elements";
+import { Button, Grid, ListItem, Panel, Pending, PlaceholderBox, Text } from "uu5g05-elements";
 import ParticipationList from "./participation-list.js";
 import DatetimeBlock from "./datetime-block.js";
 import UserParticipationBlock from "./user-participation-block.js";
@@ -58,6 +58,7 @@ const DatetimeDetail = createVisualComponent({
     const { showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const [screenSize] = useScreenSize();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
 
     function renderLoading() {
       return <Pending size="l" colorScheme="secondary" type="horizontal" />;
@@ -80,7 +81,21 @@ const DatetimeDetail = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
-      if (!data) return null;
+      if (!data)
+        return (
+          <Grid style={{ width: "100%", height: "100%" }} justifyItems="center">
+            <PlaceholderBox code="calendar" header={placeholderLsi.header} style={{ padding: "16px" }} />
+            <Button
+              style={{ maxWidth: "200px" }}
+              colorScheme="secondary"
+              significance="common"
+              icon="mdi-calendar-plus-outline"
+              onClick={() => {}}
+            >
+              <Lsi lsi={{ en: "Create datetime", cs: "Vytvořit termín" }} />
+            </Button>
+          </Grid>
+        );
 
       const { id, datetime, undecided, confirmed, denied } = data;
 

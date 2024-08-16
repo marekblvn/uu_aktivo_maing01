@@ -106,6 +106,7 @@ const ActivityInformationView = createVisualComponent({
             colorScheme="secondary"
           >
             <DatetimeDetail
+              activityId={activityId}
               datetimeId={datetimeId}
               idealParticipants={idealParticipants}
               minParticipants={minParticipants}

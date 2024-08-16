@@ -2,12 +2,14 @@
 import { createVisualComponent, Lsi, useCallback, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
-import { Dialog, Grid, useAlertBus } from "uu5g05-elements";
+import { Dialog, Grid } from "uu5g05-elements";
 import UpdateActivityInformationModal from "./update-activity-information-modal.js";
 import UpdateFrequencyModal from "./update-frequency-modal.js";
 import ActivityInformationBlock from "./activity-information-block.js";
 import DatetimeSettingsBlock from "./datetime-settings-block.js";
 import UpdateNotificationOffsetModal from "./update-notification-offset-modal.js";
+import { useAlertBus } from "uu_plus4u5g02-elements";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -52,7 +54,7 @@ const ActivitySettingsView = createVisualComponent({
     onUpdateNotificationOffset,
   }) {
     //@@viewOn:private
-    const { addAlert } = useAlertBus();
+    const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const [screenSize] = useScreenSize();
     const [informationFormOpen, setInformationFormOpen] = useState(false);
     const [frequencyFormOpen, setFrequencyFormOpen] = useState(false);
@@ -113,12 +115,7 @@ const ActivitySettingsView = createVisualComponent({
           durationMs: 2000,
         });
       } catch (error) {
-        addAlert({
-          priority: "error",
-          header: { en: "Error", cs: "Chyba" },
-          message: error.message,
-          durationMs: 3000,
-        });
+        showError(error);
       }
     };
 
@@ -134,12 +131,7 @@ const ActivitySettingsView = createVisualComponent({
             durationMs: 2000,
           });
         } catch (error) {
-          addAlert({
-            priority: "error",
-            header: { en: "Error", cs: "Chyba" },
-            message: error.message,
-            durationMs: 3000,
-          });
+          showError(error);
         }
       });
     };
@@ -158,7 +150,7 @@ const ActivitySettingsView = createVisualComponent({
           durationMs: 2000,
         });
       } catch (error) {
-        addAlert({ priority: "error", header: { en: "Error", cs: "Chyba" }, message: error.message, durationMs: 3000 });
+        showError(error, { displayDetailButton: false });
       }
     };
 
@@ -176,7 +168,7 @@ const ActivitySettingsView = createVisualComponent({
           durationMs: 2000,
         });
       } catch (error) {
-        addAlert({ priority: "error", header: { en: "Error", cs: "Chyba" }, message: error.message, durationMs: 3000 });
+        showError(error, { displayDetailButton: false });
       }
     };
 

@@ -39,7 +39,7 @@
       "info": "Looks like the thing you're looking for does not exist."
     },
     "noDatetime": {
-      "header": "Activity does not have an active date"
+      "header": "Activity does not have an active datetime"
     },
     "noPosts": {
       "header": "Activity has no posts"

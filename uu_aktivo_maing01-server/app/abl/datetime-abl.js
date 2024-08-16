@@ -93,21 +93,20 @@ class DatetimeAbl {
       if (!dtoIn.frequency || (dtoIn.frequency.months === 0 && dtoIn.frequency.days === 0)) {
         throw new Errors.Create.FrequencyIsRequired({ uuAppErrorMap });
       }
-    }
+      const nextDatetime = new Date(datetimeAsDate);
+      nextDatetime.setMonth(nextDatetime.getMonth() + dtoIn.frequency.months);
+      nextDatetime.setDate(nextDatetime.getDate() + dtoIn.frequency.days);
+      const nextNotificationDate = new Date(nextDatetime);
+      nextNotificationDate.setDate(nextNotificationDate.getDate() - dtoIn.notificationOffset.days);
+      nextNotificationDate.setHours(
+        nextNotificationDate.getHours() - dtoIn.notificationOffset.hours,
+        nextNotificationDate.getMinutes() - dtoIn.notificationOffset.minutes,
+      );
 
-    const nextDatetime = new Date(datetimeAsDate);
-    nextDatetime.setMonth(nextDatetime.getMonth() + dtoIn.frequency.months);
-    nextDatetime.setDate(nextDatetime.getDate() + dtoIn.frequency.days);
-    const nextNotificationDate = new Date(nextDatetime);
-    nextNotificationDate.setDate(nextNotificationDate.getDate() - dtoIn.notificationOffset.days);
-    nextNotificationDate.setHours(
-      nextNotificationDate.getHours() - dtoIn.notificationOffset.hours,
-      nextNotificationDate.getMinutes() - dtoIn.notificationOffset.minutes,
-    );
-
-    // next notification must NOT be sent BEFORE the current datetime, only after the next datetime is calculated, which happens then the current datetime passes
-    if (nextNotificationDate <= datetimeAsDate) {
-      throw new Errors.Create.InvalidFrequencyAndNotificationOffset({ uuAppErrorMap });
+      // next notification must NOT be sent BEFORE the current datetime, only after the next datetime is calculated, which happens then the current datetime passes
+      if (nextNotificationDate <= datetimeAsDate) {
+        throw new Errors.Create.InvalidFrequencyAndNotificationOffset({ uuAppErrorMap });
+      }
     }
 
     const datetimeCreateObject = {

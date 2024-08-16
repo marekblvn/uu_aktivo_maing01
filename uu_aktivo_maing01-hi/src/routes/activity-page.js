@@ -103,6 +103,7 @@ let ActivityPage = createVisualComponent({
               case "pendingNoData":
                 return renderLoading();
               case "error":
+                return renderReady(data, handlerMap);
               case "errorNoData":
                 return renderError(errorData);
               case "ready":

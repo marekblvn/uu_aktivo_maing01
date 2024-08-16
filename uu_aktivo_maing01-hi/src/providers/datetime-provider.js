@@ -33,6 +33,7 @@ const DatetimeProvider = createVisualComponent({
     //@@viewOn:private
     const dataObject = useDataObject({
       initialDtoIn: { id: datetimeId },
+      skipInitialLoad: datetimeId === null,
       handlerMap: {
         load: Calls.Datetime.get,
         updateParticipation: Calls.Datetime.updateParticipation,

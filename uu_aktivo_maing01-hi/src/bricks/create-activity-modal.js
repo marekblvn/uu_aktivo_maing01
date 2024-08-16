@@ -1,8 +1,10 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
-import { Grid, Modal, useAlertBus } from "uu5g05-elements";
+import { Grid, Modal } from "uu5g05-elements";
 import { CancelButton, Form, FormNumber, FormText, FormTextArea, SubmitButton } from "uu5g05-forms";
+import { useAlertBus } from "uu_plus4u5g02-elements";
+import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -32,11 +34,12 @@ const CreateActivityModal = createVisualComponent({
 
   render({ open, onClose, onSubmit }) {
     //@@viewOn:private
-    const { addAlert } = useAlertBus();
+    const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     //@@viewOff:private
 
     async function handleSubmit(e) {
       const dtoIn = e.data?.value;
+      e.preventDefault();
       try {
         await onSubmit(dtoIn);
         onClose();
@@ -53,8 +56,7 @@ const CreateActivityModal = createVisualComponent({
           durationMs: 3000,
         });
       } catch (error) {
-        addAlert({ header: "Error", message: error.message, priority: "error", durationMs: 3000 });
-        return;
+        showError(error);
       }
     }
 

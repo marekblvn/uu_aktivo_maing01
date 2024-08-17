@@ -4,6 +4,7 @@ import Config from "./config/config.js";
 import { ActionGroup, Box, Grid, Text } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -40,6 +41,7 @@ const MemberItem = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
+    const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner, isAdministrator, checkIfAdministrator, checkIfOwner } = useActivityAuthorization();
     //@@viewOff:private
 
@@ -95,7 +97,7 @@ const MemberItem = createVisualComponent({
       }
       if (checkIfOwner(uuIdentity)) return items;
       if (checkIfAdministrator(uuIdentity)) {
-        if (isOwner) {
+        if (isOwner || isAuthority || isExecutive) {
           items.push(demoteAdminAction);
           items.push(removeMemberAction);
           return items;
@@ -105,7 +107,7 @@ const MemberItem = createVisualComponent({
           return items;
         }
       } else {
-        if (isOwner) {
+        if (isOwner || isAuthority || isExecutive) {
           items.push(removeMemberAction);
           items.push(promoteAdminAction);
           return items;

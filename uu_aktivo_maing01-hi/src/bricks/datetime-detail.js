@@ -10,6 +10,8 @@ import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import DatetimeProvider from "../providers/datetime-provider.js";
 import importLsi from "../lsi/import-lsi.js";
 import CreateDatetimeModal from "./create-datetime-modal.js";
+import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -61,6 +63,8 @@ const DatetimeDetail = createVisualComponent({
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
     const [modalOpen, setModalOpen] = useState(false);
+    const { isAuthority, isExecutive } = useAuthorization();
+    const { isOwner } = useActivityAuthorization();
 
     const handleOpenModal = () => setModalOpen(true);
     const handleCloseModal = () => setModalOpen(false);
@@ -120,15 +124,17 @@ const DatetimeDetail = createVisualComponent({
             }}
           >
             <PlaceholderBox code="calendar" header={placeholderLsi.header} style={{ padding: "16px" }} />
-            <Button
-              style={{ maxWidth: "200px" }}
-              colorScheme="secondary"
-              significance="common"
-              icon="mdi-calendar-plus-outline"
-              onClick={handleOpenModal}
-            >
-              <Lsi lsi={{ en: "Create new datetime", cs: "Vytvořit nový termín" }} />
-            </Button>
+            {(isOwner || isAuthority || isExecutive) && (
+              <Button
+                style={{ maxWidth: "200px" }}
+                colorScheme="secondary"
+                significance="common"
+                icon="mdi-calendar-plus-outline"
+                onClick={handleOpenModal}
+              >
+                <Lsi lsi={{ en: "Create new datetime", cs: "Vytvořit nový termín" }} />
+              </Button>
+            )}
             <CreateDatetimeModal open={modalOpen} onClose={handleCloseModal} onSubmit={handleCreateDatetime} />
           </div>
         );

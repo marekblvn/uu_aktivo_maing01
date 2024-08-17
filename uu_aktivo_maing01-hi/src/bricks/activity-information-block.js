@@ -2,6 +2,8 @@
 import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Block, Grid, Text } from "uu5g05-elements";
+import { useAuthorization } from "../contexts/authorization-context.js";
+import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -32,6 +34,8 @@ const ActivityInformationBlock = createVisualComponent({
   render({ onClickEdit, data }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const { isAuthority, isExecutive } = useAuthorization();
+    const { isAdministrator, isOwner } = useActivityAuthorization();
     const { name, location, description, minParticipants, idealParticipants } = data;
     //@@viewOff:private
 
@@ -46,15 +50,19 @@ const ActivityInformationBlock = createVisualComponent({
           </Text>
         }
         headerType="title"
-        actionList={[
-          {
-            icon: "mdi-pencil",
-            colorScheme: "neutral",
-            significance: "common",
-            size: ["xs", "s"].includes(screenSize) ? "s" : "m",
-            onClick: onClickEdit,
-          },
-        ]}
+        actionList={
+          isAuthority || isExecutive || isOwner || isAdministrator
+            ? [
+                {
+                  icon: "mdi-pencil",
+                  colorScheme: "neutral",
+                  significance: "common",
+                  size: ["xs", "s"].includes(screenSize) ? "s" : "m",
+                  onClick: onClickEdit,
+                },
+              ]
+            : []
+        }
       >
         {({ style }) => (
           <Grid

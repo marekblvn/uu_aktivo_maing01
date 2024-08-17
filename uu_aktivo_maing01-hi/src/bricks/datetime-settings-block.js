@@ -101,7 +101,7 @@ const DatetimeSettingsBlock = createVisualComponent({
         card="full"
         header={
           <Text category="interface" segment="title" type={["xs", "s"].includes(screenSize) ? "micro" : "minor"}>
-            <Lsi lsi={{ en: "Date settings", cs: "Nastavení data" }} />
+            <Lsi lsi={{ en: "Datetime settings", cs: "Nastavení termínu" }} />
           </Text>
         }
         headerType="title"
@@ -123,12 +123,14 @@ const DatetimeSettingsBlock = createVisualComponent({
                     type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
                     bold
                   >
-                    <Lsi lsi={{ en: "Periodically create next date", cs: "Pravidelně vytvářet následující datum" }} />
+                    <Lsi
+                      lsi={{ en: "Periodically create next datetime", cs: "Pravidelně vytvářet následující termín" }}
+                    />
                   </Text>
                   <Checkbox
                     info={{
-                      en: "Should a new date be created from the existing one after its end using frequency?",
-                      cs: "Má se z existujícího data po jeho konci vytvořit nové pomocí frekvence?",
+                      en: "Should a new datetime be created from the existing one after its end using frequency?",
+                      cs: "Má se z existujícího termínu po jeho konci vytvořit nové pomocí frekvence?",
                     }}
                     value={recurrent}
                     box={false}
@@ -209,7 +211,7 @@ const DatetimeSettingsBlock = createVisualComponent({
                         type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
                         bold
                       >
-                        <Lsi lsi={{ en: "Notification Offset", cs: "Posun oznámení" }} />
+                        <Lsi lsi={{ en: "Notification Offset", cs: "Posun upozornění" }} />
                       </Text>
                       {["xs", "s"].includes(screenSize) || "—"}
                       <Text
@@ -238,7 +240,7 @@ const DatetimeSettingsBlock = createVisualComponent({
           <PlaceholderBox
             code="calendar"
             header={placeholderLsi.header}
-            info={{ en: "Date settings cannot be changed.", cs: "Nelze změnit nastavení data." }}
+            info={{ en: "Datetime settings cannot be changed.", cs: "Nelze změnit nastavení termínu." }}
           />
         )}
       </Block>

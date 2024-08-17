@@ -456,7 +456,7 @@
     },
     "uu-aktivo-main/datetime/create/notificationDateIsInPast": {
       "header": "Při pokusu o vytvoření termínu nastala chyba",
-      "message": "Posun upozornění je moc velký a způsobil by, že datum prvního upozornění by bylo v minulosti od teď a oznámení by tak nebylo odesláno."
+      "message": "Posun upozornění je moc velký a způsobil by, že datum prvního upozornění by bylo v minulosti od teď a upozornění by tak nebylo odesláno."
     },
     "uu-aktivo-main/datetime/create/invalidFrequencyAndNotificationOffset": {
       "header": "Při pokusu o vytvoření termínu nastala chyba",

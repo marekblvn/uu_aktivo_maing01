@@ -323,7 +323,7 @@ const CreateDatetimeModal = createVisualComponent({
                         return setNotificationOffsetError({
                           message: {
                             en: "Notification offset must be at least 1 hour.",
-                            cs: "Posun oznámení musí být aspoň 1 hodina.",
+                            cs: "Posun upozornění musí být aspoň 1 hodina.",
                           },
                         });
                       }

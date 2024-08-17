@@ -41,7 +41,7 @@ const UpdateNotificationOffsetModal = createVisualComponent({
         <Modal
           open={open}
           onClose={onClose}
-          header={<Lsi lsi={{ en: "Change notification offset", cs: "Změnit posun oznámení" }} />}
+          header={<Lsi lsi={{ en: "Change notification offset", cs: "Změnit posun upozornění" }} />}
           footer={
             <Grid templateColumns={{ xs: "40px repeat(2, 1fr)", s: "repeat(3, auto)" }} justifyContent={{ s: "end" }}>
               <ResetButton significance="subdued" icon="mdi-refresh" />
@@ -76,7 +76,7 @@ const UpdateNotificationOffsetModal = createVisualComponent({
                       feedback: "error",
                       message: {
                         en: "Notification offset must be at least 1 hour.",
-                        cs: "Posun oznámení musí být aspoň 1 hodina.",
+                        cs: "Posun upozornění musí být aspoň 1 hodina.",
                       },
                     };
                   }
@@ -138,7 +138,7 @@ const UpdateNotificationOffsetModal = createVisualComponent({
                         feedback: "error",
                         message: {
                           en: "Notification offset must be at least 1 hour.",
-                          cs: "Posun oznámení musí být aspoň 1 hodina.",
+                          cs: "Posun upozornění musí být aspoň 1 hodina.",
                         },
                       };
                     }

@@ -81,8 +81,8 @@ const ActivitySettingsView = createVisualComponent({
         info: (
           <Lsi
             lsi={{
-              en: "This will prevent the activity from periodically creating the next date. After the upcoming date passes, the activity will not have a date assigned.",
-              cs: "Změnou tohoto nastavení zabráníte aktivitě v pravidelném vytváření dalšího data. Po uplynutí nadcházejícího data nebude mít aktivita přiřazené žádné datum.",
+              en: "This will prevent the activity from periodically creating the next datetime. After the upcoming datetime passes, the activity will not have a datetime assigned.",
+              cs: "Změnou tohoto nastavení zabráníte aktivitě v pravidelném vytváření dalšího termínu. Po uplynutí nadcházejícího termínu nebude mít aktivita přiřazený žádný termín.",
             }}
           />
         ),
@@ -162,7 +162,7 @@ const ActivitySettingsView = createVisualComponent({
           priority: "info",
           header: {
             en: "Notification offset changed",
-            cs: "Posun oznámení změněn",
+            cs: "Posun upozornění změněn",
           },
           message: { en: "Changes you made were successfully saved.", cs: "Provedené změny byly úspěšně uloženy." },
           durationMs: 2000,

@@ -62,7 +62,7 @@ const ActivityDetail = createVisualComponent({
     } = data;
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
-    const [route, setRoute] = useRoute();
+    const [, setRoute] = useRoute();
     const { nextRoute, allow } = useRouteLeave();
     const [activeTab, setActiveTab] = useState("info");
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "notFound"] });
@@ -109,6 +109,10 @@ const ActivityDetail = createVisualComponent({
     function handleChangeTab({ activeCode }) {
       setActiveTab(activeCode);
     }
+
+    const handleReload = async (id) => {
+      return await handlerMap.load({ id });
+    };
 
     const handleAddAdministrator = async (uuIdentity) => {
       return await handlerMap.addAdministrator({ id, uuIdentity });
@@ -168,6 +172,7 @@ const ActivityDetail = createVisualComponent({
               datetimeId={datetimeId}
               minParticipants={minParticipants}
               idealParticipants={idealParticipants}
+              onReload={handleReload}
             />
           );
         case "members":

@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useScreenSize, useSession } from "uu5g05";
+import { createVisualComponent, Lsi, useLsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { ListItem, Panel, Pending, Text } from "uu5g05-elements";
+import { Button, ListItem, Panel, Pending, PlaceholderBox, Text } from "uu5g05-elements";
 import ParticipationList from "./participation-list.js";
 import DatetimeBlock from "./datetime-block.js";
 import UserParticipationBlock from "./user-participation-block.js";
@@ -9,6 +9,7 @@ import ParticipationInfoText from "./participation-info-text.js";
 import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import DatetimeProvider from "../providers/datetime-provider.js";
 import importLsi from "../lsi/import-lsi.js";
+import CreateDatetimeModal from "./create-datetime-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -52,12 +53,17 @@ const DatetimeDetail = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ idealParticipants, minParticipants, datetimeId }) {
+  render({ idealParticipants, minParticipants, datetimeId, activityId, onReload }) {
     //@@viewOn:private
     const { identity } = useSession();
-    const { showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
+    const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const [screenSize] = useScreenSize();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const handleOpenModal = () => setModalOpen(true);
+    const handleCloseModal = () => setModalOpen(false);
 
     function renderLoading() {
       return <Pending size="l" colorScheme="secondary" type="horizontal" />;
@@ -80,11 +86,56 @@ const DatetimeDetail = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
-      if (!data) return null;
+      const handleCreateDatetime = async ({ value }) => {
+        try {
+          const createdDatetime = await handlerMap.create({ activityId, ...value });
+          await onReload(activityId);
+          const formattedDatetime = new Date(createdDatetime.datetime).toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          });
+          addAlert({
+            priority: "success",
+            header: { en: "New datetime was successfully created!", cs: "Nový termín by úspěšně vytvořen!" },
+            message: {
+              en: `Every member can now update their participation until ${formattedDatetime}.`,
+              cs: `Každý člen může nyní změnit svoji účast do ${formattedDatetime}.`,
+            },
+          });
+        } catch (error) {
+          showError(error);
+        }
+      };
+
+      if (!data)
+        return (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <PlaceholderBox code="calendar" header={placeholderLsi.header} style={{ padding: "16px" }} />
+            <Button
+              style={{ maxWidth: "200px" }}
+              colorScheme="secondary"
+              significance="common"
+              icon="mdi-calendar-plus-outline"
+              onClick={handleOpenModal}
+            >
+              <Lsi lsi={{ en: "Create new datetime", cs: "Vytvořit nový termín" }} />
+            </Button>
+            <CreateDatetimeModal open={modalOpen} onClose={handleCloseModal} onSubmit={handleCreateDatetime} />
+          </div>
+        );
 
       const { id, datetime, undecided, confirmed, denied } = data;
 
-      const userCurrentParticipationType = (() => {
+      const currentUserParticipationType = (() => {
         if (confirmed.includes(identity.uuIdentity)) return "confirmed";
         if (denied.includes(identity.uuIdentity)) return "denied";
         return "undecided";
@@ -94,7 +145,7 @@ const DatetimeDetail = createVisualComponent({
         try {
           await handlerMap.updateParticipation({ id, type: data.value });
         } catch (error) {
-          showError(e);
+          showError(error);
         }
       };
 
@@ -110,7 +161,7 @@ const DatetimeDetail = createVisualComponent({
           />
           <UserParticipationBlock
             onChangeParticipation={handleChangeParticipation}
-            userParticipationType={userCurrentParticipationType}
+            userParticipationType={currentUserParticipationType}
           />
           {["xs", "s", "m"].includes(screenSize) ? (
             <Panel

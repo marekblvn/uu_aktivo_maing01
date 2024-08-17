@@ -46,8 +46,6 @@ const ActivityProvider = createVisualComponent({
         removeMember: Calls.Activity.removeMember,
         leave: Calls.Activity.leave,
         transferOwnership: Calls.Activity.transferOwnership,
-        invite: Calls.Invitation.create,
-        createDatetime: Calls.Datetime.create,
       },
     });
 

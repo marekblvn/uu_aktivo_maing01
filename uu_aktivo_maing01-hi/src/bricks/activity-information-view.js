@@ -1,11 +1,10 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
-import { Box, Grid, Line, ListItem, PlaceholderBox, Text } from "uu5g05-elements";
+import { Box, Grid, Line, ListItem, Text } from "uu5g05-elements";
 import PostListProvider from "../providers/post-list-provider.js";
 import DatetimeDetail from "./datetime-detail.js";
-import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -37,10 +36,9 @@ const ActivityInformationView = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ description, location, minParticipants, idealParticipants, activityId, datetimeId }) {
+  render({ description, location, minParticipants, idealParticipants, activityId, datetimeId, onReload }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
-    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
 
     const textType = (() => {
       switch (screenSize) {
@@ -106,15 +104,13 @@ const ActivityInformationView = createVisualComponent({
             borderRadius="moderate"
             colorScheme="secondary"
           >
-            {datetimeId !== null ? (
-              <DatetimeDetail
-                datetimeId={datetimeId}
-                idealParticipants={idealParticipants}
-                minParticipants={minParticipants}
-              />
-            ) : (
-              <PlaceholderBox code="calendar" header={placeholderLsi.header} style={{ padding: "16px" }} />
-            )}
+            <DatetimeDetail
+              activityId={activityId}
+              datetimeId={datetimeId}
+              idealParticipants={idealParticipants}
+              minParticipants={minParticipants}
+              onReload={onReload}
+            />
           </Box>
           {["xs", "s"].includes(screenSize) && <Line margin="-4px -9px" colorScheme="neutral" significance="subdued" />}
           <Box

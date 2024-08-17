@@ -3,6 +3,8 @@ import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
 import { ActionGroup, Box, DateTime, Text } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
+import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -50,6 +52,8 @@ const PostCard = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
+    const { isAuthority, isExecutive } = useAuthorization();
+    const { isOwner, isAdministrator, checkIfAdministrator, checkIfOwner } = useActivityAuthorization();
 
     const contentTextType = (() => {
       switch (screenSize) {
@@ -63,6 +67,37 @@ const PostCard = createVisualComponent({
           return "small";
       }
     })();
+
+    const getActionList = () => {
+      const list = [];
+      if (
+        isAuthority ||
+        isExecutive ||
+        isOwner ||
+        (isAdministrator && !checkIfOwner(uuIdentity) && !checkIfAdministrator(uuIdentity)) ||
+        uuIdentity === identity.uuIdentity
+      ) {
+        list.push({
+          children: <Lsi lsi={{ en: "Delete", cs: "Smazat" }} />,
+          icon: "mdi-delete",
+          collapsed: true,
+          onClick: onDelete,
+          colorScheme: "negative",
+        });
+      }
+
+      if (uuIdentity === identity.uuIdentity) {
+        list.push({
+          children: <Lsi lsi={{ en: "Edit", cs: "Upravit" }} />,
+          icon: "mdi-pencil",
+          collapsed: true,
+          order: -1,
+          onClick: onEdit,
+          colorScheme: "steel",
+        });
+      }
+      return list;
+    };
     //@@viewOff:private
 
     //@@viewOn:render
@@ -75,29 +110,7 @@ const PostCard = createVisualComponent({
             subtitle={<DateTime value={createdAt} timeFormat="short" dateFormat="medium" />}
             direction={screenSize === "xs" ? "vertical" : "horizontal"}
           />
-          {uuIdentity === identity.uuIdentity && (
-            <ActionGroup
-              size="s"
-              itemList={[
-                {
-                  children: <Lsi lsi={{ en: "Edit", cs: "Upravit" }} />,
-                  icon: "mdi-pencil",
-                  collapsed: true,
-                  order: -1,
-                  onClick: onEdit,
-                  colorScheme: "steel",
-                },
-                { divider: true },
-                {
-                  children: <Lsi lsi={{ en: "Delete", cs: "Smazat" }} />,
-                  icon: "mdi-delete",
-                  collapsed: true,
-                  onClick: onDelete,
-                  colorScheme: "negative",
-                },
-              ]}
-            />
-          )}
+          {uuIdentity === identity.uuIdentity && <ActionGroup size="s" itemList={getActionList()} />}
         </div>
         <Text className={Css.text()} autoFit category="interface" segment="content" type={contentTextType}>
           {content}

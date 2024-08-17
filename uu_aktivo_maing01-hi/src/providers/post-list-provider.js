@@ -42,7 +42,7 @@ const PostListProvider = createVisualComponent({
       itemIdentifier: "id",
       initialDtoIn: {
         filters: { activityId: activityId },
-        sort: { createdAt: 1 },
+        sort: { createdAt: -1 },
       },
       handlerMap: {
         load: Calls.Post.list,
@@ -59,7 +59,7 @@ const PostListProvider = createVisualComponent({
     const handleCreatePost = async (value) => {
       try {
         await handlerMap.create({ activityId, type: "normal", content: value });
-        await handlerMap.load({ activityId });
+        await handlerMap.load({ filters: { activityId }, sort: { createdAt: -1 } });
       } catch (error) {
         showError(error);
       }

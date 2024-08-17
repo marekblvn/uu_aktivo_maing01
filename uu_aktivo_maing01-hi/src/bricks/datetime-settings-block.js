@@ -4,6 +4,8 @@ import Config from "./config/config.js";
 import { Block, Grid, PlaceholderBox, RichIcon, Text } from "uu5g05-elements";
 import { Checkbox } from "uu5g05-forms";
 import importLsi from "../lsi/import-lsi.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
+import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -43,6 +45,8 @@ const DatetimeSettingsBlock = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
+    const { isAuthority, isExecutive } = useAuthorization();
+    const { isOwner } = useActivityAuthorization();
 
     const formattedFrequencyCs = (() => {
       if (!frequency) return "";
@@ -172,13 +176,15 @@ const DatetimeSettingsBlock = createVisualComponent({
                         <Lsi lsi={{ en: formattedFrequencyEn, cs: formattedFrequencyCs }} />
                       </Text>
                     </div>
-                    <RichIcon
-                      icon="mdi-pencil"
-                      size="xs"
-                      borderRadius="expressive"
-                      style={{ marginLeft: "auto" }}
-                      onClick={onEditFrequency}
-                    />
+                    {(isAuthority || isExecutive || isOwner) && (
+                      <RichIcon
+                        icon="mdi-pencil"
+                        size="xs"
+                        borderRadius="expressive"
+                        style={{ marginLeft: "auto" }}
+                        onClick={onEditFrequency}
+                      />
+                    )}
                   </div>
                 )}
                 {notificationOffset && (
@@ -214,13 +220,15 @@ const DatetimeSettingsBlock = createVisualComponent({
                         <Lsi lsi={{ en: formattedNotificationOffsetEn, cs: formattedNotificationOffsetCs }} />
                       </Text>
                     </div>
-                    <RichIcon
-                      icon="mdi-pencil"
-                      size="xs"
-                      borderRadius="expressive"
-                      style={{ marginLeft: "auto" }}
-                      onClick={onEditNotificationOffset}
-                    />
+                    {(isAuthority || isExecutive || isOwner) && (
+                      <RichIcon
+                        icon="mdi-pencil"
+                        size="xs"
+                        borderRadius="expressive"
+                        style={{ marginLeft: "auto" }}
+                        onClick={onEditNotificationOffset}
+                      />
+                    )}
                   </div>
                 )}
               </Grid>

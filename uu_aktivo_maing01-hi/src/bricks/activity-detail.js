@@ -16,6 +16,8 @@ import ActivityInformationView from "./activity-information-view.js";
 import ActivityMembersView from "./activity-members-view.js";
 import ActivitySettingsView from "./activity-settings-view.js";
 import importLsi from "../lsi/import-lsi.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
+import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -66,6 +68,8 @@ const ActivityDetail = createVisualComponent({
     const { nextRoute, allow } = useRouteLeave();
     const [activeTab, setActiveTab] = useState("info");
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "notFound"] });
+    const { isAuthority, isExecutive } = useAuthorization();
+    const { isAdministrator, isOwner } = useActivityAuthorization();
 
     useEffect(() => {
       const lastTab = sessionStorage.getItem("lastTabCode");
@@ -97,7 +101,7 @@ const ActivityDetail = createVisualComponent({
         code: "members",
       },
     ];
-    if (identity.uuIdentity === owner) {
+    if (isOwner || isAdministrator || isAuthority || isExecutive) {
       tabItemList.push({
         label: <Lsi lsi={{ en: "Settings", cs: "Nastavení" }} />,
         icon: activeTab === "settings" ? "mdi-cog" : "mdi-cog-outline",

@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCall, useCallback, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
 import { Dialog, Grid } from "uu5g05-elements";
@@ -10,6 +10,7 @@ import DatetimeSettingsBlock from "./datetime-settings-block.js";
 import UpdateNotificationOffsetModal from "./update-notification-offset-modal.js";
 import { useAlertBus } from "uu_plus4u5g02-elements";
 import importLsi from "../lsi/import-lsi.js";
+import Calls from "../calls.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -52,6 +53,7 @@ const ActivitySettingsView = createVisualComponent({
     onChangeRecurrence,
     onUpdateFrequency,
     onUpdateNotificationOffset,
+    onReload,
   }) {
     //@@viewOn:private
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
@@ -60,6 +62,7 @@ const ActivitySettingsView = createVisualComponent({
     const [frequencyFormOpen, setFrequencyFormOpen] = useState(false);
     const [notificationOffsetFormOpen, setNotificationOffsetFormOpen] = useState(false);
     const [dialogProps, setDialogProps] = useState();
+    const { call: callDatetimeDelete } = useCall(Calls.Datetime.delete);
     //@@viewOff:private
 
     const handleOpenInformationForm = () => setInformationFormOpen(true);
@@ -102,7 +105,46 @@ const ActivitySettingsView = createVisualComponent({
         ],
       });
     }, []);
+
+    const showDeleteDatetimeDialog = useCallback((onConfirm) => {
+      setDialogProps({
+        header: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "header"]} />,
+        info: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "info"]} />,
+        icon: "mdi-delete",
+        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+        actionList: [
+          {
+            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+            onClick: handleCloseDialog,
+          },
+          {
+            children: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "submit"]} />,
+            colorScheme: "negative",
+            onClick: onConfirm,
+          },
+        ],
+      });
+    });
+
     const handleCloseDialog = () => setDialogProps(null);
+
+    const handleDeleteDatetime = () => {
+      showDeleteDatetimeDialog(async () => {
+        try {
+          await callDatetimeDelete({ id: datetimeId });
+          handleCloseDialog();
+          await onReload(id);
+          addAlert({
+            priority: "info",
+            header: { en: "Datetime was deleted", cs: "Termín byl smazán" },
+            message: { en: "The datetime was successfully deleted.", cs: "Termín byl úspěšně smazán." },
+            durationMs: 2000,
+          });
+        } catch (error) {
+          showError(error);
+        }
+      });
+    };
 
     const handleUpdateActivityInfo = async ({ data }) => {
       try {
@@ -199,6 +241,7 @@ const ActivitySettingsView = createVisualComponent({
             onChangeRecurrence={handleChangeRecurrence}
             onEditFrequency={handleOpenFrequencyForm}
             onEditNotificationOffset={handleOpenNotificationOffsetForm}
+            onDeleteDatetime={handleDeleteDatetime}
           />
         </Grid>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={handleCloseDialog} />

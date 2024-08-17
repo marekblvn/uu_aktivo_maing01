@@ -87,6 +87,11 @@
       "header": "Are you sure you want to decline invitation to %s?",
       "info": "The invitation will be deleted.",
       "submit": "Decline"
+    },
+    "deleteDatetime": {
+      "header": "Are you sure you want to delete the datetime?",
+      "info": "The datetime will be permanently deleted and it's recurrence will be stopped (if it is recurrent). Please note that by deleting the datetime, you will lose all participation data in the current datetime!",
+      "submit": "Delete"
     }
   },
   "Errors": {

@@ -199,6 +199,7 @@ const ActivityDetail = createVisualComponent({
               onChangeRecurrence={handleChangeRecurrence}
               onUpdateFrequency={handleUpdateFrequency}
               onUpdateNotificationOffset={handleUpdateNotificationOffset}
+              onReload={handleReload}
             />
           );
         default:

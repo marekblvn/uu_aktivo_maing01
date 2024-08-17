@@ -41,6 +41,7 @@ const DatetimeSettingsBlock = createVisualComponent({
     onEditFrequency,
     onEditNotificationOffset,
     onChangeRecurrence,
+    onDeleteDatetime,
   }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
@@ -105,6 +106,22 @@ const DatetimeSettingsBlock = createVisualComponent({
           </Text>
         }
         headerType="title"
+        actionList={
+          (isOwner || isAuthority || isExecutive) && datetimeId !== null
+            ? [
+                {
+                  colorScheme: "negative",
+                  significance: "common",
+                  icon: "mdi-delete",
+                  tooltip: {
+                    en: "Delete datetime",
+                    cs: "Smazat termín",
+                  },
+                  onClick: onDeleteDatetime,
+                },
+              ]
+            : []
+        }
       >
         {datetimeId !== null ? (
           ({ style }) => (

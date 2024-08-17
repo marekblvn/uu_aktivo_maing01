@@ -1,11 +1,15 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCall, useCallback, useScreenSize, useState } from "uu5g05";
+import { useAlertBus, PersonItem } from "uu_plus4u5g02-elements";
+import { Button, Dialog, Grid } from "uu5g05-elements";
+import { useAuthorization } from "../contexts/authorization-context.js";
+import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
+import Calls from "../calls.js";
 import Config from "./config/config.js";
 import Container from "./container.js";
-import { Dialog, Grid } from "uu5g05-elements";
 import MemberList from "./member-list.js";
+import CreateInvitationModal from "./create-invitation-modal.js";
 import importLsi from "../lsi/import-lsi.js";
-import { useAlertBus, PersonItem } from "uu_plus4u5g02-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -45,11 +49,24 @@ const ActivityMembersView = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ members, owner, administrators, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity }) {
+  render({
+    activityId,
+    members,
+    owner,
+    administrators,
+    onRemoveMember,
+    onPromoteAdmin,
+    onDemoteAdmin,
+    onLeaveActivity,
+  }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
-    const { addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
+    const { addAlert, showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
+    const { call: callInvitationCreate } = useCall(Calls.Invitation.create);
+    const { isAuthority, isExecutive } = useAuthorization();
+    const { isOwner, isAdministrator } = useActivityAuthorization();
     const [dialogProps, setDialogProps] = useState();
+    const [openModal, setOpenModal] = useState(false);
     const membersFiltered = members.filter((item) => !administrators.includes(item) && item !== owner);
     //@@viewOff:private
 
@@ -78,6 +95,29 @@ const ActivityMembersView = createVisualComponent({
         ],
       });
     }, []);
+
+    const handleOpenModal = () => setOpenModal(true);
+    const handleCloseModal = () => setOpenModal(false);
+    const handleCreateInvitation = async ({ data }) => {
+      const uuIdentity = data.value.uuIdentity;
+      try {
+        await callInvitationCreate({ activityId, uuIdentity });
+        handleCloseModal();
+        addAlert({
+          priority: "info",
+          header: {
+            en: "User invited",
+            cs: "Uživatel pozván",
+          },
+          info: {
+            en: "Invitation was successfully created.",
+            cs: "Byla úspěšně vytvořena pozvánka pro uživatele.",
+          },
+        });
+      } catch (error) {
+        showError(error);
+      }
+    };
 
     const handlePromoteAdmin = (uuIdentity) => {
       handleOpenDialog("addAdministrator", uuIdentity, async (event) => {
@@ -140,6 +180,19 @@ const ActivityMembersView = createVisualComponent({
           borderBottomRightRadius: "8px",
         }}
       >
+        {(isOwner || isAdministrator || isAuthority || isExecutive) && (
+          <Grid>
+            <Button
+              style={{ marginLeft: "auto" }}
+              icon="mdi-account-plus"
+              colorScheme="primary"
+              size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
+              onClick={handleOpenModal}
+            >
+              <Lsi lsi={{ en: "Invite user", cs: "Pozvat uživatele" }} />
+            </Button>
+          </Grid>
+        )}
         <Grid templateColumns="1fr">
           <MemberList
             items={[owner]}
@@ -174,6 +227,12 @@ const ActivityMembersView = createVisualComponent({
           />
         </Grid>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={handleCloseDialog} />
+        <CreateInvitationModal
+          open={openModal}
+          onClose={handleCloseModal}
+          onSubmit={handleCreateInvitation}
+          members={members}
+        />
       </Container>
     );
     //@@viewOff:render

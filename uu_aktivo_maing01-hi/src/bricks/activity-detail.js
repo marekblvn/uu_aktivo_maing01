@@ -7,17 +7,16 @@ import {
   useRoute,
   useRouteLeave,
   useScreenSize,
-  useSession,
   useState,
 } from "uu5g05";
-import Config from "./config/config.js";
 import { Header, PlaceholderBox, Tabs } from "uu5g05-elements";
+import Config from "./config/config.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
+import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import ActivityInformationView from "./activity-information-view.js";
 import ActivityMembersView from "./activity-members-view.js";
 import ActivitySettingsView from "./activity-settings-view.js";
 import importLsi from "../lsi/import-lsi.js";
-import { useAuthorization } from "../contexts/authorization-context.js";
-import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -63,7 +62,6 @@ const ActivityDetail = createVisualComponent({
       datetimeId,
     } = data;
     const [screenSize] = useScreenSize();
-    const { identity } = useSession();
     const [, setRoute] = useRoute();
     const { nextRoute, allow } = useRouteLeave();
     const [activeTab, setActiveTab] = useState("info");
@@ -87,7 +85,7 @@ const ActivityDetail = createVisualComponent({
         sessionStorage.removeItem("lastTabCode");
         allow();
       }
-    }, [nextRoute]);
+    }, [nextRoute, allow]);
 
     const tabItemList = [
       {
@@ -182,6 +180,7 @@ const ActivityDetail = createVisualComponent({
         case "members":
           return (
             <ActivityMembersView
+              activityId={id}
               members={members}
               administrators={administrators}
               owner={owner}

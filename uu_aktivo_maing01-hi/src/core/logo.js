@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, useRoute } from "uu5g05";
+import { createVisualComponent, useRoute, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Box, Text } from "uu5g05-elements";
+import { Box, RichIcon, Text } from "uu5g05-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -46,14 +46,21 @@ const Logo = createVisualComponent({
   render() {
     //@@viewOn:private
     const [, setRoute] = useRoute();
+    const [screenSize] = useScreenSize();
     //@@viewOff:private
 
     //@@viewOn:render
 
     return (
       <Box onClick={() => setRoute("")} className={Css.box()} shape="background">
+        <RichIcon
+          icon="mdi-lightning-bolt"
+          cssBackground="transparent"
+          cssColor="rgb(255,140,0)"
+          size={["xl", "l", "m", "s"].includes(screenSize) ? "xl" : "l"}
+        />
         <Text category="interface" segment="title" type="main" className={Css.text()}>
-          ⚡Aktivo
+          Aktivo
         </Text>
       </Box>
     );

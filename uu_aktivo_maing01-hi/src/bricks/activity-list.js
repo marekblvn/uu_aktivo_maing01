@@ -52,7 +52,7 @@ const ActivityList = createVisualComponent({
 
     return (
       <Grid
-        templateColumns={{ xs: "100%", l: "repeat(2, 2fr)" }}
+        templateColumns={{ xs: "100%", l: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }}
         columnGap={{ m: "16px", l: "32px" }}
         rowGap={{ m: "16px", l: "32px" }}
         style={{ marginTop: "16px", marginBottom: "16px" }}

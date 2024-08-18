@@ -56,7 +56,7 @@ let MyActivities = createVisualComponent({
     const loadNextRef = useRef();
     const [dialogProps, setDialogProps] = useState();
     const [openModal, setOpenModal] = useState(false);
-    const [noData, setNoData] = useState(true);
+    const [headerButtonVisible, setHeaderButtonVisible] = useState(false);
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noActivityList"] });
     //@@viewOff:private
 
@@ -104,8 +104,8 @@ let MyActivities = createVisualComponent({
       [showDialog],
     );
 
-    const hideHeaderButton = () => setNoData(true);
-    const showHeaderButton = () => setNoData(false);
+    const hideHeaderButton = () => setHeaderButtonVisible(false);
+    const showHeaderButton = () => setHeaderButtonVisible(true);
     //@@viewOff:methods
 
     //@@viewOn:render
@@ -184,7 +184,7 @@ let MyActivities = createVisualComponent({
             level={screenSize === "xs" ? 5 : 5}
             style={{ marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}` }}
           />
-          {!noData && (
+          {headerButtonVisible && (
             <ActionGroup
               itemList={[
                 {

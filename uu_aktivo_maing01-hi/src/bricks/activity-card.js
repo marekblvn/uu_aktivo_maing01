@@ -100,39 +100,38 @@ const ActivityCard = createVisualComponent({
           <Header
             title={
               <div style={{ display: "flex", alignItems: "center", columnGap: "8px" }}>
-                <Text
-                  category="interface"
-                  segment="title"
-                  type={`${screenSize === "xs" ? "micro" : screenSize === "s" ? "minor" : "common"}`}
-                  autoFit
-                >
+                {renderIcon()}
+                <Text category="interface" segment="title" type={`${screenSize === "xs" ? "micro" : "minor"}`} autoFit>
                   {activity.name}
                 </Text>
-                {renderIcon()}
               </div>
             }
-            subtitle={activity.location || ""}
           />
         }
         actionList={actionItems}
         footer={
-          <Button
-            width={screenSize === "xs" ? "100%" : "200px"}
-            colorScheme="primary"
-            significance="highlighted"
-            onClick={() => setRoute("activity", { id: activity.id })}
-          >
-            <Lsi lsi={{ en: "Open Activity", cs: "Otevřít aktivitu" }} />
-          </Button>
+          <div style={{ display: "flex", width: "100%" }}>
+            <Button
+              width={screenSize === "xs" ? "100%" : "200px"}
+              colorScheme="primary"
+              significance="highlighted"
+              onClick={() => setRoute("activity", { id: activity.id })}
+              style={{ marginLeft: "auto" }}
+              size={["xl", "l"].includes(screenSize) ? "m" : "s"}
+            >
+              <Lsi lsi={{ en: "Open Activity", cs: "Otevřít aktivitu" }} />
+            </Button>
+          </div>
         }
       >
         {activity.description.length > 0 && (
           <Text
             category="interface"
             segment="content"
-            type={`${screenSize === "xs" ? "small" : screenSize === "s" ? "medium" : "large"}`}
+            type={["xl", "l"].includes(screenSize) ? "large" : screenSize === "m" ? "medium" : "small"}
             autoFit
             colorScheme="building"
+            significance="subdued"
             style={{ textAlign: "justify" }}
           >
             {activity.description}

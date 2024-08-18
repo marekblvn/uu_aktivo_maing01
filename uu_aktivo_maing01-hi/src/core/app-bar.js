@@ -38,9 +38,7 @@ const AppBar = createVisualComponent({
     const [screenSize] = useScreenSize();
 
     useEffect(() => {
-      if (["xs", "s"].includes(screenSize)) {
-        handleCloseSideMenu();
-      }
+      handleCloseSideMenu();
     }, [screenSize]);
     //@@viewOff:private
 

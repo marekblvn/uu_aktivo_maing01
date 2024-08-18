@@ -178,11 +178,11 @@ const ActivityMembersView = createVisualComponent({
           borderTop: "none",
           borderBottomLeftRadius: "8px",
           borderBottomRightRadius: "8px",
-          height: "calc(100vh - 182px)",
+          height: "100%",
         }}
       >
-        {(isOwner || isAdministrator || isAuthority || isExecutive) && (
-          <Grid>
+        <Grid templateColumns="1fr">
+          {(isOwner || isAdministrator || isAuthority || isExecutive) && (
             <Button
               style={{ marginLeft: "auto" }}
               icon="mdi-account-plus"
@@ -192,9 +192,7 @@ const ActivityMembersView = createVisualComponent({
             >
               <Lsi lsi={{ en: "Invite user", cs: "Pozvat uživatele" }} />
             </Button>
-          </Grid>
-        )}
-        <Grid templateColumns="1fr">
+          )}
           <MemberList
             items={[owner]}
             colorScheme="primary"

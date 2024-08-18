@@ -224,10 +224,10 @@ const ActivitySettingsView = createVisualComponent({
           borderTop: "none",
           borderBottomLeftRadius: "8px",
           borderBottomRightRadius: "8px",
-          height: "calc(100vh - 182px)",
+          height: "100%",
         }}
       >
-        <Grid rowGap="12px">
+        <Grid rowGap="12px" templateColumns={{ xs: "100%", m: "repeat(2, 1fr)" }}>
           {/* Activity settings */}
           <ActivityInformationBlock
             data={{ name, description, location, minParticipants, idealParticipants }}

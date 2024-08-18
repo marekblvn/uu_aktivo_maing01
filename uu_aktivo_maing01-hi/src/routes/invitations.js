@@ -205,7 +205,7 @@ let Invitations = createVisualComponent({
           height: "calc(100vh - 88px)",
         }}
       >
-        <div style={{ display: "flex", marginBottom: "24px" }}>
+        <div style={{ display: "flex", marginBottom: "24px", padding: "0 8px" }}>
           <Header
             title={<Lsi lsi={{ en: "Invitations", cs: "Pozvánky" }} />}
             icon={
@@ -218,10 +218,7 @@ let Invitations = createVisualComponent({
                 size={screenSize === "xs" ? "l" : "xl"}
               />
             }
-            level={4}
-            style={{
-              marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}`,
-            }}
+            level={["xs", "s"].includes(screenSize) ? 5 : 4}
           />
         </div>
         <InvitationListProvider>

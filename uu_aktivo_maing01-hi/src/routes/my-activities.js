@@ -181,8 +181,7 @@ let MyActivities = createVisualComponent({
                 size={screenSize === "xs" ? "l" : "xl"}
               />
             }
-            level={screenSize === "xs" ? 5 : 5}
-            style={{ marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}` }}
+            level={["xs", "s"].includes(screenSize) ? 5 : 4}
           />
           {headerButtonVisible && (
             <ActionGroup
@@ -195,7 +194,7 @@ let MyActivities = createVisualComponent({
                   order: -1,
                   icon: "mdi-plus",
                   collapsed: false,
-                  size: ["xl", "l", "m"].includes(screenSize) ? "m" : "xs",
+                  size: ["xl", "l"].includes(screenSize) ? "m" : screenSize === "m" ? "s" : "xs",
                 },
               ]}
               collapsedMenuProps={{

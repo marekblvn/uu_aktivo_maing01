@@ -7,9 +7,10 @@ import {
   useRoute,
   useRouteLeave,
   useScreenSize,
+  useSlide,
   useState,
 } from "uu5g05";
-import { Header, PlaceholderBox, Tabs } from "uu5g05-elements";
+import { Header, PlaceholderBox, Tabs, Text } from "uu5g05-elements";
 import Config from "./config/config.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
@@ -61,13 +62,25 @@ const ActivityDetail = createVisualComponent({
       minParticipants,
       datetimeId,
     } = data;
-    const [screenSize] = useScreenSize();
+
     const [, setRoute] = useRoute();
     const { nextRoute, allow } = useRouteLeave();
-    const [activeTab, setActiveTab] = useState("info");
-    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "notFound"] });
     const { isAuthority, isExecutive } = useAuthorization();
     const { isAdministrator, isOwner } = useActivityAuthorization();
+
+    const [screenSize] = useScreenSize();
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "notFound"] });
+
+    const [activeTab, setActiveTab] = useState("info");
+    const { ref, style } = useSlide({
+      onEnd(e) {
+        const { direction, pointerType } = e.data;
+        if (pointerType !== "mouse") {
+          if (direction.right) setActiveTab(tabDirections[activeTab].left);
+          else if (direction.left) setActiveTab(tabDirections[activeTab].right);
+        }
+      },
+    });
 
     useEffect(() => {
       const lastTab = sessionStorage.getItem("lastTabCode");
@@ -87,21 +100,65 @@ const ActivityDetail = createVisualComponent({
       }
     }, [nextRoute, allow]);
 
+    const tabDirections = {
+      info: {
+        left: "info",
+        right: "members",
+      },
+      members: {
+        left: "info",
+        right: "attendance",
+      },
+      attendance: {
+        left: "members",
+        right: isOwner || isAdministrator || isAuthority || isExecutive ? "settings" : "attendance",
+      },
+      settings: {
+        left: "attendance",
+        right: "settings",
+      },
+    };
+
     const tabItemList = [
       {
-        label: <Lsi lsi={{ en: "Information", cs: "Informace" }} />,
+        label:
+          ["xs", "s"].includes(screenSize) && activeTab !== "info" ? undefined : (
+            <Text category="interface" segment="highlight" type="common">
+              <Lsi lsi={{ en: "Information", cs: "Informace" }} />
+            </Text>
+          ),
         icon: activeTab === "info" ? "mdi-information" : "mdi-information-outline",
         code: "info",
       },
       {
-        label: <Lsi lsi={{ en: "Members", cs: "Členové" }} />,
+        label:
+          ["xs", "s"].includes(screenSize) && activeTab !== "members" ? undefined : (
+            <Text category="interface" segment="highlight" type="common">
+              <Lsi lsi={{ en: "Members", cs: "Členové" }} />
+            </Text>
+          ),
         icon: activeTab === "members" ? "mdi-account-multiple" : "mdi-account-multiple-outline",
         code: "members",
+      },
+      {
+        label:
+          ["xs", "s"].includes(screenSize) && activeTab !== "attendance" ? undefined : (
+            <Text category="interface" segment="highlight" type="common">
+              <Lsi lsi={{ en: "Attendance", cs: "Docházka" }} />
+            </Text>
+          ),
+        icon: activeTab === "attendance" ? "mdi-chart-box" : "mdi-chart-box-outline",
+        code: "attendance",
       },
     ];
     if (isOwner || isAdministrator || isAuthority || isExecutive) {
       tabItemList.push({
-        label: <Lsi lsi={{ en: "Settings", cs: "Nastavení" }} />,
+        label:
+          ["xs", "s"].includes(screenSize) && activeTab !== "settings" ? undefined : (
+            <Text category="interface" segment="highlight" type="common">
+              <Lsi lsi={{ en: "Settings", cs: "Nastavení" }} />
+            </Text>
+          ),
         icon: activeTab === "settings" ? "mdi-cog" : "mdi-cog-outline",
         code: "settings",
       });
@@ -152,13 +209,14 @@ const ActivityDetail = createVisualComponent({
     function renderNavigation() {
       return (
         <Tabs
-          block
-          type="line"
+          justified
+          type="card-inner"
           colorScheme="primary"
           itemList={tabItemList}
           activeCode={activeTab}
           onChange={handleChangeTab}
           displayBottomLine={true}
+          size="s"
         />
       );
     }
@@ -206,8 +264,10 @@ const ActivityDetail = createVisualComponent({
       }
     }
 
+    const { userSelect, ...restStyles } = style;
+
     return (
-      <div style={{ position: "relative" }}>
+      <div ref={ref} style={restStyles}>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Header
             title={name}

@@ -138,7 +138,7 @@ let MyActivities = createVisualComponent({
             info={placeholderLsi.info}
             actionList={[
               {
-                children: <Lsi lsi={{ en: "Create new Activity", cs: "Vytvořit novou aktivitu" }} />,
+                children: <Lsi lsi={{ en: "Create new activity", cs: "Vytvořit novou aktivitu" }} />,
                 primary: true,
                 icon: "mdi-plus",
                 colorScheme: "primary",
@@ -168,34 +168,34 @@ let MyActivities = createVisualComponent({
           marginTop: "32px",
         }}
       >
-        <div style={{ display: "flex", marginBottom: "24px" }}>
+        <div style={{ display: "flex", marginBottom: "24px", padding: "0 8px" }}>
           <Header
             title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
             icon={
               <RichIcon
-                icon="mdi-lightning-bolt"
-                colorScheme="orange"
+                icon="mdi-pulse"
+                colorScheme="primary"
                 significance="subdued"
                 borderRadius="moderate"
                 cssBackground="#ffffff"
                 size={screenSize === "xs" ? "l" : "xl"}
               />
             }
-            level={4}
+            level={screenSize === "xs" ? 5 : 5}
             style={{ marginLeft: `${["xs", "s"].includes(screenSize) ? "6px" : "0"}` }}
           />
           {!noData && (
             <ActionGroup
               itemList={[
                 {
-                  children: <Lsi lsi={{ en: "Create new Activity", cs: "Vytvořit novou aktivitu" }} />,
+                  children: <Lsi lsi={{ en: "Create new activity", cs: "Vytvořit novou aktivitu" }} />,
                   colorScheme: "primary",
                   significance: "common",
                   onClick: () => setOpenModal(true),
                   order: -1,
                   icon: "mdi-plus",
                   collapsed: false,
-                  size: screenSize === "xl" ? "l" : screenSize === "xs" ? "s" : screenSize,
+                  size: ["xl", "l", "m"].includes(screenSize) ? "m" : "xs",
                 },
               ]}
               collapsedMenuProps={{

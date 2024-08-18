@@ -178,6 +178,7 @@ const ActivityMembersView = createVisualComponent({
           borderTop: "none",
           borderBottomLeftRadius: "8px",
           borderBottomRightRadius: "8px",
+          height: "calc(100vh - 182px)",
         }}
       >
         {(isOwner || isAdministrator || isAuthority || isExecutive) && (

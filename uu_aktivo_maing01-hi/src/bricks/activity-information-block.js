@@ -57,7 +57,7 @@ const ActivityInformationBlock = createVisualComponent({
                   icon: "mdi-pencil",
                   colorScheme: "neutral",
                   significance: "common",
-                  size: ["xs", "s"].includes(screenSize) ? "s" : "m",
+                  size: ["xs", "s"].includes(screenSize) ? "xxs" : "s",
                   onClick: onClickEdit,
                 },
               ]

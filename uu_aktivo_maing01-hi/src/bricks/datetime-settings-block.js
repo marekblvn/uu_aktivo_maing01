@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useLsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Block, Grid, PlaceholderBox, RichIcon, Text } from "uu5g05-elements";
+import { Block, Button, Grid, PlaceholderBox, RichIcon, Text } from "uu5g05-elements";
 import { Checkbox } from "uu5g05-forms";
 import importLsi from "../lsi/import-lsi.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
@@ -106,22 +106,6 @@ const DatetimeSettingsBlock = createVisualComponent({
           </Text>
         }
         headerType="title"
-        actionList={
-          (isOwner || isAuthority || isExecutive) && datetimeId !== null
-            ? [
-                {
-                  colorScheme: "negative",
-                  significance: "common",
-                  icon: "mdi-delete",
-                  tooltip: {
-                    en: "Delete datetime",
-                    cs: "Smazat termín",
-                  },
-                  onClick: onDeleteDatetime,
-                },
-              ]
-            : []
-        }
       >
         {datetimeId !== null ? (
           ({ style }) => (
@@ -129,45 +113,41 @@ const DatetimeSettingsBlock = createVisualComponent({
               style={style}
               columnGap="8px"
               templateColumns={{ xs: "100%" }}
-              templateRows={{ xs: "repeat(2, auto)" }}
-              alignItems="center"
+              templateRows={{ xs: "1fr auto" }}
+              rowGap="32px"
             >
-              {recurrent && (
-                <div style={{ display: "flex", alignItems: "center", columnGap: "6px" }}>
-                  <Text
-                    category="interface"
-                    segment="content"
-                    type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
-                    bold
-                  >
-                    <Lsi
-                      lsi={{ en: "Periodically create next datetime", cs: "Pravidelně vytvářet následující termín" }}
+              <Grid templateColumns={{ xs: "100%" }} templateRows={{ xs: "repeat(2, auto)" }}>
+                {recurrent && (
+                  <div style={{ display: "flex", alignItems: "center", columnGap: "6px" }}>
+                    <Text
+                      category="interface"
+                      segment="content"
+                      type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                      bold
+                    >
+                      <Lsi
+                        lsi={{ en: "Periodically create next datetime", cs: "Pravidelně vytvářet následující termín" }}
+                      />
+                    </Text>
+                    <Checkbox
+                      info={{
+                        en: "Should a new datetime be created from the existing one after its end using frequency?",
+                        cs: "Má se z existujícího termínu po jeho konci vytvořit nové pomocí frekvence?",
+                      }}
+                      value={recurrent}
+                      box={false}
+                      onChange={onChangeRecurrence}
+                      size={"s"}
+                      disabled={true} // TODO: Remove this line when uuCmd activity/stopRecurrence is implemented
+                      style={{ marginLeft: "auto" }}
                     />
-                  </Text>
-                  <Checkbox
-                    info={{
-                      en: "Should a new datetime be created from the existing one after its end using frequency?",
-                      cs: "Má se z existujícího termínu po jeho konci vytvořit nové pomocí frekvence?",
-                    }}
-                    value={recurrent}
-                    box={false}
-                    onChange={onChangeRecurrence}
-                    size="xxs"
-                    disabled={true} // TODO: Remove this line when uuCmd activity/stopRecurrence is implemented
-                  />
-                </div>
-              )}
-              <Grid
-                templateColumns={{ xs: "100%" }}
-                templateRows={{ xs: "repeat(2, auto)" }}
-                justifyContent={{ xs: "start", l: "end" }}
-              >
+                  </div>
+                )}
                 {frequency && recurrent && (
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      maxWidth: ["xs"].includes(screenSize) ? "500px" : "400px",
                     }}
                   >
                     <div
@@ -200,7 +180,7 @@ const DatetimeSettingsBlock = createVisualComponent({
                         icon="mdi-pencil"
                         size="xs"
                         borderRadius="expressive"
-                        style={{ marginLeft: "auto" }}
+                        style={{ marginLeft: "auto", marginRight: "14px" }}
                         onClick={onEditFrequency}
                       />
                     )}
@@ -211,7 +191,6 @@ const DatetimeSettingsBlock = createVisualComponent({
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      maxWidth: "xs" === screenSize ? "500px" : "400px",
                     }}
                   >
                     <div
@@ -244,21 +223,43 @@ const DatetimeSettingsBlock = createVisualComponent({
                         icon="mdi-pencil"
                         size="xs"
                         borderRadius="expressive"
-                        style={{ marginLeft: "auto" }}
+                        style={{ marginLeft: "auto", marginRight: "14px" }}
                         onClick={onEditNotificationOffset}
                       />
                     )}
                   </div>
                 )}
               </Grid>
+              <Grid templateRows={{ xs: "1fr" }} templateColumns={{ xs: "auto auto" }} alignItems="center">
+                <Text
+                  category="interface"
+                  segment="content"
+                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+                  bold
+                >
+                  <Lsi lsi={{ en: "Delete datetime", cs: "Smazat termín" }} />
+                </Text>
+                <Button
+                  style={{ marginLeft: "auto", marginRight: "14px" }}
+                  colorScheme="negative"
+                  significance="distinct"
+                  onClick={onDeleteDatetime}
+                  size={["xs", "s"].includes(screenSize) ? "xxs" : "s"}
+                >
+                  <Lsi lsi={{ en: "Delete datetime", cs: "Smazat termín" }} />
+                </Button>
+              </Grid>
             </Grid>
           )
         ) : (
-          <PlaceholderBox
-            code="calendar"
-            header={placeholderLsi.header}
-            info={{ en: "Datetime settings cannot be changed.", cs: "Nelze změnit nastavení termínu." }}
-          />
+          <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <PlaceholderBox
+              code="calendar"
+              header={placeholderLsi.header}
+              info={{ en: "Datetime settings cannot be changed.", cs: "Nelze změnit nastavení termínu." }}
+              size="s"
+            />
+          </div>
         )}
       </Block>
     );

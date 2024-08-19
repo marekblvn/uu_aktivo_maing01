@@ -64,22 +64,22 @@ const Spa = createVisualComponent({
     return (
       <Plus4U5.SpaProvider initialLanguageList={["en", "cs"]}>
         <Uu5Elements.ModalBus>
-          <AuthorizationContextProvider>
-            <Plus4U5App.Top.View
-              topBgColor="rgb(33, 150, 243)"
-              textBackground="full"
-              unitName={
-                <AppBar
-                  handleCloseSideMenu={() => setMenuOpen(false)}
-                  handleOpenSideMenu={() => setMenuOpen(true)}
-                  sideMenuOpen={menuOpen}
-                />
-              }
-            />
-            <SideMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
+          <Plus4U5App.Top.View
+            topBgColor="rgb(33, 150, 243)"
+            textBackground="full"
+            unitName={
+              <AppBar
+                handleCloseSideMenu={() => setMenuOpen(false)}
+                handleOpenSideMenu={() => setMenuOpen(true)}
+                sideMenuOpen={menuOpen}
+              />
+            }
+          />
+          <SideMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
+            <AuthorizationContextProvider>
               <Plus4U5App.Spa routeMap={ROUTE_MAP} displayTop={false} />
-            </SideMenuDrawer>
-          </AuthorizationContextProvider>
+            </AuthorizationContextProvider>
+          </SideMenuDrawer>
         </Uu5Elements.ModalBus>
       </Plus4U5.SpaProvider>
     );

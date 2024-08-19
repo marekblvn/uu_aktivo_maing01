@@ -76,6 +76,106 @@ class AttendanceMongo extends UuObjectDao {
     return await super.find(filter, pageInfo);
   }
 
+  async listStatistics(awid, filterObject = {}, sortObject = null) {
+    let filter = {
+      awid,
+      ...filterObject,
+    };
+    let aggregationPipeline = [
+      { $match: filter },
+      {
+        $facet: {
+          confirmed: [
+            { $unwind: "$confirmed" },
+            {
+              $group: {
+                _id: "$confirmed",
+                confirmedCount: {
+                  $sum: 1,
+                },
+              },
+            },
+          ],
+          denied: [
+            { $unwind: "$denied" },
+            {
+              $group: {
+                _id: "$denied",
+                deniedCount: {
+                  $sum: 1,
+                },
+              },
+            },
+          ],
+          undecided: [
+            { $unwind: "$undecided" },
+            {
+              $group: {
+                _id: "$undecided",
+                undecidedCount: {
+                  $sum: 1,
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          stats: {
+            $concatArrays: ["$confirmed", "$denied", "$undecided"],
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: "$stats",
+        },
+      },
+      {
+        $group: {
+          _id: "$stats._id",
+          confirmedCount: {
+            $sum: {
+              $ifNull: ["$stats.confirmedCount", 0],
+            },
+          },
+          deniedCount: {
+            $sum: {
+              $ifNull: ["$stats.deniedCount", 0],
+            },
+          },
+          undecidedCount: {
+            $sum: {
+              $ifNull: ["$stats.undecidedCount", 0],
+            },
+          },
+          total: {
+            $sum: {
+              $add: [
+                { $ifNull: ["$stats.confirmedCount", 0] },
+                { $ifNull: ["$stats.deniedCount", 0] },
+                { $ifNull: ["$stats.undecidedCount", 0] },
+              ],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          uuIdentity: "$_id",
+          confirmedCount: 1,
+          deniedCount: 1,
+          undecidedCount: 1,
+          total: 1,
+        },
+      },
+      sortObject ? { $sort: sortObject } : { $sort: { uuIdentity: 1 } },
+    ];
+    return await super.aggregate(aggregationPipeline);
+  }
+
   /**
    * Deletes uuObjects based on awid and activityId.
    * @param {string} awid

@@ -1,6 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Utils } from "uu5g05";
+import { createVisualComponent, useDataList } from "uu5g05";
 import Config from "./config/config.js";
+import Calls from "../calls.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -28,20 +29,37 @@ const AttendanceListProvider = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render(props) {
+  render({ children, activityId, dateFilter, sortKey, sortOrder }) {
     //@@viewOn:private
-    const { children } = props;
+    const filter = { activityId, ...dateFilter };
+    const sort = sortKey && sortOrder !== 0 ? { [sortKey]: sortOrder } : {};
+    Object.keys(filter).forEach((key) => filter[key] === undefined && delete filter[key]);
+    const dataObject = useDataList(
+      {
+        itemIdentifier: "uuIdentity",
+        skipInitialLoad: true,
+        initialDtoIn: {
+          filters: filter,
+          sort,
+        },
+        handlerMap: {
+          load: Calls.Attendance.listStatistics,
+        },
+      },
+      [dateFilter, sortKey, sortOrder],
+    );
+    let { state, data, errorData, pendingData, handlerMap } = dataObject;
     //@@viewOff:private
 
     //@@viewOn:render
-    const attrs = Utils.VisualComponent.getAttrs(props, Css.main(props));
 
-    return (
-      <div {...attrs}>
-        <div>Visual Component {AttendanceListProvider.uu5Tag}</div>
-        {children}
-      </div>
-    );
+    return children({
+      state,
+      data,
+      errorData,
+      pendingData,
+      handlerMap,
+    });
     //@@viewOff:render
   },
 });

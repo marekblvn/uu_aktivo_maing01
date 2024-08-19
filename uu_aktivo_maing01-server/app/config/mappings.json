@@ -151,6 +151,11 @@
         "httpMethod": "GET",
         "type": "CMD"
       },
+      "attendance/listStatistics": {
+        "realization": "api/controllers/AttendanceController.listStatistics",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
       "attendance/delete": {
         "realization": "api/controllers/AttendanceController.delete",
         "httpMethod": "POST",

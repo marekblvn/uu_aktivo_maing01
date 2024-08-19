@@ -16,6 +16,19 @@ const attendanceListDtoInType = shape({
   }),
 });
 
+const attendanceListStatisticsDtoInType = shape({
+  filters: shape({
+    activityId: id().isRequired(),
+    before: date(),
+    after: date(),
+  }).isRequired(),
+  sort: shape({
+    confirmedCount: integer(-1, 1),
+    deniedCount: integer(-1, 1),
+    undecidedCount: integer(-1, 1),
+  }),
+});
+
 const attendanceDeleteDtoInType = shape({
   id: id().isRequired(),
 });

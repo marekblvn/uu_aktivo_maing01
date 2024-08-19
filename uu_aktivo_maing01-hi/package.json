@@ -7,6 +7,7 @@
   "namespace": "UuAktivo",
   "spec": "uu5-app; uu_appg01_devkit@6.0.1; uu5devkitg01-plugin@1.0.5",
   "dependencies": {
+    "react-to-pdf": "^1.0.1",
     "uu_plus4u5g02": "^1.28.3",
     "uu_plus4u5g02-app": "^1.28.3",
     "uu_plus4u5g02-elements": "^1.28.3",

@@ -18,6 +18,7 @@ import ActivityInformationView from "./activity-information-view.js";
 import ActivityMembersView from "./activity-members-view.js";
 import ActivitySettingsView from "./activity-settings-view.js";
 import importLsi from "../lsi/import-lsi.js";
+import ActivityAttendanceView from "./activity-attendance-view.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -259,6 +260,8 @@ const ActivityDetail = createVisualComponent({
               onReload={handleReload}
             />
           );
+        case "attendance":
+          return <ActivityAttendanceView activityId={id} />;
         default:
           return <PlaceholderBox code="items" header={placeholderLsi.header} info={placeholderLsi.info} />;
       }

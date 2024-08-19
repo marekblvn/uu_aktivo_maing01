@@ -150,6 +150,83 @@ class AttendanceAbl {
     return dtoOut;
   }
 
+  async listStatistics(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("attendanceListStatisticsDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.ListStatistics),
+      Errors.ListStatistics.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      if (!dtoIn.filters?.activityId) {
+        throw new Errors.ListStatistics.UserNotAuthorized({ uuAppErrorMap });
+      }
+
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, dtoIn.filters.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.ListStatistics.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.ListStatistics.ActivityDoesNotExist(
+          { uuAppErrorMap },
+          { activityId: dtoIn.filters.activityId },
+        );
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.ListStatistics.UserNotMember({ uuAppErrorMap });
+      }
+    }
+
+    const { filters } = dtoIn;
+    const queryFilters = {};
+    if (filters) {
+      const { after, before, activityId } = filters;
+      if (activityId) {
+        queryFilters.activityId = activityId;
+      }
+      if (after) {
+        queryFilters.datetime = { $gte: new Date(after) };
+      }
+      if (before) {
+        queryFilters.datetime = queryFilters.datetime || {};
+        queryFilters.datetime.$lt = new Date(before);
+      }
+    }
+
+    let sort = null;
+    if (dtoIn.sort) {
+      sort = Object.keys(dtoIn.sort).length === 0 ? null : dtoIn.sort;
+    }
+
+    let itemList;
+    try {
+      itemList = await this.attendanceDao.listStatistics(awid, queryFilters, sort);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.ListStatistics.AttendanceDaoListFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    let dtoOut = {};
+    dtoOut.itemList = itemList;
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
   async delete(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("attendanceDeleteDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(

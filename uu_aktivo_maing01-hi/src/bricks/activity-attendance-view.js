@@ -1,11 +1,11 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useLsi, useScreenSize, useState } from "uu5g05";
+import { Error } from "uu_plus4u5g02-elements";
+import { ActionGroup, Line, Pending, PlaceholderBox } from "uu5g05-elements";
+import { DateRange } from "uu5g05-forms";
 import Config from "./config/config.js";
 import Container from "./container.js";
-import { ActionGroup, Line, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
-import { Error } from "uu_plus4u5g02-elements";
 import AttendanceListProvider from "../providers/attendance-list-provider.js";
-import { DateRange } from "uu5g05-forms";
 import AttendanceList from "./attendance-list.js";
 import importLsi from "../lsi/import-lsi.js";
 //@@viewOff:imports
@@ -40,8 +40,7 @@ const ActivityAttendanceView = createVisualComponent({
     const [screenSize] = useScreenSize();
     const [dateRange, setDateRange] = useState(undefined);
     const [dateFilter, setDateFilter] = useState({ before: undefined, after: undefined });
-    const [sortKey, setSortKey] = useState(undefined);
-    const [sortOrder, setSortOrder] = useState(0);
+    const [sort, setSort] = useState({});
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     //@@viewOff:private
 
@@ -55,19 +54,11 @@ const ActivityAttendanceView = createVisualComponent({
       }
     };
 
-    const handleChangeSort = (e, key) => {
-      e.preventDefault();
-      if (sortKey === key) {
-        if (sortOrder === 1) {
-          return setSortOrder(-1);
-        } else {
-          setSortKey(undefined);
-          return setSortOrder(0);
-        }
-      } else {
-        setSortKey(key);
-        return setSortOrder(1);
+    const handleChangeSort = (key, order) => {
+      if (sort[key] === order) {
+        return setSort({});
       }
+      return setSort({ [key]: order });
     };
 
     //@@viewOn:render
@@ -114,7 +105,7 @@ const ActivityAttendanceView = createVisualComponent({
 
       const dataToRender = data.filter((item) => item != null).map((item) => item.data);
 
-      return <AttendanceList itemList={dataToRender} />;
+      return <AttendanceList itemList={dataToRender} dateRange={dateFilter} />;
     }
 
     return (
@@ -130,18 +121,10 @@ const ActivityAttendanceView = createVisualComponent({
         }}
       >
         <ActionGroup
-          alignment="right"
-          collapsedMenuProps={{
-            labelAlignment: "stretch",
-            colorScheme: "neutral",
-            significance: "subdued",
-          }}
           itemList={[
             {
               icon: "mdi-magnify",
-              primary: true,
               colorScheme: "primary",
-              significance: "common",
               disabled: !dateRange,
               tooltip: !dateRange
                 ? { en: "Please select a date range first", cs: "Prosím vyberte datové rozmezí" }
@@ -149,7 +132,7 @@ const ActivityAttendanceView = createVisualComponent({
               onClick: handleLoadAttendance,
             },
             {
-              component: (
+              children: (
                 <DateRange
                   displayWeekNumbers={true}
                   weekStartDay={1}
@@ -159,132 +142,100 @@ const ActivityAttendanceView = createVisualComponent({
                   format="D/M/YY"
                   style={{
                     width: ["xs"].includes(screenSize) ? "auto" : "300px",
-                    minWidth: "100px",
+                    minWidth: "140px",
                   }}
                 />
               ),
             },
             {
-              icon: "uugdsstencil-communication-thumb-up",
-              iconRight:
-                screenSize !== "xs" && sortKey === "confirmedCount"
-                  ? sortOrder === 1
-                    ? "mdi-arrow-up-thin"
-                    : "mdi-arrow-down-thin"
-                  : "",
-              colorScheme: sortKey === "confirmedCount" ? "positive" : "building",
-              significance: "distinct",
-              onClick: (e) => handleChangeSort(e, "confirmedCount"),
-              pressed: sortKey === "confirmedCount" ? true : false,
-              size: ["xl", "l", "m"].includes(screenSize) ? "m" : screenSize === "s" ? "s" : "m",
-              collapsed: screenSize === "xs",
-              collapsedChildren: (
-                <>
-                  <Lsi
-                    lsi={
-                      sortKey === "confirmedCount"
-                        ? {
-                            en: sortOrder === 1 ? "Ascending" : "Descending",
-                            cs: sortOrder === 1 ? "Vzestupně" : "Sestupně",
-                          }
-                        : {}
-                    }
-                  />
-                  {sortKey === "confirmedCount" && (
-                    <RichIcon
-                      icon={sortOrder === 1 ? "mdi-arrow-up-thin" : "mdi-arrow-down-thin"}
-                      colorScheme="positive"
-                      significance="subdued"
-                      size="xs"
-                    />
-                  )}
-                </>
-              ),
-            },
-            {
-              icon: "uugds-help",
-              iconRight:
-                screenSize !== "xs" && sortKey === "undecidedCount"
-                  ? sortOrder === 1
-                    ? "mdi-arrow-up-thin"
-                    : "mdi-arrow-down-thin"
-                  : "",
-              colorScheme: sortKey === "undecidedCount" ? "neutral" : "building",
-              significance: "distinct",
-              onClick: (e) => handleChangeSort(e, "undecidedCount"),
-              pressed: sortKey === "undecidedCount" ? true : false,
-              size: ["xl", "l", "m"].includes(screenSize) ? "m" : screenSize === "s" ? "s" : "m",
-              collapsed: screenSize === "xs",
-              collapsedChildren: (
-                <>
-                  <Lsi
-                    lsi={
-                      sortKey === "undecidedCount"
-                        ? {
-                            en: sortOrder === 1 ? "Ascending" : "Descending",
-                            cs: sortOrder === 1 ? "Vzestupně" : "Sestupně",
-                          }
-                        : {}
-                    }
-                  />
-                  {sortKey === "undecidedCount" && (
-                    <RichIcon
-                      icon={sortOrder === 1 ? "mdi-arrow-up-thin" : "mdi-arrow-down-thin"}
-                      colorScheme="neutral"
-                      significance="subdued"
-                      size="xs"
-                    />
-                  )}
-                </>
-              ),
-            },
-            {
-              icon: "uugdsstencil-communication-thumb-down",
-              iconRight:
-                screenSize !== "xs" && sortKey === "deniedCount"
-                  ? sortOrder === 1
-                    ? "mdi-arrow-up-thin"
-                    : "mdi-arrow-down-thin"
-                  : "",
-              colorScheme: sortKey === "deniedCount" ? "negative" : "building",
-              significance: "distinct",
-              onClick: (e) => handleChangeSort(e, "deniedCount"),
-              pressed: sortKey === "deniedCount" ? true : false,
-              size: ["xl", "l", "m"].includes(screenSize) ? "m" : screenSize === "s" ? "s" : "m",
-              collapsed: screenSize === "xs",
-              collapsedChildren: (
-                <>
-                  <Lsi
-                    lsi={
-                      sortKey === "deniedCount"
-                        ? {
-                            en: sortOrder === 1 ? "Ascending" : "Descending",
-                            cs: sortOrder === 1 ? "Vzestupně" : "Sestupně",
-                          }
-                        : {}
-                    }
-                  />
-                  {sortKey === "deniedCount" && (
-                    <RichIcon
-                      icon={sortOrder === 1 ? "mdi-arrow-up-thin" : "mdi-arrow-down-thin"}
-                      colorScheme="negative"
-                      significance="subdued"
-                      size="xs"
-                    />
-                  )}
-                </>
-              ),
+              icon: "mdi-sort",
+              iconNotification:
+                Object.keys(sort).length > 0
+                  ? sort["confirmedCount"]
+                    ? { colorScheme: "positive" }
+                    : sort["undecidedCount"]
+                      ? { colorScheme: "neutral" }
+                      : { colorScheme: "negative" }
+                  : false,
+              children: <Lsi lsi={{ en: "Sort by", cs: "Seřadit podle" }} />,
+              openPosition: "bottom-center",
+              colorScheme: "building",
+              itemList: [
+                {
+                  icon: "uugdsstencil-communication-thumb-up",
+                  children: <Lsi lsi={{ en: "Came", cs: "Přišel/la" }} />,
+                  colorScheme: "positive",
+                  significance: sort["confirmedCount"] ? "highlighted" : "common",
+                  collapsible: true,
+                  initialCollapsed: !sort["confirmedCount"],
+                  itemList: [
+                    {
+                      icon: "mdi-arrow-up-thin",
+                      children: <Lsi lsi={{ en: "Ascending", cs: "Vzestupně" }} />,
+                      onClick: () => handleChangeSort("confirmedCount", 1),
+                      iconRight: sort["confirmedCount"] === 1 ? "mdi-check" : "",
+                    },
+                    {
+                      icon: "mdi-arrow-down-thin",
+                      children: <Lsi lsi={{ en: "Descending", cs: "Sestupně" }} />,
+                      onClick: () => handleChangeSort("confirmedCount", -1),
+                      iconRight: sort["confirmedCount"] === -1 ? "mdi-check" : "",
+                    },
+                  ],
+                },
+                {
+                  icon: "uugds-help",
+                  children: <Lsi lsi={{ en: "Did not decide", cs: "Nerozhodl/la se" }} />,
+                  colorScheme: "neutral",
+                  significance: sort["undecidedCount"] ? "highlighted" : "common",
+                  collapsible: true,
+                  initialCollapsed: !sort["undecidedCount"],
+                  itemList: [
+                    {
+                      icon: "mdi-arrow-up-thin",
+                      children: <Lsi lsi={{ en: "Ascending", cs: "Vzestupně" }} />,
+                      onClick: () => handleChangeSort("undecidedCount", 1),
+                      iconRight: sort["undecidedCount"] === 1 ? "mdi-check" : "",
+                    },
+                    {
+                      icon: "mdi-arrow-down-thin",
+                      children: <Lsi lsi={{ en: "Descending", cs: "Sestupně" }} />,
+                      onClick: () => handleChangeSort("undecidedCount", -1),
+                      iconRight: sort["undecidedCount"] === -1 ? "mdi-check" : "",
+                    },
+                  ],
+                },
+                {
+                  icon: "uugdsstencil-communication-thumb-down",
+                  children: <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel/la" }} />,
+                  colorScheme: "negative",
+                  significance: sort["deniedCount"] ? "highlighted" : "common",
+                  collapsible: true,
+                  initialCollapsed: !sort["deniedCount"],
+                  itemList: [
+                    {
+                      icon: "mdi-arrow-up-thin",
+                      children: <Lsi lsi={{ en: "Ascending", cs: "Vzestupně" }} />,
+                      onClick: () => handleChangeSort("deniedCount", 1),
+                      iconRight: sort["deniedCount"] === 1 ? "mdi-check" : "",
+                      pressed: sort["deniedCount"] === 1,
+                    },
+                    {
+                      icon: "mdi-arrow-down-thin",
+                      children: <Lsi lsi={{ en: "Descending", cs: "Sestupně" }} />,
+                      onClick: () => handleChangeSort("deniedCount", -1),
+                      iconRight: sort["deniedCount"] === -1 ? "mdi-check" : "",
+                      pressed: sort["deniedCount"] === -1,
+                    },
+                  ],
+                },
+              ],
             },
           ]}
         />
-        <Line margin="12px 0" significance="subdued" />
-        <div style={{ padding: "16px 8px" }}>
-          <AttendanceListProvider
-            activityId={activityId}
-            dateFilter={dateFilter}
-            sortKey={sortKey}
-            sortOrder={sortOrder}
-          >
+        <Line margin="12px 0 6px" significance="subdued" />
+        <div style={{ padding: "2px 8px" }}>
+          <AttendanceListProvider activityId={activityId} dateFilter={dateFilter} sort={sort}>
             {({ state, data, errorData, pendingData, handlerMap }) => {
               switch (state) {
                 case "pending":

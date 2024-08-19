@@ -1,8 +1,10 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useEffect, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Box, Grid, RichIcon, ScrollableBox, Text } from "uu5g05-elements";
+import { ActionGroup, Box, Grid, ScrollableBox } from "uu5g05-elements";
 import AttendanceItem from "./attendance-item.js";
+import AttendanceListHeader from "./attendance-list-header.js";
+import SaveAttendanceModal from "./save-attendance-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -48,119 +50,57 @@ const AttendanceList = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ itemList }) {
+  render({ itemList, dateRange }) {
     const [screenSize] = useScreenSize();
-    const [itemsToRender, setItemsToRender] = useState(itemList);
+    const [modalOpen, setModalOpen] = useState(false);
     //@@viewOff:private
+
+    const handleOpenModal = () => setModalOpen(true);
+    const handleCloseModal = () => setModalOpen(false);
+
+    useEffect(() => {
+      handleCloseModal();
+    }, [screenSize]);
 
     //@@viewOn:render
     function renderItems(items) {
       return items.map((item, index) => <AttendanceItem key={index} data={item} />);
     }
     return (
-      <Box>
-        <Grid templateRows={{ xs: `"repeat(${itemsToRender.length + 1}, 1fr)"` }} rowGap={0}>
-          <Grid templateColumns={{ xs: "repeat(5,1fr)" }} columnGap={0}>
-            <div
-              className={Css.firstCol()}
-              style={
-                ["xs", "s"].includes(screenSize)
-                  ? {
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: 0,
-                    }
-                  : {}
-              }
-            >
-              {["xs", "s"].includes(screenSize) ? (
-                <RichIcon icon="mdi-account" size="m" significance="subdued" />
-              ) : (
-                <Text
-                  category="interface"
-                  segment="content"
-                  type={["xl", "l"].includes(screenSize) ? "medium" : "small"}
-                  bold
-                >
-                  <Lsi lsi={{ en: "Member", cs: "Člen" }} />
-                </Text>
-              )}
-            </div>
-            <div className={Css.nthCol(1)}>
-              <RichIcon
-                icon="uugdsstencil-communication-thumb-up"
-                size={["xs", "s"].includes(screenSize) ? "s" : "xxs"}
-                colorScheme="positive"
-                significance="subdued"
-              />
-              {["xs", "s"].includes(screenSize) || (
-                <Text
-                  category="interface"
-                  segment="content"
-                  type={["xl", "l"].includes(screenSize) ? "medium" : "small"}
-                  bold
-                >
-                  <Lsi lsi={{ en: "Came", cs: "Přišel/la" }} />
-                </Text>
-              )}
-            </div>
-            <div className={Css.nthCol(2)}>
-              <RichIcon
-                icon="uugds-help"
-                size={["xs", "s"].includes(screenSize) ? "s" : "xxs"}
-                colorScheme="neutral"
-                significance="subdued"
-              />
-              {["xs", "s"].includes(screenSize) || (
-                <Text
-                  category="interface"
-                  segment="content"
-                  type={["xl", "l"].includes(screenSize) ? "medium" : "small"}
-                  bold
-                >
-                  <Lsi lsi={{ en: "Did not decide", cs: "Nerozhodl/la se" }} />
-                </Text>
-              )}
-            </div>
-            <div className={Css.nthCol(3)}>
-              <RichIcon
-                icon="uugdsstencil-communication-thumb-down"
-                size={["xs", "s"].includes(screenSize) ? "s" : "xxs"}
-                colorScheme="negative"
-                significance="subdued"
-              />
-              {["xs", "s"].includes(screenSize) || (
-                <Text
-                  category="interface"
-                  segment="content"
-                  type={["xl", "l"].includes(screenSize) ? "medium" : "small"}
-                  bold
-                >
-                  <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel/la" }} />
-                </Text>
-              )}
-            </div>
-            <div className={Css.nthCol(4)}>
-              {["xs", "s"].includes(screenSize) ? (
-                <RichIcon icon="uugdsstencil-commerce-sum" size="s" colorScheme="building" significance="subdued" />
-              ) : (
-                <Text
-                  category="interface"
-                  segment="content"
-                  type={["xl", "l"].includes(screenSize) ? "medium" : "small"}
-                  bold
-                >
-                  <Lsi lsi={{ en: "Datetimes passed", cs: "Proběhlých termínů" }} />
-                </Text>
-              )}
-            </div>
+      <>
+        {["xl", "l"].includes(screenSize) && (
+          <ActionGroup
+            style={{ marginBottom: "8px" }}
+            alignment="left"
+            itemList={[
+              {
+                icon: "mdi-content-save-outline",
+                children: <Lsi lsi={{ en: "Save attendance", cs: "Uložit docházku" }} />,
+                colorScheme: "neutral",
+                onClick: handleOpenModal,
+              },
+            ]}
+          />
+        )}
+        <Box>
+          <Grid templateRows={{ xs: `"repeat(${itemList.length + 1}, 1fr)"` }} rowGap={0}>
+            <AttendanceListHeader />
+            <ScrollableBox maxHeight={["xl", "l"].includes(screenSize) ? 624 : screenSize === "m" ? 610 : 594}>
+              {renderItems(itemList)}
+            </ScrollableBox>
           </Grid>
-          <ScrollableBox maxHeight={["xl", "l"].includes(screenSize) ? 624 : screenSize === "m" ? 610 : 594}>
-            {renderItems(itemsToRender)}
-          </ScrollableBox>
-        </Grid>
-      </Box>
+          <SaveAttendanceModal
+            open={modalOpen}
+            onClose={handleCloseModal}
+            initialFilename={`${dateRange.after}_${dateRange.before}`}
+          >
+            <Grid templateRows={{ xs: `"repeat(${itemList.length + 1}, 1fr)"` }} rowGap={0}>
+              <AttendanceListHeader />
+              {renderItems(itemList)}
+            </Grid>
+          </SaveAttendanceModal>
+        </Box>
+      </>
     );
     //@@viewOff:render
   },

@@ -50,7 +50,7 @@ let MyActivities = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
-    const { showError } = useAlertBus({ import: importLsi, path: ["Error"] });
+    const { showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const loadRef = useRef();
     const createActivityRef = useRef();
     const loadNextRef = useRef();

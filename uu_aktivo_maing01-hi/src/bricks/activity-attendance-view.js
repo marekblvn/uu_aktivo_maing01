@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useLsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
 import { ActionGroup, Line, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";

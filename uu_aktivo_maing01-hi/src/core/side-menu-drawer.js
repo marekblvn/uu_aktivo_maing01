@@ -84,7 +84,7 @@ const SideMenuDrawer = createVisualComponent({
         content={<MenuList itemList={itemList} />}
         type="elevated"
         spacing="loose"
-        width="100vw"
+        width={window.innerWidth}
       >
         {children}
       </Drawer>

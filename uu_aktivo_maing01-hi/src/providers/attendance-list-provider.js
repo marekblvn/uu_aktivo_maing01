@@ -29,10 +29,9 @@ const AttendanceListProvider = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ children, activityId, dateFilter, sortKey, sortOrder }) {
+  render({ children, activityId, dateFilter, sort }) {
     //@@viewOn:private
     const filter = { activityId, ...dateFilter };
-    const sort = sortKey && sortOrder !== 0 ? { [sortKey]: sortOrder } : {};
     Object.keys(filter).forEach((key) => filter[key] === undefined && delete filter[key]);
     const dataObject = useDataList(
       {
@@ -46,7 +45,7 @@ const AttendanceListProvider = createVisualComponent({
           load: Calls.Attendance.listStatistics,
         },
       },
-      [dateFilter, sortKey, sortOrder],
+      [dateFilter, sort],
     );
     let { state, data, errorData, pendingData, handlerMap } = dataObject;
     //@@viewOff:private

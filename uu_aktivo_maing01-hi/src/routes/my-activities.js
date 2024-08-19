@@ -14,7 +14,7 @@ import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
 import ActivityListProvider from "../providers/activity-list-provider.js";
-import { ActionGroup, Dialog, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
+import { ActionGroup, Dialog, Grid, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
 import ActivityList from "../bricks/activity-list.js";
 import CreateActivityModal from "../bricks/create-activity-modal.js";
 import importLsi from "../lsi/import-lsi.js";
@@ -56,8 +56,8 @@ let MyActivities = createVisualComponent({
     const loadNextRef = useRef();
     const [dialogProps, setDialogProps] = useState();
     const [openModal, setOpenModal] = useState(false);
-    const [headerButtonVisible, setHeaderButtonVisible] = useState(false);
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noActivityList"] });
+    const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     //@@viewOff:private
 
     //@@viewOn:methods
@@ -103,9 +103,6 @@ let MyActivities = createVisualComponent({
       },
       [showDialog],
     );
-
-    const hideHeaderButton = () => setHeaderButtonVisible(false);
-    const showHeaderButton = () => setHeaderButtonVisible(true);
     //@@viewOff:methods
 
     //@@viewOn:render
@@ -118,10 +115,11 @@ let MyActivities = createVisualComponent({
         case "load":
         case "loadNext":
         default:
+          const errorCode = errorData.error?.code;
           return (
             <Error
-              title={errorData.error?.message}
-              subtitle={"/" + errorData.error?.code.split("/").at(-1)}
+              title={errorLsi[errorCode]?.header || { en: "Something went wrong", cs: "Něco se pokazilo" }}
+              subtitle={errorLsi[errorCode]?.message || errorData.error?.code}
               error={errorData.error}
             />
           );
@@ -130,60 +128,65 @@ let MyActivities = createVisualComponent({
 
     function renderReady(data, handlerMap) {
       if (!data.length) {
-        hideHeaderButton();
         return (
-          <PlaceholderBox
-            code="items"
-            header={placeholderLsi.header}
-            info={placeholderLsi.info}
-            actionList={[
-              {
-                children: <Lsi lsi={{ en: "Create new activity", cs: "Vytvořit novou aktivitu" }} />,
-                primary: true,
-                icon: "mdi-plus",
-                colorScheme: "primary",
-                significance: "common",
-                onClick: () => setOpenModal(true),
-              },
-            ]}
-            style={{ marginTop: "10%" }}
-          />
+          <Grid
+            style={{ marginBottom: "24px", padding: "0 8px" }}
+            templateRows={{ xs: "auto 1fr" }}
+            templateColumns={{ xs: "100%" }}
+          >
+            <div style={{ display: "flex", justifyContent: "start" }}>
+              <Header
+                title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
+                icon={
+                  <RichIcon
+                    icon="mdi-pulse"
+                    colorScheme="primary"
+                    significance="subdued"
+                    borderRadius="moderate"
+                    cssBackground="#ffffff"
+                    size={screenSize === "xs" ? "l" : "xl"}
+                  />
+                }
+                level={["xs", "s"].includes(screenSize) ? 5 : 4}
+              />
+            </div>
+            <PlaceholderBox
+              code="items"
+              header={placeholderLsi.header}
+              info={placeholderLsi.info}
+              actionList={[
+                {
+                  children: <Lsi lsi={{ en: "Create new activity", cs: "Vytvořit novou aktivitu" }} />,
+                  primary: true,
+                  icon: "mdi-plus",
+                  colorScheme: "primary",
+                  significance: "common",
+                  onClick: () => setOpenModal(true),
+                },
+              ]}
+              style={{ marginTop: "10%", padding: "0 16px" }}
+            />
+          </Grid>
         );
       }
 
-      showHeaderButton();
       return (
         <>
-          <ActivityList itemList={data} onActivityLeave={handleLeaveActivity} />
-          <AutoLoad data={data} handleLoadNext={handlerMap.loadNext} distance={window.innerHeight} />
-        </>
-      );
-    }
-
-    return (
-      <Container
-        style={{
-          width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`,
-          height: "calc(100vh - 88px)",
-          marginTop: "32px",
-        }}
-      >
-        <div style={{ display: "flex", marginBottom: "24px", padding: "0 8px" }}>
-          <Header
-            title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
-            icon={
-              <RichIcon
-                icon="mdi-pulse"
-                colorScheme="primary"
-                significance="subdued"
-                borderRadius="moderate"
-                cssBackground="#ffffff"
-                size={screenSize === "xs" ? "l" : "xl"}
-              />
-            }
-            level={["xs", "s"].includes(screenSize) ? 5 : 4}
-          />
-          {headerButtonVisible && (
+          <div style={{ display: "flex", marginBottom: "24px", padding: "0 8px" }}>
+            <Header
+              title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
+              icon={
+                <RichIcon
+                  icon="mdi-pulse"
+                  colorScheme="primary"
+                  significance="subdued"
+                  borderRadius="moderate"
+                  cssBackground="#ffffff"
+                  size={screenSize === "xs" ? "l" : "xl"}
+                />
+              }
+              level={["xs", "s"].includes(screenSize) ? 5 : 4}
+            />
             <ActionGroup
               itemList={[
                 {
@@ -202,8 +205,21 @@ let MyActivities = createVisualComponent({
                 significance: "common",
               }}
             />
-          )}
-        </div>
+          </div>
+          <ActivityList itemList={data} onActivityLeave={handleLeaveActivity} />
+          <AutoLoad data={data} handleLoadNext={handlerMap.loadNext} distance={window.innerHeight} />
+        </>
+      );
+    }
+
+    return (
+      <Container
+        style={{
+          width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`,
+          height: "calc(100vh - 88px)",
+          marginTop: "32px",
+        }}
+      >
         <ActivityListProvider>
           {({ state, data, errorData, pendingData, handlerMap }) => {
             loadRef.current = handlerMap.load;

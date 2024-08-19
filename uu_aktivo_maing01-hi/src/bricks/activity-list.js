@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Skeleton } from "uu5g05-elements";
 import ActivityCard from "./activity-card.js";
@@ -33,9 +33,8 @@ const ActivityList = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render(props) {
+  render({ itemList, onActivityLeave }) {
     //@@viewOn:private
-    const { itemList, onActivityLeave } = props;
     //@@viewOff:private
 
     //@@viewOn:render

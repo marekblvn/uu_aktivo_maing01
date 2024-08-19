@@ -181,7 +181,7 @@ let Invitations = createVisualComponent({
               code="items"
               header={placeholderLsi.header}
               info={placeholderLsi.info}
-              style={{ marginTop: "10%" }}
+              style={{ marginTop: "10%", padding: "0 16px" }}
             />
           </div>
         );

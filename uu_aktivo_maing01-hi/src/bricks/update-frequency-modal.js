@@ -1,8 +1,9 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
-import { CancelButton, Form, FormNumber, ResetButton, SubmitButton } from "uu5g05-forms";
+import { CancelButton, Form, FormNumber, FormSelect, ResetButton, SubmitButton } from "uu5g05-forms";
 import { Grid, Modal } from "uu5g05-elements";
+import { FREQUENCY_OPTIONS, getIndexByValues, limitedFrequencyOptions } from "../../utils/frequency-utils.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -30,10 +31,10 @@ const UpdateFrequencyModal = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ open, onClose, initialValues, activityId, notificationOffset, onSubmit }) {
+  render({ open, onClose, initialValues, notificationOffset, onSubmit }) {
     //@@viewOn:private
+    const initialValueIndex = getIndexByValues(initialValues);
     //@@viewOff:private
-
     //@@viewOn:render
     return (
       <Form.Provider onSubmit={onSubmit}>
@@ -53,133 +54,18 @@ const UpdateFrequencyModal = createVisualComponent({
         >
           <Form.View>
             <Grid templateColumns={{ xs: "100%", s: "repeat(2, 1fr)" }} alignItems={"start"}>
-              <FormNumber
-                name="months"
-                label={{ en: "Months", cs: "Měsíce" }}
-                min={0}
-                max={12}
-                step={1}
+              <FormSelect
+                name="frequency"
+                label={{ en: "Datetime recurrence frequency", cs: "Frekvence opakování termínu" }}
                 required
-                initialValue={initialValues.months}
-                validateOnChange
-                onValidate={async (e) => {
-                  const months = e.data.value;
-                  const days = e.data.form.value.days;
-                  if (months === days && days === 0)
-                    return {
-                      code: "frequencyCannotBeZero",
-                      feedback: "error",
-                      message: {
-                        en: "Number of months and number of days cannot both be zero.",
-                        cs: "Počet měsíců a počet dní nesmí být obojí nula.",
-                      },
-                    };
-                }}
+                itemList={limitedFrequencyOptions(notificationOffset)}
+                initialValue={FREQUENCY_OPTIONS[initialValueIndex].value}
                 validationMap={{
                   badValue: {
                     feedback: "error",
                     message: {
-                      en: "Number of months must be an integer.",
-                      cs: "Počet měsíců musí být celé číslo.",
-                    },
-                  },
-                  min: {
-                    feedback: "error",
-                    message: {
-                      en: "Minimum allowed number of months is 0.",
-                      cs: "Minimální povolený počet měsíců je 0.",
-                    },
-                  },
-                  required: {
-                    feedback: "error",
-                    message: {
-                      en: "Number of months is required.",
-                      cs: "Počet měsíců je povinný parametr.",
-                    },
-                  },
-                  max: {
-                    feedback: "error",
-                    message: {
-                      en: "Maximum allowed number of months is 12.",
-                      cs: "Maximální povolený počet měsíců je 12.",
-                    },
-                  },
-                  step: {
-                    feedback: "error",
-                    message: {
-                      en: "Number of months must be an integer.",
-                      cs: "Počet měsíců musí být celé číslo.",
-                    },
-                  },
-                }}
-              />
-              <FormNumber
-                name="days"
-                label={{ en: "Days", cs: "Dny" }}
-                min={0}
-                max={31}
-                step={1}
-                required
-                initialValue={initialValues.days}
-                validateOnChange
-                onValidate={async (e) => {
-                  const days = e.data.value;
-                  const months = e.data.form.value.months;
-                  if (months === days && days === 0)
-                    return {
-                      code: "frequencyCannotBeZero",
-                      feedback: "error",
-                      message: {
-                        en: "Number of months and number of days cannot both be zero.",
-                        cs: "Počet měsíců a počet dní nesmí být obojí nula.",
-                      },
-                    };
-                  if (months === 0 && days < notificationOffset.days + 1) {
-                    return {
-                      code: "invalidFrequency",
-                      feedback: "error",
-                      message: {
-                        en: "Minimum possible number of days is %d.",
-                        cs: "Nejnižší povolený počet dní je %d.",
-                      },
-                      messageParams: [notificationOffset.days + 1],
-                    };
-                  }
-                }}
-                validationMap={{
-                  badValue: {
-                    feedback: "error",
-                    message: {
-                      en: "Number of days must be an integer.",
-                      cs: "Počet dní musí být celé číslo.",
-                    },
-                  },
-                  min: {
-                    feedback: "error",
-                    message: {
-                      en: `Minimum allowed number of days is %d.`,
-                      cs: `Nejnižší povolený počet dní je %d.`,
-                    },
-                  },
-                  required: {
-                    feedback: "error",
-                    message: {
-                      en: "Number of days is required.",
-                      cs: "Počet dní je povinný parametr.",
-                    },
-                  },
-                  max: {
-                    feedback: "error",
-                    message: {
-                      en: "Maximum allowed number of days is 31.",
-                      cs: "Nejvyšší povolený počet dní je 31.",
-                    },
-                  },
-                  step: {
-                    feedback: "error",
-                    message: {
-                      en: "Number of days must be an integer.",
-                      cs: "Počet dní musí být celé číslo.",
+                      en: "Bad frequency value, please select one of the options.",
+                      cs: "Špatná hodnota frekvence, vyberte prosím jednu z možností.",
                     },
                   },
                 }}

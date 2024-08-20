@@ -1,16 +1,17 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCall, useCallback, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCall, useCallback, useRoute, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
-import { Dialog, Grid } from "uu5g05-elements";
-import UpdateActivityInformationModal from "./update-activity-information-modal.js";
+import { Dialog, Line } from "uu5g05-elements";
+import UpdateActivitySettingsModal from "./update-activity-settings-modal.js";
 import UpdateFrequencyModal from "./update-frequency-modal.js";
-import ActivityInformationBlock from "./activity-information-block.js";
+import ActivitySettingsBlock from "./activity-settings-block.js";
 import DatetimeSettingsBlock from "./datetime-settings-block.js";
 import UpdateNotificationOffsetModal from "./update-notification-offset-modal.js";
 import { useAlertBus } from "uu_plus4u5g02-elements";
 import importLsi from "../lsi/import-lsi.js";
 import Calls from "../calls.js";
+import TransferOwnershipModal from "./transfer-ownership-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -45,34 +46,42 @@ const ActivitySettingsView = createVisualComponent({
     location,
     minParticipants,
     idealParticipants,
+    members,
     datetimeId,
     frequency,
     notificationOffset,
     recurrent,
     onUpdateActivityInfo,
+    onTransferOwnership,
+    onDeleteActivity,
     onChangeRecurrence,
     onUpdateFrequency,
     onUpdateNotificationOffset,
     onReload,
   }) {
     //@@viewOn:private
+    const [, setRoute] = useRoute();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const [screenSize] = useScreenSize();
-    const [informationFormOpen, setInformationFormOpen] = useState(false);
+    const [activitySettingsFormOpen, setActivitySettingsFormOpen] = useState(false);
+    const [transferOwnershipFormOpen, setTransferOwnershipFormOpen] = useState(false);
     const [frequencyFormOpen, setFrequencyFormOpen] = useState(false);
     const [notificationOffsetFormOpen, setNotificationOffsetFormOpen] = useState(false);
     const [dialogProps, setDialogProps] = useState();
     const { call: callDatetimeDelete } = useCall(Calls.Datetime.delete);
     //@@viewOff:private
 
-    const handleOpenInformationForm = () => setInformationFormOpen(true);
-    const handleCloseInformationForm = () => setInformationFormOpen(false);
+    const handleOpenActivitySettingsForm = () => setActivitySettingsFormOpen(true);
+    const handleCloseActivitySettingsForm = () => setActivitySettingsFormOpen(false);
 
     const handleOpenFrequencyForm = () => setFrequencyFormOpen(true);
     const handleCloseFrequencyForm = () => setFrequencyFormOpen(false);
 
     const handleOpenNotificationOffsetForm = () => setNotificationOffsetFormOpen(true);
     const handleCloseNotificationOffsetForm = () => setNotificationOffsetFormOpen(false);
+
+    const handleOpenTransferOwnershipForm = () => setTransferOwnershipFormOpen(true);
+    const handleCloseTransferOwnershipForm = () => setTransferOwnershipFormOpen(false);
 
     const showChangeRecurrenceDialog = useCallback((onConfirm) => {
       setDialogProps({
@@ -126,6 +135,26 @@ const ActivitySettingsView = createVisualComponent({
       });
     });
 
+    const showDeleteActivityDialog = useCallback((onConfirm) => {
+      setDialogProps({
+        header: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "header"]} />,
+        info: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "info"]} />,
+        icon: "mdi-delete",
+        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+        actionList: [
+          {
+            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+            onClick: handleCloseDialog,
+          },
+          {
+            children: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "submit"]} />,
+            colorScheme: "negative",
+            onClick: onConfirm,
+          },
+        ],
+      });
+    });
+
     const handleCloseDialog = () => setDialogProps(null);
 
     const handleDeleteDatetime = () => {
@@ -146,14 +175,51 @@ const ActivitySettingsView = createVisualComponent({
       });
     };
 
+    const handleDeleteActivity = () => {
+      showDeleteActivityDialog(async () => {
+        try {
+          await onDeleteActivity(id);
+          handleCloseDialog();
+          addAlert({
+            priority: "info",
+            header: { en: "Activity deleted", cs: "Aktivita smazána" },
+            message: { en: "The activity was successfully deleted.", cs: "Aktivita byla úspěšně smazána." },
+            durationMs: 2000,
+          });
+          setRoute("my-activities");
+        } catch (error) {
+          showError(error);
+        }
+      });
+    };
+
     const handleUpdateActivityInfo = async ({ data }) => {
       try {
         await onUpdateActivityInfo(data);
-        handleCloseInformationForm();
+        handleCloseActivitySettingsForm();
         addAlert({
           priority: "info",
-          header: { en: "Activity information updated", cs: "Informace aktivity upraveny" },
+          header: { en: "Activity settings edited", cs: "Nastavení aktivity upraveno" },
           message: { en: "Changes you made were successfully saved.", cs: "Provedené změny byly úspěšně uloženy." },
+          durationMs: 2000,
+        });
+      } catch (error) {
+        showError(error);
+      }
+    };
+
+    const handleTransferOwnership = async ({ data }) => {
+      delete data.value.consent;
+      try {
+        await onTransferOwnership(data);
+        handleCloseTransferOwnershipForm();
+        addAlert({
+          priority: "info",
+          header: { en: "Activity ownership transferred", cs: "Vlastnictví aktivity převedeno" },
+          message: {
+            en: "The ownership of the activity was successfully transferred.",
+            cs: "Vlastnictví aktivity bylo úspěšně převedeno.",
+          },
           durationMs: 2000,
         });
       } catch (error) {
@@ -219,7 +285,7 @@ const ActivitySettingsView = createVisualComponent({
       <Container
         style={{
           width: "auto",
-          padding: "8px 8px 10px",
+          padding: "16px 24px 10px",
           border: "solid 1px rgb(33,33,33, 0.11)",
           borderTop: "none",
           borderBottomLeftRadius: "8px",
@@ -227,28 +293,28 @@ const ActivitySettingsView = createVisualComponent({
           height: "100%",
         }}
       >
-        <Grid rowGap="12px" templateColumns={{ xs: "100%", m: "repeat(2, 1fr)" }}>
-          {/* Activity settings */}
-          <ActivityInformationBlock
-            data={{ name, description, location, minParticipants, idealParticipants }}
-            onClickEdit={handleOpenInformationForm}
-          />
-          {/* Datetime settings */}
-          <DatetimeSettingsBlock
-            datetimeId={datetimeId}
-            recurrent={recurrent}
-            frequency={frequency}
-            notificationOffset={notificationOffset}
-            onChangeRecurrence={handleChangeRecurrence}
-            onEditFrequency={handleOpenFrequencyForm}
-            onEditNotificationOffset={handleOpenNotificationOffsetForm}
-            onDeleteDatetime={handleDeleteDatetime}
-          />
-        </Grid>
+        <ActivitySettingsBlock
+          data={{ name, description, location, minParticipants, idealParticipants, members, datetimeId }}
+          onClickEdit={handleOpenActivitySettingsForm}
+          onClickTransferOwnership={handleOpenTransferOwnershipForm}
+          onClickDeleteActivity={handleDeleteActivity}
+        />
+        <Line direction="horizontal" colorScheme="building" significance="subdued" margin="16px 0" />
+        <DatetimeSettingsBlock
+          datetimeId={datetimeId}
+          recurrent={recurrent}
+          frequency={frequency}
+          notificationOffset={notificationOffset}
+          onChangeRecurrence={handleChangeRecurrence}
+          onEditFrequency={handleOpenFrequencyForm}
+          onEditNotificationOffset={handleOpenNotificationOffsetForm}
+          onDeleteDatetime={handleDeleteDatetime}
+        />
+        {/* </Grid> */}
         <Dialog {...dialogProps} open={!!dialogProps} onClose={handleCloseDialog} />
-        <UpdateActivityInformationModal
-          open={informationFormOpen}
-          onClose={handleCloseInformationForm}
+        <UpdateActivitySettingsModal
+          open={activitySettingsFormOpen}
+          onClose={handleCloseActivitySettingsForm}
           initialValues={{ name, description, location, minParticipants, idealParticipants }}
           onSubmit={handleUpdateActivityInfo}
         />
@@ -267,6 +333,12 @@ const ActivitySettingsView = createVisualComponent({
           activityId={id}
           frequency={frequency}
           onSubmit={handleUpdateNotificationOffset}
+        />
+        <TransferOwnershipModal
+          open={transferOwnershipFormOpen}
+          onClose={handleCloseTransferOwnershipForm}
+          members={members}
+          onSubmit={handleTransferOwnership}
         />
       </Container>
     );

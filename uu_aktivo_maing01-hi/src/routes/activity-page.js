@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, PropTypes, useDevice, useLsi, useRoute, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useLsi, useRoute, useScreenSize } from "uu5g05";
 import { Pending, PlaceholderBox } from "uu5g05-elements";
 import { Error } from "uu_plus4u5g02-elements";
 import Config from "./config/config.js";
@@ -45,6 +45,7 @@ let ActivityPage = createVisualComponent({
     const [screenSize] = useScreenSize();
     const [, setRoute] = useRoute();
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noActivity"] });
+    const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     //@@viewOff:private
 
     function renderLoading() {
@@ -56,7 +57,14 @@ let ActivityPage = createVisualComponent({
         case "load":
         case "loadNext":
         default:
-          return <Error title={errorData.error?.message} subtitle={errorData.error?.code} error={errorData.error} />;
+          const errorCode = errorData.error?.code;
+          return (
+            <Error
+              title={errorLsi[errorCode]?.header || { en: "Something went wrong", cs: "Něco se pokazilo" }}
+              subtitle={errorLsi[errorCode]?.message || errorData.error?.code}
+              error={errorData.error}
+            />
+          );
       }
     }
 

@@ -1,11 +1,12 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useLsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Block, Button, Grid, PlaceholderBox, RichIcon, Text } from "uu5g05-elements";
+import { Button, Grid, ListLayout, PlaceholderBox, Text } from "uu5g05-elements";
 import { Checkbox } from "uu5g05-forms";
 import importLsi from "../lsi/import-lsi.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
+import { getIndexByValues, FREQUENCY_LSI } from "../../utils/frequency-utils.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -49,29 +50,9 @@ const DatetimeSettingsBlock = createVisualComponent({
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner } = useActivityAuthorization();
 
-    const formattedFrequencyCs = (() => {
-      if (!frequency) return "";
-      const { months, days } = frequency;
-      const monthsString =
-        months === 0
-          ? ""
-          : months === 1
-            ? "1 měsíc"
-            : [2, 3, 4].includes(months)
-              ? `${months} měsíce`
-              : `${months} měsíců`;
-      const daysString =
-        days === 0 ? "" : days === 1 ? "1 den" : [2, 3, 4].includes(days) ? `${days} dny` : `${days} dní`;
-      return [monthsString, daysString].filter((i) => i !== "").join(" a ");
-    })();
+    const canEditAndDelete = isAuthority || isExecutive || isOwner;
 
-    const formattedFrequencyEn = (() => {
-      if (!frequency) return "";
-      const { months, days } = frequency;
-      const monthsString = months === 0 ? "" : months === 1 ? "1 month" : `${months} months`;
-      const daysString = days === 0 ? "" : days === 1 ? "1 day" : `${days} days`;
-      return [monthsString, daysString].filter((i) => i !== "").join(" and ");
-    })();
+    const frequencyOptionIndex = getIndexByValues(frequency);
 
     const formattedNotificationOffsetCs = (() => {
       if (!notificationOffset) return "";
@@ -98,170 +79,79 @@ const DatetimeSettingsBlock = createVisualComponent({
 
     //@@viewOn:render
     return (
-      <Block
-        card="full"
-        header={
-          <Text category="interface" segment="title" type={["xs", "s"].includes(screenSize) ? "micro" : "minor"}>
+      <Grid rowGap={{ xs: 2, l: 16 }}>
+        <div>
+          <Text category="interface" segment="title" type={["xl", "l", "m"].includes(screenSize) ? "minor" : "micro"}>
             <Lsi lsi={{ en: "Datetime settings", cs: "Nastavení termínu" }} />
           </Text>
-        }
-        headerType="title"
-      >
-        {datetimeId !== null ? (
-          ({ style }) => (
-            <Grid
-              style={style}
-              columnGap="8px"
-              templateColumns={{ xs: "100%" }}
-              templateRows={{ xs: "1fr auto" }}
-              rowGap="32px"
-            >
-              <Grid templateColumns={{ xs: "100%" }} templateRows={{ xs: "repeat(2, auto)" }}>
-                {recurrent && (
-                  <div style={{ display: "flex", alignItems: "center", columnGap: "6px" }}>
-                    <Text
-                      category="interface"
-                      segment="content"
-                      type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
-                      bold
-                    >
-                      <Lsi
-                        lsi={{ en: "Periodically create next datetime", cs: "Pravidelně vytvářet následující termín" }}
-                      />
-                    </Text>
-                    <Checkbox
-                      info={{
-                        en: "Should a new datetime be created from the existing one after its end using frequency?",
-                        cs: "Má se z existujícího termínu po jeho konci vytvořit nové pomocí frekvence?",
-                      }}
-                      value={recurrent}
-                      box={false}
-                      onChange={onChangeRecurrence}
-                      size={"s"}
-                      disabled={true} // TODO: Remove this line when uuCmd activity/stopRecurrence is implemented
-                      style={{ marginLeft: "auto" }}
-                    />
-                  </div>
-                )}
-                {frequency && recurrent && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: ["xs", "s"].includes(screenSize) ? "grid" : "flex",
-                        columnGap: "4px",
-                        rowGap: "4px",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        category="interface"
-                        segment="content"
-                        type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
-                        bold
-                      >
-                        <Lsi lsi={{ en: "Frequency", cs: "Frekvence" }} />
-                      </Text>
-                      {["xs", "s"].includes(screenSize) || "—"}
-                      <Text
-                        category="interface"
-                        segment="content"
-                        type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
-                      >
-                        <Lsi lsi={{ en: formattedFrequencyEn, cs: formattedFrequencyCs }} />
-                      </Text>
-                    </div>
-                    {(isAuthority || isExecutive || isOwner) && (
-                      <RichIcon
-                        icon="mdi-pencil"
-                        size="xs"
-                        borderRadius="expressive"
-                        style={{ marginLeft: "auto", marginRight: "14px" }}
-                        onClick={onEditFrequency}
-                      />
-                    )}
-                  </div>
-                )}
-                {notificationOffset && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: ["xs", "s"].includes(screenSize) ? "grid" : "flex",
-                        columnGap: "4px",
-                        rowGap: "4px",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        category="interface"
-                        segment="content"
-                        type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
-                        bold
-                      >
-                        <Lsi lsi={{ en: "Notification Offset", cs: "Posun upozornění" }} />
-                      </Text>
-                      {["xs", "s"].includes(screenSize) || "—"}
-                      <Text
-                        category="interface"
-                        segment="content"
-                        type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
-                      >
-                        <Lsi lsi={{ en: formattedNotificationOffsetEn, cs: formattedNotificationOffsetCs }} />
-                      </Text>
-                    </div>
-                    {(isAuthority || isExecutive || isOwner) && (
-                      <RichIcon
-                        icon="mdi-pencil"
-                        size="xs"
-                        borderRadius="expressive"
-                        style={{ marginLeft: "auto", marginRight: "14px" }}
-                        onClick={onEditNotificationOffset}
-                      />
-                    )}
-                  </div>
-                )}
-              </Grid>
-              <Grid templateRows={{ xs: "1fr" }} templateColumns={{ xs: "auto auto" }} alignItems="center">
-                <Text
-                  category="interface"
-                  segment="content"
-                  type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
-                  bold
-                >
-                  <Lsi lsi={{ en: "Delete datetime", cs: "Smazat termín" }} />
-                </Text>
-                <Button
-                  style={{ marginLeft: "auto", marginRight: "14px" }}
-                  colorScheme="negative"
-                  significance="distinct"
-                  onClick={onDeleteDatetime}
-                  size={["xs", "s"].includes(screenSize) ? "xxs" : "s"}
-                >
-                  <Lsi lsi={{ en: "Delete datetime", cs: "Smazat termín" }} />
-                </Button>
-              </Grid>
-            </Grid>
-          )
+        </div>
+
+        {datetimeId === null ? (
+          <PlaceholderBox
+            code="calendar"
+            header={placeholderLsi.header}
+            info={{ en: "Datetime settings cannot be changed", cs: "Nelze měnit nastavení termínu" }}
+            style={{ padding: "12px" }}
+            size={["xl", "l"].includes(screenSize) ? "m" : "s"}
+          />
         ) : (
-          <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <PlaceholderBox
-              code="calendar"
-              header={placeholderLsi.header}
-              info={{ en: "Datetime settings cannot be changed.", cs: "Nelze změnit nastavení termínu." }}
-              size="s"
-            />
-          </div>
+          <ListLayout
+            itemList={[
+              {
+                label: { en: "Recurrent datetime", cs: "Opakující se termín" },
+                children: <Checkbox value={recurrent} readOnly box={false} borderRadius="full" colorScheme="red" />,
+              },
+              {
+                label: { en: "Datetime recurrence frequency", cs: "Frekvence opakování termínu" },
+                children: <Lsi lsi={FREQUENCY_LSI[frequencyOptionIndex]} />,
+                actionList: canEditAndDelete
+                  ? [
+                      {
+                        icon: "mdi-pencil",
+                        onClick: onEditFrequency,
+                      },
+                    ]
+                  : null,
+              },
+              {
+                label: { en: "Datetime notification offset", cs: "Posun oznámení termínu" },
+                info: {
+                  en: "How many days, hours, minutes before the datetime deadline will the notification be sent",
+                  cs: "Kolik dní, hodin, minut před datem termínu bude posláno upozornění",
+                },
+                children: <Lsi lsi={{ en: formattedNotificationOffsetEn, cs: formattedNotificationOffsetCs }} />,
+                actionList: canEditAndDelete
+                  ? [
+                      {
+                        icon: "mdi-pencil",
+                        onClick: onEditNotificationOffset,
+                      },
+                    ]
+                  : null,
+              },
+            ]}
+            collapsibleItemList={
+              canEditAndDelete
+                ? [
+                    {
+                      label: { en: "Delete datetime", cs: "Smazat termín" },
+                      children: (
+                        <Button
+                          colorScheme="negative"
+                          significance="distinct"
+                          style={{ margin: "8px 0" }}
+                          onClick={onDeleteDatetime}
+                        >
+                          <Lsi lsi={{ en: "Delete datetime", cs: "Smazat termín" }} />
+                        </Button>
+                      ),
+                    },
+                  ]
+                : null
+            }
+          />
         )}
-      </Block>
+      </Grid>
     );
     //@@viewOff:render
   },

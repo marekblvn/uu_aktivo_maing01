@@ -299,7 +299,7 @@ const ActivitySettingsView = createVisualComponent({
           onClickTransferOwnership={handleOpenTransferOwnershipForm}
           onClickDeleteActivity={handleDeleteActivity}
         />
-        <Line direction="horizontal" colorScheme="building" significance="subdued" />
+        <Line direction="horizontal" colorScheme="building" significance="subdued" margin="16px 0" />
         <DatetimeSettingsBlock
           datetimeId={datetimeId}
           recurrent={recurrent}

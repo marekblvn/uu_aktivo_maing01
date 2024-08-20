@@ -196,6 +196,14 @@ const ActivityDetail = createVisualComponent({
       return await handlerMap.update({ id, ...value });
     };
 
+    const handleTransferOwnership = async ({ value }) => {
+      return await handlerMap.transferOwnership({ id, ...value });
+    };
+
+    const handleDeleteActivity = async (id) => {
+      return await handlerMap.delete({ id });
+    };
+
     const handleChangeRecurrence = async () => {};
 
     const handleUpdateFrequency = async ({ value }) => {
@@ -258,6 +266,8 @@ const ActivityDetail = createVisualComponent({
               onUpdateFrequency={handleUpdateFrequency}
               onUpdateNotificationOffset={handleUpdateNotificationOffset}
               onReload={handleReload}
+              onTransferOwnership={handleTransferOwnership}
+              onDeleteActivity={handleDeleteActivity}
             />
           );
         case "attendance":

@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { ActionGroup, Block, Grid, ListLayout, Text } from "uu5g05-elements";
+import { ActionGroup, Button, Grid, ListLayout, Text } from "uu5g05-elements";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 //@@viewOff:imports
@@ -31,12 +31,12 @@ const ActivitySettingsBlock = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ onClickEdit, data }) {
+  render({ onClickEdit, data, onClickTransferOwnership, onClickDeleteActivity }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { isAuthority, isExecutive } = useAuthorization();
     const { isAdministrator, isOwner } = useActivityAuthorization();
-    const { name, location, description, minParticipants, idealParticipants } = data;
+    const { name, location, description, minParticipants, idealParticipants, datetimeId, members } = data;
     //@@viewOff:private
 
     //@@viewOn:render
@@ -91,6 +91,39 @@ const ActivitySettingsBlock = createVisualComponent({
               children: idealParticipants,
             },
           ]}
+          collapsibleItemList={
+            isOwner || isAuthority || isExecutive
+              ? [
+                  {
+                    label: { en: "Transfer activity ownership", cs: "Převést vlastnictví aktivity" },
+                    children: (
+                      <Button
+                        colorScheme="warning"
+                        significance="distinct"
+                        onClick={onClickTransferOwnership}
+                        style={{ margin: "8px 0" }}
+                        disabled={datetimeId !== null || members.length === 1}
+                      >
+                        <Lsi lsi={{ en: "Transfer activity ownership", cs: "Převést vlastnictví aktivity" }} />
+                      </Button>
+                    ),
+                  },
+                  {
+                    label: { en: "Delete activity", cs: "Smazat aktivitu" },
+                    children: (
+                      <Button
+                        colorScheme="negative"
+                        significance="distinct"
+                        style={{ margin: "8px 0" }}
+                        onClick={onClickDeleteActivity}
+                      >
+                        <Lsi lsi={{ en: "Delete activity", cs: "Smazat aktivitu" }} />
+                      </Button>
+                    ),
+                  },
+                ]
+              : null
+          }
         />
       </Grid>
     );

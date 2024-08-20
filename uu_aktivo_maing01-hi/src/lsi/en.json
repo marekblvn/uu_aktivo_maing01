@@ -92,6 +92,11 @@
       "header": "Are you sure you want to delete the datetime?",
       "info": "The datetime will be permanently deleted and it's recurrence will be stopped (if it is recurrent). Please note that by deleting the datetime, you will lose all participation data in the current datetime!",
       "submit": "Delete"
+    },
+    "deleteActivity": {
+      "header": "Are you absolutely sure you want to delete this activity?",
+      "info": "This activity and all information contained in it will be lost permanently. Please note that this decision cannot be reversed.",
+      "submit": "Delete"
     }
   },
   "Errors": {

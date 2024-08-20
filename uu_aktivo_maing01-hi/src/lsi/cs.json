@@ -92,6 +92,11 @@
       "header": "Opravdu chcete smazat termín aktivity?",
       "info": "Termín bude trvale smazán a přeruší se tak jeho opakování (pokud je nastaveno). Vezměte prosím na vědomí, že smazáním termínu ztratíte všechna data o účasti členů na tomto termínu!",
       "submit": "Smazat"
+    },
+    "deleteActivity": {
+      "header": "Opravdu chcete smazat tuto aktivitu?",
+      "info": "Tato aktivita a všechny informace v ní obsažené budou trvale ztraceny. Vezměte prosím na vědomí, že toto rozhodnutí nelze vzít zpět.",
+      "submit": "Smazat"
     }
   },
   "Errors": {

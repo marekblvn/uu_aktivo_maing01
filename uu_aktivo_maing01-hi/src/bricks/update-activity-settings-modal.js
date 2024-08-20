@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useRef, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { CancelButton, Form, FormNumber, FormText, FormTextArea, SubmitButton } from "uu5g05-forms";
+import { CancelButton, Form, FormNumber, FormText, FormTextArea, ResetButton, SubmitButton } from "uu5g05-forms";
 import { Grid, Modal } from "uu5g05-elements";
 //@@viewOff:imports
 
@@ -17,9 +17,9 @@ const Css = {
 //@@viewOn:helpers
 //@@viewOff:helpers
 
-const UpdateActivityInformationModal = createVisualComponent({
+const UpdateActivitySettingsModal = createVisualComponent({
   //@@viewOn:statics
-  uu5Tag: Config.TAG + "UpdateActivityInformationModal",
+  uu5Tag: Config.TAG + "UpdateActivitySettingsModal",
   //@@viewOff:statics
 
   //@@viewOn:propTypes
@@ -39,13 +39,14 @@ const UpdateActivityInformationModal = createVisualComponent({
     //@@viewOn:render
 
     return (
-      <Form.Provider size={["xl", "l", "m"].includes(screenSize) ? "m" : screenSize} onSubmit={onSubmit}>
+      <Form.Provider onSubmit={onSubmit}>
         <Modal
           open={open}
           onClose={onClose}
-          header={<Lsi lsi={{ en: "Edit Activity information", cs: "Upravit informace o aktivitě" }} />}
+          header={<Lsi lsi={{ en: "Edit activity settings", cs: "Upravit nastavení aktivity" }} />}
           footer={
-            <Grid templateColumns={{ xs: "repeat(2, 1fr)", s: "repeat(2, auto)" }} justifyContent={{ s: "end" }}>
+            <Grid templateColumns={{ xs: "40px repeat(2, 1fr)", s: "repeat(3, auto)" }} justifyContent={{ s: "end" }}>
+              <ResetButton significance="subdued" icon="mdi-refresh" />
               <CancelButton onClick={onClose} />
               <SubmitButton>
                 <Lsi lsi={{ en: "Edit", cs: "Upravit" }} />
@@ -141,8 +142,8 @@ const UpdateActivityInformationModal = createVisualComponent({
                     }
                   }}
                   info={{
-                    cs: "Tato hodnota je použita pro informování členů, zda dostatečný počet členů potvrdil svoji účast",
-                    en: "This value is used to inform members whether a sufficient number of members have confirmed their participation",
+                    en: "How many participants are necessary for the activity?",
+                    cs: "Kolik účastníků je potřeba na aktivitu aby mohla proběhnout?",
                   }}
                   validateOnChange
                   validationMap={{
@@ -178,17 +179,17 @@ const UpdateActivityInformationModal = createVisualComponent({
                   min={minParticipantsValue}
                   step={1}
                   info={{
-                    cs: "Tato hodnota je použita pro informování členů, zda ideální počet členů potvrdil svoji účast",
-                    en: "This value is used to inform members whether an ideal number of members have confirmed their participation",
+                    en: "What number of participants is ideal for the activity?",
+                    cs: "Kolik účastníků by ideálně mělo přijít?",
                   }}
                   validateOnChange
                   validationMap={{
                     min: {
                       message: {
-                        en: `Ideal number of participants cannot be less than minimum number of participants (${minParticipantsValue})`,
-                        cs: `Ideální počet účastníků nemůže být méně než minimální počet účastníků (${minParticipantsValue})`,
+                        en: `Ideal number of participants should not be less than minimum number of participants (${minParticipantsValue})`,
+                        cs: `Ideální počet účastníků by neměl být méně než minimální počet účastníků (${minParticipantsValue})`,
                       },
-                      feedback: "error",
+                      feedback: "warning",
                     },
                     max: {
                       message: {
@@ -217,6 +218,6 @@ const UpdateActivityInformationModal = createVisualComponent({
 });
 
 //@@viewOn:exports
-export { UpdateActivityInformationModal };
-export default UpdateActivityInformationModal;
+export { UpdateActivitySettingsModal };
+export default UpdateActivitySettingsModal;
 //@@viewOff:exports

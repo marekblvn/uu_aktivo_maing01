@@ -207,7 +207,7 @@ const ActivityDetail = createVisualComponent({
     const handleChangeRecurrence = async () => {};
 
     const handleUpdateFrequency = async ({ value }) => {
-      return await handlerMap.updateFrequency({ id, frequency: value });
+      return await handlerMap.updateFrequency({ id, ...value });
     };
 
     const handleUpdateNotificationOffset = async ({ value }) => {

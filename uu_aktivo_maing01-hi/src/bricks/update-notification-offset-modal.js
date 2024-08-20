@@ -1,9 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { CancelButton, Form, FormNumber, FormSelect, ResetButton, SubmitButton } from "uu5g05-forms";
+import { CancelButton, Form, FormNumber, FormSelect, Message, ResetButton, SubmitButton } from "uu5g05-forms";
 import { Grid, Modal } from "uu5g05-elements";
-import Calls from "../calls.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -31,8 +30,9 @@ const UpdateNotificationOffsetModal = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ open, onClose, initialValues, activityId, frequency, onSubmit }) {
+  render({ open, onClose, initialValues, frequency, onSubmit }) {
     //@@viewOn:private
+    const [error, setError] = useState(null);
     //@@viewOff:private
 
     //@@viewOn:render
@@ -46,7 +46,7 @@ const UpdateNotificationOffsetModal = createVisualComponent({
             <Grid templateColumns={{ xs: "40px repeat(2, 1fr)", s: "repeat(3, auto)" }} justifyContent={{ s: "end" }}>
               <ResetButton significance="subdued" icon="mdi-refresh" />
               <CancelButton onClick={onClose} />
-              <SubmitButton>
+              <SubmitButton disabled={!!error}>
                 <Lsi lsi={{ en: "Change", cs: "Změnit" }} />
               </SubmitButton>
             </Grid>
@@ -54,8 +54,8 @@ const UpdateNotificationOffsetModal = createVisualComponent({
         >
           <Form.View>
             <Grid
-              templateColumns={{ xs: "100", s: "repeat(2,1fr)" }}
-              templateRows={{ xs: "repeat(2, 1fr)", s: "100%" }}
+              templateColumns={{ xs: "100", s: "repeat(3,1fr)" }}
+              templateRows={{ xs: "repeat(3, 1fr)", s: "100%" }}
               alignItems={"start"}
             >
               <FormNumber
@@ -71,15 +71,26 @@ const UpdateNotificationOffsetModal = createVisualComponent({
                   const days = e.data.value;
                   const hours = e.data.form.value.hours;
                   if (days === hours && hours === 0) {
-                    return {
+                    return setError({
                       code: "invalidNotificationOffset",
                       feedback: "error",
                       message: {
                         en: "Notification offset must be at least 1 hour.",
                         cs: "Posun upozornění musí být aspoň 1 hodina.",
                       },
-                    };
+                    });
                   }
+                  if (frequency.months === 0) {
+                    if (days * 24 + hours > frequency.days * 24) {
+                      return setError({
+                        message: {
+                          en: "Notification offset cannot be greater than frequency.",
+                          cs: "Posun upozornění nemůže být větší než frekvence.",
+                        },
+                      });
+                    }
+                  }
+                  setError(null);
                 }}
                 validationMap={{
                   badValue: {
@@ -119,82 +130,94 @@ const UpdateNotificationOffsetModal = createVisualComponent({
                   },
                 }}
               />
-              <Grid templateColumns={{ xs: "1fr 1fr" }} alignItems="start">
-                <FormNumber
-                  name="hours"
-                  label={{ en: "Hours", cs: "Hodiny" }}
-                  max={23}
-                  min={0}
-                  step={1}
-                  required
-                  initialValue={initialValues.hours}
-                  validateOnChange
-                  onValidate={async (e) => {
-                    const days = e.data.form.value.days;
-                    const hours = e.data.value;
-                    if (days === hours && hours === 0) {
-                      return {
-                        code: "invalidNotificationOffset",
-                        feedback: "error",
+              <FormNumber
+                name="hours"
+                label={{ en: "Hours", cs: "Hodiny" }}
+                max={23}
+                min={0}
+                step={1}
+                required
+                initialValue={initialValues.hours}
+                validateOnChange
+                onValidate={async (e) => {
+                  const days = e.data.form.value.days;
+                  const hours = e.data.value;
+                  if (days === hours && hours === 0) {
+                    return setError({
+                      message: {
+                        en: "Notification offset must be at least 1 hour.",
+                        cs: "Posun upozornění musí být aspoň 1 hodina.",
+                      },
+                    });
+                  }
+                  if (frequency.months === 0) {
+                    if (days * 24 + hours > frequency.days * 24) {
+                      return setError({
                         message: {
-                          en: "Notification offset must be at least 1 hour.",
-                          cs: "Posun upozornění musí být aspoň 1 hodina.",
+                          en: "Notification offset cannot be greater than frequency.",
+                          cs: "Posun upozornění nemůže být větší než frekvence.",
                         },
-                      };
+                      });
                     }
-                  }}
-                  validationMap={{
-                    badValue: {
-                      feedback: "error",
-                      message: {
-                        en: "Value must be an integer.",
-                        cs: "Hodnota musí být celé číslo.",
-                      },
+                  }
+                  setError(null);
+                }}
+                validationMap={{
+                  badValue: {
+                    feedback: "error",
+                    message: {
+                      en: "Value must be an integer.",
+                      cs: "Hodnota musí být celé číslo.",
                     },
-                    max: {
-                      feedback: "error",
-                      message: {
-                        en: "Maximum allowed value is %d.",
-                        cs: "Nejvyšší povolená hodnota je %d.",
-                      },
+                  },
+                  max: {
+                    feedback: "error",
+                    message: {
+                      en: "Maximum allowed value is %d.",
+                      cs: "Nejvyšší povolená hodnota je %d.",
                     },
-                    min: {
-                      feedback: "error",
-                      message: {
-                        en: "Minimum allowed value is %d.",
-                        cs: "Nejnižší povolená hodnota je %d.",
-                      },
+                  },
+                  min: {
+                    feedback: "error",
+                    message: {
+                      en: "Minimum allowed value is %d.",
+                      cs: "Nejnižší povolená hodnota je %d.",
                     },
-                    required: {
-                      feedback: "error",
-                      message: {
-                        en: "Value is required.",
-                        cs: "Povinný parametr.",
-                      },
+                  },
+                  required: {
+                    feedback: "error",
+                    message: {
+                      en: "Value is required.",
+                      cs: "Povinný parametr.",
                     },
-                    step: {
-                      feedback: "error",
-                      message: {
-                        en: "Value must be an integer.",
-                        cs: "Hodnota musí být celé číslo.",
-                      },
+                  },
+                  step: {
+                    feedback: "error",
+                    message: {
+                      en: "Value must be an integer.",
+                      cs: "Hodnota musí být celé číslo.",
                     },
-                  }}
-                />
-                <FormSelect
-                  name="minutes"
-                  label={{ en: "Minutes", cs: "Minuty" }}
-                  itemList={[
-                    { value: 0, children: "0" },
-                    { value: 15, children: "15" },
-                    { value: 30, children: "30" },
-                    { value: 45, children: "45" },
-                  ]}
-                  required
-                  initialValue={initialValues.minutes}
-                />
-              </Grid>
+                  },
+                }}
+              />
+              <FormSelect
+                name="minutes"
+                label={{ en: "Minutes", cs: "Minuty" }}
+                itemList={[
+                  { value: 0, children: "0" },
+                  { value: 15, children: "15" },
+                  { value: 30, children: "30" },
+                  { value: 45, children: "45" },
+                ]}
+                required
+                initialValue={initialValues.minutes}
+              />
             </Grid>
+            {!!error && (
+              <Message feedback="error" style={{ marginTop: "12px" }}>
+                <Lsi lsi={error.message} />
+              </Message>
+            )}
           </Form.View>
         </Modal>
       </Form.Provider>

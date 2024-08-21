@@ -147,9 +147,9 @@ const DatetimeDetail = createVisualComponent({
         return "undecided";
       })();
 
-      const handleChangeParticipation = async ({ data }) => {
+      const handleChangeParticipation = async (type) => {
         try {
-          await handlerMap.updateParticipation({ id, type: data.value });
+          await handlerMap.updateParticipation({ id, type });
         } catch (error) {
           showError(error);
         }
@@ -180,7 +180,15 @@ const DatetimeDetail = createVisualComponent({
               style={{ backgroundColor: "rgba(33, 33, 33, 0.02)" }}
               colorScheme="neutral"
             >
-              <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
+              {[...confirmed, ...denied, ...undecided].length > 1 ? (
+                <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
+              ) : (
+                <PlaceholderBox
+                  code="users"
+                  header={{ en: "There are no other members", cs: "Nejsou žádní další členové" }}
+                  info={{ en: "You are the sole member of this activity.", cs: "Jste jediným členem této aktivity." }}
+                />
+              )}
             </Panel>
           ) : (
             <ListItem colorScheme="neutral" className={Css.listItem()}>
@@ -195,7 +203,20 @@ const DatetimeDetail = createVisualComponent({
                 <Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />
               </Text>
               <div style={{ padding: "0 20px" }}>
-                <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
+                {[...confirmed, ...denied, ...undecided].length > 1 ? (
+                  <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
+                ) : (
+                  <div style={{ height: "320px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <PlaceholderBox
+                      code="users"
+                      header={{ en: "There are no other members", cs: "Nejsou žádní další členové" }}
+                      info={{
+                        en: "You are the sole member of this activity.",
+                        cs: "Jste jediným členem této aktivity.",
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </ListItem>
           )}

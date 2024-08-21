@@ -1,8 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useLsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Button, Grid, ListLayout, PlaceholderBox, Text } from "uu5g05-elements";
-import { Checkbox } from "uu5g05-forms";
+import { Button, Grid, ListLayout, PlaceholderBox, RichIcon, Text } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
@@ -53,8 +52,7 @@ const DatetimeSettingsBlock = createVisualComponent({
 
     const canEditAndDelete = isAuthority || isExecutive || isOwner;
 
-    const frequencyOptionIndex = getIndexByValues(frequency);
-
+    const optionIndex = getIndexByValues(frequency);
     //@@viewOff:private
 
     //@@viewOn:render
@@ -79,19 +77,28 @@ const DatetimeSettingsBlock = createVisualComponent({
             itemList={[
               {
                 label: { en: "Recurrent datetime", cs: "Opakující se termín" },
-                children: <Checkbox value={recurrent} readOnly box={false} borderRadius="full" colorScheme="red" />,
+                children: (
+                  <RichIcon
+                    icon={recurrent ? "mdi-check-circle-outline" : "mdi-close-circle-outline"}
+                    colorScheme={recurrent ? "positive" : "negative"}
+                    significance="subdued"
+                    size="m"
+                    borderRadius="none"
+                  />
+                ),
               },
               {
                 label: { en: "Datetime recurrence frequency", cs: "Frekvence opakování termínu" },
-                children: <Lsi lsi={FREQUENCY_LSI[frequencyOptionIndex]} />,
-                actionList: canEditAndDelete
-                  ? [
-                      {
-                        icon: "mdi-pencil",
-                        onClick: onEditFrequency,
-                      },
-                    ]
-                  : null,
+                children: <Lsi lsi={FREQUENCY_LSI[optionIndex]} />,
+                actionList:
+                  canEditAndDelete && recurrent
+                    ? [
+                        {
+                          icon: "mdi-pencil",
+                          onClick: onEditFrequency,
+                        },
+                      ]
+                    : null,
               },
               {
                 label: { en: "Datetime notification offset", cs: "Posun oznámení termínu" },

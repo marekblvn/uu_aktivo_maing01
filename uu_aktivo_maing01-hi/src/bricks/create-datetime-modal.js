@@ -12,43 +12,10 @@ import {
   SubmitButton,
 } from "uu5g05-forms";
 import { Grid, Line, Modal } from "uu5g05-elements";
+import { FREQUENCY_OPTIONS } from "../../utils/frequency-utils.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
-const frequencyOptions = [
-  {
-    children: { en: "1 day", cs: "1 den" },
-    value: { months: 0, days: 1 },
-  },
-  {
-    children: { en: "2 days", cs: "2 dny" },
-    value: { months: 0, days: 2 },
-  },
-  {
-    children: { en: "3 days", cs: "3 dny" },
-    value: { months: 0, days: 3 },
-  },
-  {
-    children: { en: "1 week", cs: "1 týden" },
-    value: { months: 0, days: 7 },
-  },
-  {
-    children: { en: "2 weeks", cs: "2 týdny" },
-    value: { months: 0, days: 14 },
-  },
-  {
-    children: { en: "1 month", cs: "1 měsíc" },
-    value: { months: 1, days: 0 },
-  },
-  {
-    children: { en: "2 months", cs: "2 měsíce" },
-    value: { months: 2, days: 0 },
-  },
-  {
-    children: { en: "1 year", cs: "1 rok" },
-    value: { months: 12, days: 0 },
-  },
-];
 //@@viewOff:constants
 
 //@@viewOn:css
@@ -132,7 +99,7 @@ const CreateDatetimeModal = createVisualComponent({
           header={<Lsi lsi={{ en: "Create new datetime", cs: "Vytvořit nový termín" }} />}
           footer={
             <Grid templateColumns={{ xs: "repeat(2, 1fr)", s: "repeat(2, auto)" }} justifyContent={{ s: "end" }}>
-              <CancelButton />
+              <CancelButton onClick={onClose} />
               <SubmitButton disabled={!!notificationOffsetError}>
                 <Lsi lsi={{ en: "Create", cs: "Vytvořit" }} />
               </SubmitButton>
@@ -194,8 +161,8 @@ const CreateDatetimeModal = createVisualComponent({
                         style={{ width: screenSize === "xs" ? "auto" : "180px" }}
                         name="frequency"
                         required
-                        itemList={frequencyOptions}
-                        initialValue={frequencyOptions[3].value}
+                        itemList={FREQUENCY_OPTIONS}
+                        initialValue={FREQUENCY_OPTIONS[3].value}
                       />
                     </Grid>
                   </Grid>

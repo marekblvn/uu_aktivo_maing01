@@ -1,9 +1,9 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
-import { CancelButton, Form, FormNumber, FormSelect, ResetButton, SubmitButton } from "uu5g05-forms";
+import { CancelButton, Form, FormSelect, ResetButton, SubmitButton } from "uu5g05-forms";
 import { Grid, Modal } from "uu5g05-elements";
-import { FREQUENCY_OPTIONS, getIndexByValues, limitedFrequencyOptions } from "../../utils/frequency-utils.js";
+import { getFrequencyOption, limitedFrequencyOptions } from "../../utils/frequency-utils.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -33,7 +33,7 @@ const UpdateFrequencyModal = createVisualComponent({
 
   render({ open, onClose, initialValues, notificationOffset, onSubmit }) {
     //@@viewOn:private
-    const initialValueIndex = getIndexByValues(initialValues);
+    const initialOption = getFrequencyOption(initialValues);
     //@@viewOff:private
     //@@viewOn:render
     return (
@@ -53,13 +53,13 @@ const UpdateFrequencyModal = createVisualComponent({
           }
         >
           <Form.View>
-            <Grid templateColumns={{ xs: "100%", s: "repeat(2, 1fr)" }} alignItems={"start"}>
+            <Grid templateColumns={{ xs: "100%" }} alignItems={"start"}>
               <FormSelect
                 name="frequency"
                 label={{ en: "Datetime recurrence frequency", cs: "Frekvence opakování termínu" }}
                 required
                 itemList={limitedFrequencyOptions(notificationOffset)}
-                initialValue={FREQUENCY_OPTIONS[initialValueIndex].value}
+                initialValue={initialOption.value}
                 validationMap={{
                   badValue: {
                     feedback: "error",

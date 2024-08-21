@@ -43,11 +43,34 @@ export const getIndexByValues = (frequency) => {
 };
 
 export const limitedFrequencyOptions = (notificationOffset) => {
+  if (notificationOffset.months === 0 && notificationOffset.days === 0) return FREQUENCY_OPTIONS;
   return FREQUENCY_OPTIONS.filter((item) => {
     const { months, days } = item.value;
     if (months === 0 && days < notificationOffset.days + 1) return false;
     return true;
   });
+};
+
+const formatCs = (frequency) => {
+  if (!frequency || Object.keys(frequency).length === 0) return "";
+  const { months = 0, days = 0 } = frequency;
+  const monthsString =
+    months === 0 ? "" : months === 1 ? "1 měsíc" : [2, 3, 4].includes(months) ? `${months} měsíce` : `${months} měsíců`;
+  const daysString = days === 0 ? "" : days === 1 ? "1 den" : [2, 3, 4].includes(days) ? `${days} dny` : `${days} dní`;
+  return [monthsString, daysString].filter((str) => !!str).join(" a ");
+};
+
+const formatEn = (frequency) => {
+  if (!frequency || Object.keys(frequency).length === 0) return "";
+  const { months = 0, days = 0 } = frequency;
+  const monthsString = months === 0 ? "" : months === 1 ? "1 month" : `${months} months`;
+  const daysString = days === 0 ? "" : days === 1 ? "1 day" : `${days} days`;
+  return [monthsString, daysString].filter((str) => !!str).join(" and ");
+};
+
+export const getFrequencyOption = (frequency) => {
+  const index = getIndexByValues(frequency);
+  return FREQUENCY_OPTIONS[index];
 };
 
 export const FREQUENCY_LSI = FREQUENCY_OPTIONS.map((item) => item.children);

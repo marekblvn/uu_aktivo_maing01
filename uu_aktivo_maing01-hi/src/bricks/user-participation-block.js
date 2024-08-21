@@ -1,9 +1,8 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { Box, RichIcon } from "uu5g05-elements";
+import { Box, ButtonGroup } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
-import { SwitchSelect } from "uu5g05-forms";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -15,6 +14,7 @@ const Css = {
     Config.Css.css({
       padding: ["xl", "l", "m"].includes(size) ? "8px" : "4px",
       display: "flex",
+      justifyContent: "space-between",
     }),
   select: () =>
     Config.Css.css({
@@ -57,49 +57,26 @@ const UserParticipationBlock = createVisualComponent({
 
     const itemList = [
       {
-        value: "confirmed",
-        children: (
-          <>
-            <RichIcon
-              icon="uugdsstencil-communication-thumb-up"
-              colorScheme={userParticipationType === "confirmed" ? "positive" : "dim"}
-              significance="subdued"
-              size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
-            />
-            {["xs"].includes(screenSize) || <Lsi lsi={{ en: "Coming", cs: "Přijdu" }} />}
-          </>
-        ),
-        colorScheme: userParticipationType === "confirmed" ? "positive" : "dim",
+        icon: "uugdsstencil-communication-thumb-up",
+        children: ["xs", "s"].includes(screenSize) ? null : <Lsi lsi={{ en: "Coming", cs: "Přijdu" }} />,
+        onClick: () => onChangeParticipation("confirmed"),
+        colorScheme: "positive",
+        significance: "subdued",
+        pressed: userParticipationType === "confirmed",
       },
       {
-        value: "undecided",
-        children: (
-          <>
-            <RichIcon
-              icon="uugds-help"
-              colorScheme={userParticipationType === "undecided" ? "neutral" : "dim"}
-              significance="subdued"
-              size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
-            />
-            {["xs"].includes(screenSize) || <Lsi lsi={{ en: "Don't know", cs: "Nevím" }} />}
-          </>
-        ),
-        colorScheme: userParticipationType === "undecided" ? "neutral" : "dim",
+        icon: "uugds-help",
+        children: ["xs", "s"].includes(screenSize) ? null : <Lsi lsi={{ en: "Don't know", cs: "Nevím" }} />,
+        onClick: () => onChangeParticipation("undecided"),
+        colorScheme: "neutral",
+        pressed: userParticipationType === "undecided",
       },
       {
-        value: "denied",
-        children: (
-          <>
-            <RichIcon
-              icon="uugdsstencil-communication-thumb-down"
-              colorScheme={userParticipationType === "denied" ? "negative" : "dim"}
-              significance="subdued"
-              size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
-            />
-            {["xs"].includes(screenSize) || <Lsi lsi={{ en: "Not coming", cs: "Nepřijdu" }} />}
-          </>
-        ),
-        colorScheme: userParticipationType === "denied" ? "negative" : "dim",
+        icon: "uugdsstencil-communication-thumb-down",
+        children: ["xs", "s"].includes(screenSize) ? null : <Lsi lsi={{ en: "Not coming", cs: "Nepřijdu" }} />,
+        onClick: () => onChangeParticipation("denied"),
+        colorScheme: "negative",
+        pressed: userParticipationType === "denied",
       },
     ];
     //@@viewOff:private
@@ -114,17 +91,17 @@ const UserParticipationBlock = createVisualComponent({
       >
         <PersonItem
           title={<Lsi lsi={{ en: "You", cs: "Vy" }} />}
-          size={screenSize === "xs" ? "s" : screenSize === "xl" ? "l" : screenSize}
+          size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
           uuIdentity={identity.uuIdentity}
         />
-        <SwitchSelect
-          value={userParticipationType}
-          size={["xl", "xs", "l"].includes(screenSize) ? "m" : screenSize}
-          itemList={itemList}
-          onChange={onChangeParticipation}
-          className={Css.select()}
-          colorScheme={colorScheme}
-        />
+        <Box borderRadius="moderate" style={{ padding: "4px" }}>
+          <ButtonGroup
+            itemList={itemList}
+            colorScheme="building"
+            significance="subdued"
+            size={["xl", "l", "m"].includes(screenSize) ? "m" : "l"}
+          />
+        </Box>
       </Box>
     );
     //@@viewOff:render

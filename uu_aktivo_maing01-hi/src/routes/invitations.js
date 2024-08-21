@@ -186,9 +186,10 @@ let Invitations = createVisualComponent({
           </div>
         );
       }
+      const dataToRender = data.filter(item != null);
       return (
         <InvitationList
-          itemList={data}
+          itemList={dataToRender}
           onInvitationDelete={handleDeleteInvitation}
           onInvitationAccept={handleAcceptInvitation}
         />
@@ -226,10 +227,11 @@ let Invitations = createVisualComponent({
             loadRef.current = handlerMap.load;
             switch (state) {
               case "pending":
+                return renderReady(data);
               case "pendingData":
                 return renderLoading();
               case "error":
-                renderReady(data);
+                return renderReady(data);
               case "errorNoData":
                 return renderError(errorData);
               case "ready":

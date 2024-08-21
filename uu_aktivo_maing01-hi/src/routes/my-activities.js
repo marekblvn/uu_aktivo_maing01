@@ -15,7 +15,7 @@ import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
 import ActivityListProvider from "../providers/activity-list-provider.js";
 import { ActionGroup, Dialog, Grid, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
-import ActivityList from "../bricks/activity-list.js";
+import ActivityAlbum from "../bricks/activity-album.js";
 import CreateActivityModal from "../bricks/create-activity-modal.js";
 import importLsi from "../lsi/import-lsi.js";
 import { useAlertBus } from "uu_plus4u5g02-elements";
@@ -71,7 +71,6 @@ let MyActivities = createVisualComponent({
           {
             children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
             onClick: (e) => {
-              e.preventDefault();
               setDialogProps(null);
             },
           },
@@ -89,7 +88,6 @@ let MyActivities = createVisualComponent({
               }
             },
             colorScheme: "negative",
-            significance: "highlighted",
           },
         ],
       });
@@ -98,7 +96,7 @@ let MyActivities = createVisualComponent({
     const handleLeaveActivity = useCallback(
       (item) => {
         showDialog(async () => {
-          return await item.handlerMap.leave(item.data.id);
+          return await item.handlerMap.leave({ id: item.data.id });
         });
       },
       [showDialog],
@@ -170,6 +168,8 @@ let MyActivities = createVisualComponent({
         );
       }
 
+      const dataToRender = data.filter((item) => item != null);
+
       return (
         <>
           <div style={{ display: "flex", marginBottom: "24px", padding: "0 8px" }}>
@@ -206,8 +206,12 @@ let MyActivities = createVisualComponent({
               }}
             />
           </div>
-          <ActivityList itemList={data} onActivityLeave={handleLeaveActivity} />
-          <AutoLoad data={data} handleLoadNext={handlerMap.loadNext} distance={window.innerHeight} />
+          <ActivityAlbum itemList={dataToRender} onActivityLeave={handleLeaveActivity} />
+          <AutoLoad
+            data={data}
+            handleLoadNext={() => handlerMap.loadNext({ filters: { members: [identity.uuIdentity] } })}
+            distance={window.innerHeight}
+          />
         </>
       );
     }
@@ -220,7 +224,7 @@ let MyActivities = createVisualComponent({
           marginTop: "32px",
         }}
       >
-        <ActivityListProvider>
+        <ActivityListProvider filters={{ members: [identity.uuIdentity] }} pageSize={10}>
           {({ state, data, errorData, pendingData, handlerMap }) => {
             loadRef.current = handlerMap.load;
             loadNextRef.current = handlerMap.loadNext;
@@ -228,10 +232,11 @@ let MyActivities = createVisualComponent({
 
             switch (state) {
               case "pending":
+                return renderReady(data, handlerMap);
               case "pendingNoData":
                 return renderLoading();
               case "error":
-                renderReady(data, handlerMap);
+                return renderReady(data, handlerMap);
               case "errorNoData":
                 return renderError(errorData);
               case "ready":

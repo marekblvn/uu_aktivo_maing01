@@ -7,6 +7,7 @@ import importLsi from "../lsi/import-lsi.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { getIndexByValues, FREQUENCY_LSI } from "../../utils/frequency-utils.js";
+import { notificationOffsetToLsi } from "../../utils/notification-offset-utils.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -54,27 +55,6 @@ const DatetimeSettingsBlock = createVisualComponent({
 
     const frequencyOptionIndex = getIndexByValues(frequency);
 
-    const formattedNotificationOffsetCs = (() => {
-      if (!notificationOffset) return "";
-      const { days, hours, minutes } = notificationOffset;
-      const daysString =
-        days === 0 ? "" : days === 1 ? "1 den" : [2, 3, 4].includes(days) ? `${days} dny` : `${days} dní`;
-      const hoursString =
-        hours === 0 ? "" : hours === 1 ? "1 hodina" : [2, 3, 4].includes(hours) ? `${hours} hodiny` : `${hours} hodin`;
-      const minutesString = minutes === 0 ? "" : `${minutes} minut`;
-      const timeString = [hoursString, minutesString].filter((i) => i !== "").join(" a ");
-      return `${daysString}${days > 0 && timeString !== "" ? ", " : ""}${timeString}`;
-    })();
-
-    const formattedNotificationOffsetEn = (() => {
-      if (!notificationOffset) return "";
-      const { days, hours, minutes } = notificationOffset;
-      const daysString = days === 0 ? "" : days === 1 ? "1 day" : `${days} days`;
-      const hoursString = hours === 0 ? "" : hours === 1 ? "1 hour" : `${hours} hours`;
-      const minutesString = minutes === 0 ? "" : `${minutes} minutes`;
-      const timeString = [hoursString, minutesString].filter((i) => i !== "").join(" and ");
-      return `${daysString}${days > 0 && timeString !== "" ? ", " : ""}${timeString}`;
-    })();
     //@@viewOff:private
 
     //@@viewOn:render
@@ -119,7 +99,7 @@ const DatetimeSettingsBlock = createVisualComponent({
                   en: "How many days, hours, minutes before the datetime deadline will the notification be sent",
                   cs: "Kolik dní, hodin, minut před datem termínu bude posláno upozornění",
                 },
-                children: <Lsi lsi={{ en: formattedNotificationOffsetEn, cs: formattedNotificationOffsetCs }} />,
+                children: <Lsi lsi={notificationOffsetToLsi(notificationOffset)} />,
                 actionList: canEditAndDelete
                   ? [
                       {

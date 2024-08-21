@@ -7,6 +7,7 @@ import { FilterManagerModal, FilterButton, FilterBar } from "uu5tilesg02-control
 import { PersonItem } from "uu_plus4u5g02-elements";
 import { Block, Icon, RichIcon, Text } from "uu5g05-elements";
 import { FREQUENCY_LSI, getIndexByValues } from "../../utils/frequency-utils.js";
+import { notificationOffsetToLsi } from "../../utils/notification-offset-utils.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -113,7 +114,7 @@ const COLUMN_LIST = [
     header: <Lsi lsi={{ en: "Notification offset", cs: "Posun upozornění" }} />,
     headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
     cellComponent: <Table.Cell horizontalAlignment="center" />,
-    cell: ({ data }) => JSON.stringify(data.notificationOffset, null, 2),
+    cell: ({ data }) => <Lsi lsi={notificationOffsetToLsi(data.notificationOffset)} />,
   },
 ];
 

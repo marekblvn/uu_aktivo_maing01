@@ -59,7 +59,7 @@ const UpdateFrequencyModal = createVisualComponent({
                 label={{ en: "Datetime recurrence frequency", cs: "Frekvence opakování termínu" }}
                 required
                 itemList={limitedFrequencyOptions(notificationOffset)}
-                initialValue={initialOption.value}
+                initialValue={initialOption?.value}
                 validationMap={{
                   badValue: {
                     feedback: "error",

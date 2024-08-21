@@ -1,11 +1,10 @@
 //@@viewOn:imports
-import { createVisualComponent, useDataList, useSession } from "uu5g05";
+import { createVisualComponent, useDataList } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
-const PAGE_SIZE = 10;
 //@@viewOff:constants
 
 //@@viewOn:css
@@ -30,24 +29,22 @@ const ActivityListProvider = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ children }) {
+  render({ children, filters, pageSize }) {
     //@@viewOn:private
-    const { identity } = useSession();
     const dataList = useDataList({
-      pageSize: PAGE_SIZE,
+      pageSize,
       itemIdentifier: "id",
       initialDtoIn: {
-        filters: {
-          members: [identity.uuIdentity],
-        },
+        filters,
       },
       handlerMap: {
         load: Calls.Activity.list,
         create: Calls.Activity.create,
+        delete: Calls.Activity.delete,
+        update: Calls.Activity.update,
       },
       itemHandlerMap: {
         leave: Calls.Activity.leave,
-        delete: Calls.Activity.delete,
       },
     });
     let { state, data, errorData, pendingData, handlerMap } = dataList;

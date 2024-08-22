@@ -31,6 +31,8 @@
     "home": "Welcome",
     "my-activities": "My Activities",
     "invitations": "Invitations",
+    "management": "Management",
+    "management/activities": "Activity management",
     "about": "About Application"
   },
   "Placeholder": {

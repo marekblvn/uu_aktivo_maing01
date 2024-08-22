@@ -165,7 +165,18 @@ let ActivityManagement = createVisualComponent({
           return await handlerMap.delete({ id: activity.id });
         });
 
-      return <ActivityList data={data} onDeleteActivity={handleDeleteActivity} onLoadNext={handlerMap.loadNext} />;
+      const handleRefresh = async () => {
+        return await handlerMap.load();
+      };
+
+      return (
+        <ActivityList
+          data={data}
+          onDeleteActivity={handleDeleteActivity}
+          onLoadNext={handlerMap.loadNext}
+          onRefresh={handleRefresh}
+        />
+      );
     }
 
     return (
@@ -178,27 +189,25 @@ let ActivityManagement = createVisualComponent({
       >
         <ActivityListProvider pageSize={50}>
           {({ state, data, errorData, pendingData, handlerMap }) => {
-            const dataToRender = data
-              ? data
-                  .filter((item) => item != null)
-                  .map((item) => ({
-                    ...item.data,
-                    members: item.data.members.length,
-                    onClickGoToActivity: goToActivity,
-                    onClickDatetime: showDatetimeModal,
-                  }))
-              : [];
             switch (state) {
-              case "pending":
-                return renderReady(dataToRender, handlerMap);
               case "pendingNoData":
                 return renderLoading();
-              case "error":
-                return renderReady(dataToRender, handlerMap);
               case "errorNoData":
                 return renderError(errorData);
               case "ready":
+              case "error":
+              case "pending":
               case "readyNoData":
+                const dataToRender = data
+                  ? data
+                      .filter((item) => item != null)
+                      .map((item) => ({
+                        ...item.data,
+                        members: item.data.members.length,
+                        onClickGoToActivity: goToActivity,
+                        onClickDatetime: showDatetimeModal,
+                      }))
+                  : [];
                 return renderReady(dataToRender, handlerMap);
             }
           }}

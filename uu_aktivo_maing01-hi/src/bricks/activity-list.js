@@ -197,7 +197,7 @@ const ActivityList = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ data, onLoadNext, onDeleteActivity }) {
+  render({ data, onLoadNext, onRefresh, onDeleteActivity }) {
     //@@viewOn:private
     const [sorterList, setSorterList] = useState();
     const [filterList, setFilterList] = useState();
@@ -239,7 +239,17 @@ const ActivityList = createVisualComponent({
               <Lsi lsi={{ en: "Activity management", cs: "Správa aktivit" }} />
             </Text>
           }
-          actionList={[{ component: <FilterButton type="bar" /> }]}
+          actionList={[
+            { component: <FilterButton type="bar" /> },
+            {
+              icon: "mdi-refresh",
+              tooltip: { en: "Refresh", cs: "Obnovit" },
+              onClick: onRefresh,
+              colorScheme: "dim",
+              significance: "subdued",
+              order: 1,
+            },
+          ]}
         >
           <FilterBar />
           <FilterManagerModal />

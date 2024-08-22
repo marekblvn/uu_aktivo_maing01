@@ -222,7 +222,12 @@ let Invitations = createVisualComponent({
             level={["xs", "s"].includes(screenSize) ? 5 : 4}
           />
         </div>
-        <InvitationListProvider>
+        <InvitationListProvider
+          filters={{
+            uuIdentity: identity.uuIdentity,
+          }}
+          pageSize={10}
+        >
           {({ state, data, errorData, pendingData, handlerMap }) => {
             loadRef.current = handlerMap.load;
             switch (state) {

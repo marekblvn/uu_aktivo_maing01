@@ -5,7 +5,6 @@ import Calls from "../calls.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
-const PAGE_SIZE = 8;
 //@@viewOff:constants
 
 //@@viewOn:css
@@ -27,19 +26,19 @@ const InvitationListProvider = createVisualComponent({
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    filters: {},
+    pageSize: 10,
+  },
   //@@viewOff:defaultProps
 
-  render({ children }) {
+  render({ children, filters, pageSize }) {
     //@@viewOn:private
-    const { identity } = useSession();
     const dataList = useDataList({
-      pageSize: PAGE_SIZE,
+      pageSize: pageSize,
       itemIdentifier: "id",
       initialDtoIn: {
-        filters: {
-          uuIdentity: identity.uuIdentity,
-        },
+        filters,
       },
       handlerMap: {
         load: Calls.Invitation.list,

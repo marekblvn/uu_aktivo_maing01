@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useRoute, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useRoute, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { withRoute } from "uu_plus4u5g02-app";
 import { useAuthorization } from "../contexts/authorization-context.js";
@@ -42,6 +42,7 @@ let ActivityManagement = createVisualComponent({
     const [, setRoute] = useRoute();
     const [screenSize] = useScreenSize();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
+    const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const { isAuthority, isExecutive } = useAuthorization();
     const [dialogProps, setDialogProps] = useState(null);
     const [modalProps, setModalProps] = useState(null);
@@ -194,20 +195,19 @@ let ActivityManagement = createVisualComponent({
                 return renderLoading();
               case "errorNoData":
                 return renderError(errorData);
-              case "ready":
               case "error":
               case "pending":
+              case "ready":
               case "readyNoData":
-                const dataToRender = data
-                  ? data
-                      .filter((item) => item != null)
-                      .map((item) => ({
-                        ...item.data,
-                        members: item.data.members.length,
-                        onClickGoToActivity: goToActivity,
-                        onClickDatetime: showDatetimeModal,
-                      }))
-                  : [];
+                const dataToRender = data.map((item) => {
+                  if (item == null) return item;
+                  return {
+                    ...item.data,
+                    members: item.data.members.length,
+                    onClickGoToActivity: goToActivity,
+                    onClickDatetime: showDatetimeModal,
+                  };
+                });
                 return renderReady(dataToRender, handlerMap);
             }
           }}

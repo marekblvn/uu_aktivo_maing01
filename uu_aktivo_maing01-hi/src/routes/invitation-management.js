@@ -149,13 +149,14 @@ let InvitationManagement = createVisualComponent({
                 return renderLoading();
               case "errorNoData":
                 return renderError(errorData);
-              case "ready":
-              case "error":
               case "pending":
+              case "error":
+              case "ready":
               case "readyNoData":
-                const dataToRender = data
-                  ? data.filter((item) => item != null).map((item) => ({ ...item.data, handlerMap: item.handlerMap }))
-                  : [];
+                const dataToRender = data.map((item) => {
+                  if (item == null) return item;
+                  return { ...item.data, handlerMap: item.handlerMap };
+                });
                 return renderReady(dataToRender, handlerMap);
             }
           }}

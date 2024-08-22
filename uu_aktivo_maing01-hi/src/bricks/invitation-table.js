@@ -13,7 +13,7 @@ const SORTER_LIST = [
   {
     key: "activityName",
     label: <Lsi lsi={{ en: "Activity name", cs: "Název aktivity" }} />,
-    sort: (a, b) => b.activityName.localeCompare(a.activityName),
+    sort: (a, b) => a.activityName.localeCompare(b.activityName),
   },
   {
     key: "createdAt",
@@ -21,8 +21,8 @@ const SORTER_LIST = [
     sort: (a, b) => {
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
-      if (dateA > dateB) return -1;
-      else if (dateA < dateB) return 1;
+      if (dateA < dateB) return -1;
+      else if (dateA > dateB) return 1;
       return 0;
     },
   },
@@ -67,6 +67,20 @@ const FILTER_LIST = [
     inputProps: { placeholder: { en: "Enter activity name", cs: "Zadejte název aktivity" } },
   },
   {
+    key: "uuIdentity",
+    label: { en: "Recipient", cs: "Příjemce" },
+    filter: (item, value) => {
+      let fragments = value.split(/\s+/);
+      return fragments.some((frag) => {
+        let itemValue = item.uuIdentity;
+        return itemValue.toLowerCase().indexOf(frag.toLowerCase()) !== -1;
+      });
+    },
+    inputProps: {
+      placeholder: { en: "Enter recipient's Plus4U ID", cs: "Zadejte Plus4U ID příjemce" },
+    },
+  },
+  {
     key: "createdAt",
     label: { en: "Created at", cs: "Datum vytvoření" },
     filter: (item, value) => {
@@ -108,8 +122,6 @@ const InvitationTable = createVisualComponent({
     const [sorterList, setSorterList] = useState();
     const [filterList, setFilterList] = useState();
     //@@viewOff:private
-
-    console.log(data);
 
     const getActionList = useCallback(
       ({ rowIndex, data }) => {

@@ -9,6 +9,7 @@ import { Dialog, Pending } from "uu5g05-elements";
 import ActivityListProvider from "../providers/activity-list-provider.js";
 import ActivityList from "../bricks/activity-list.js";
 import importLsi from "../lsi/import-lsi.js";
+import DatetimeManagementModal from "../bricks/datetime-management-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -42,12 +43,11 @@ let ActivityManagement = createVisualComponent({
     const [screenSize] = useScreenSize();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const { isAuthority, isExecutive } = useAuthorization();
-    const [pageSize, setPageSize] = useState(50);
-    const [shownPageIndex, setShownPageIndex] = useState(0);
     const [dialogProps, setDialogProps] = useState(null);
+    const [modalProps, setModalProps] = useState(null);
     //@@viewOff:private
 
-    const showDialog = useCallback((activityName, onConfirm) => {
+    const showDeleteActivityDialog = useCallback((activityName, onConfirm) => {
       setDialogProps({
         header: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "header"]} />,
         icon: "mdi-delete",
@@ -83,9 +83,46 @@ let ActivityManagement = createVisualComponent({
       });
     }, []);
 
+    const showDeleteDatetimeDialog = useCallback((onConfirm) => {
+      setDialogProps({
+        header: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "header"]} />,
+        info: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "info"]} />,
+        icon: "mdi-delete",
+        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+        actionList: [
+          {
+            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+            onClick: () => setDialogProps(null),
+          },
+          {
+            children: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "submit"]} />,
+            colorScheme: "negative",
+            onClick: async (e) => {
+              e.preventDefault();
+              try {
+                await onConfirm();
+                setDialogProps(null);
+                addAlert({
+                  priority: "info",
+                  header: { en: "Datetime deleted", cs: "Termín smazán" },
+                  message: {
+                    en: `Datetime was successfully deleted.`,
+                    cs: `Termín byl úspěšně smazán.`,
+                  },
+                });
+              } catch (error) {
+                showError(error);
+              }
+            },
+          },
+        ],
+      });
+    });
+
     const goToActivity = useCallback((id) => setRoute("activity", { id }), []);
 
-    const goToDatetime = useCallback((id) => setRoute("management/datetime", { id }), []);
+    const showDatetimeModal = useCallback((id, activity) => setModalProps({ id, activity }));
+    const handleDeleteDatetime = async (deleteHandler) => showDeleteDatetimeDialog(deleteHandler);
 
     //@@viewOn:render
     if (!isAuthority && !isExecutive) {
@@ -124,7 +161,7 @@ let ActivityManagement = createVisualComponent({
       if (!data || !data.length) return null;
 
       const handleDeleteActivity = (activity) =>
-        showDialog(activity.name, async () => {
+        showDeleteActivityDialog(activity.name, async () => {
           return await handlerMap.delete({ id: activity.id });
         });
 
@@ -139,7 +176,7 @@ let ActivityManagement = createVisualComponent({
           maxWidth: "auto",
         }}
       >
-        <ActivityListProvider pageSize={pageSize}>
+        <ActivityListProvider pageSize={50}>
           {({ state, data, errorData, pendingData, handlerMap }) => {
             const dataToRender = data
               ? data
@@ -148,7 +185,7 @@ let ActivityManagement = createVisualComponent({
                     ...item.data,
                     members: item.data.members.length,
                     onClickGoToActivity: goToActivity,
-                    onClickGoToDatetime: goToDatetime,
+                    onClickDatetime: showDatetimeModal,
                   }))
               : [];
             switch (state) {
@@ -167,6 +204,12 @@ let ActivityManagement = createVisualComponent({
           }}
         </ActivityListProvider>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
+        <DatetimeManagementModal
+          {...modalProps}
+          open={!!modalProps}
+          onClose={() => setModalProps(null)}
+          onDeleteDatetime={handleDeleteDatetime}
+        />
       </Container>
     );
     //@@viewOff:render

@@ -186,7 +186,7 @@ let Invitations = createVisualComponent({
           </div>
         );
       }
-      const dataToRender = data.filter(item != null);
+      const dataToRender = data.filter((item) => item != null);
       return (
         <InvitationList
           itemList={dataToRender}

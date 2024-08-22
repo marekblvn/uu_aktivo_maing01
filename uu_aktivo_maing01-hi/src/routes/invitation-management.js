@@ -91,8 +91,8 @@ let InvitationManagement = createVisualComponent({
               priority: "info",
               header: { en: "Invitation deleted", cs: "Pozvánka smazána" },
               message: {
-                en: `Invitation to ${invitation.activityName} was successfully deleted.`,
-                cs: `Pozvánka do ${invitation.activityName} byla úspěšně smazána.`,
+                en: `Invitation to '${invitation.activityName}' was successfully deleted.`,
+                cs: `Pozvánka do '${invitation.activityName}' byla úspěšně smazána.`,
               },
               durationMs: 2000,
             });

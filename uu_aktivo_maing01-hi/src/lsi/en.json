@@ -87,12 +87,12 @@
       "submit": "Delete"
     },
     "declineInvitation": {
-      "header": "Are you sure you want to decline invitation to %s?",
+      "header": "Are you sure you want to decline invitation to '%s'?",
       "info": "The invitation will be deleted.",
       "submit": "Decline"
     },
     "acceptInvitation": {
-      "header": "You are about to accept an invitation to %s",
+      "header": "You are about to accept an invitation to '%s'",
       "info": "By accepting this invitation you will become a member of the activity.",
       "submit": "Accept"
     },

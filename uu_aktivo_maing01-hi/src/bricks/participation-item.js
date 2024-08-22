@@ -3,6 +3,7 @@ import { createVisualComponent, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Box, Icon, RichIcon } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
+import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -33,6 +34,7 @@ const ParticipationItem = createVisualComponent({
   render({ uuIdentity, colorScheme, icon }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const { isAuthority, isExecutive } = useAuthorization();
     //@@viewOff:private
 
     //@@viewOn:render
@@ -46,13 +48,17 @@ const ParticipationItem = createVisualComponent({
         style={{ padding: "3px 4px 3px 12px", margin: "4px 0" }}
       >
         <RichIcon
-          size={["xl", "l", "m", "s"].includes(screenSize) ? "xs" : "xxs"}
+          size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
           icon={icon}
           margin={{ right: "12px" }}
           colorScheme={colorScheme}
           significance="subdued"
         />
-        <PersonItem size={["xl", "l", "m", "s"].includes(screenSize) ? "s" : "xxs"} uuIdentity={uuIdentity} />
+        <PersonItem
+          size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
+          uuIdentity={uuIdentity}
+          subtitle={isAuthority || isExecutive ? uuIdentity : null}
+        />
       </Box>
     );
     //@@viewOff:render

@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useLsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Button, ListItem, Panel, Pending, PlaceholderBox, Text } from "uu5g05-elements";
+import { Button, Grid, ListItem, Panel, Pending, PlaceholderBox, Text } from "uu5g05-elements";
 import ParticipationList from "./participation-list.js";
 import DatetimeBlock from "./datetime-block.js";
 import UserParticipationBlock from "./user-participation-block.js";
@@ -147,6 +147,10 @@ const DatetimeDetail = createVisualComponent({
         return "undecided";
       })();
 
+      const filteredConfirmed = confirmed.filter((i) => i !== identity.uuIdentity);
+      const filteredUndecided = undecided.filter((i) => i !== identity.uuIdentity);
+      const filteredDenied = denied.filter((i) => i !== identity.uuIdentity);
+
       const handleChangeParticipation = async (type) => {
         try {
           await handlerMap.updateParticipation({ id, type });
@@ -181,7 +185,9 @@ const DatetimeDetail = createVisualComponent({
               colorScheme="neutral"
             >
               {[...confirmed, ...denied, ...undecided].length > 1 ? (
-                <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
+                <ParticipationList
+                  items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}
+                />
               ) : (
                 <PlaceholderBox
                   code="users"
@@ -204,7 +210,9 @@ const DatetimeDetail = createVisualComponent({
               </Text>
               <div style={{ padding: "0 20px" }}>
                 {[...confirmed, ...denied, ...undecided].length > 1 ? (
-                  <ParticipationList confirmed={confirmed} undecided={undecided} denied={denied} />
+                  <ParticipationList
+                    items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}
+                  />
                 ) : (
                   <div style={{ height: "320px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <PlaceholderBox

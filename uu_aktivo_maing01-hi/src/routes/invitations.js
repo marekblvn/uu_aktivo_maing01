@@ -211,7 +211,7 @@ let Invitations = createVisualComponent({
             title={<Lsi lsi={{ en: "Invitations", cs: "Pozvánky" }} />}
             icon={
               <RichIcon
-                icon="mdi-email"
+                icon="uugds-email"
                 colorScheme="steel"
                 significance="subdued"
                 borderRadius="moderate"

@@ -89,7 +89,7 @@ const COLUMN_LIST = [
         significance="subdued"
         borderRadius="moderate"
         tooltip={{ en: "Go to datetime detail", cs: "Přejít na detail termínu" }}
-        onClick={() => data.onClickGoToDatetime(data.datetimeId)}
+        onClick={() => data.onClickDatetime(data.datetimeId, data)}
       />
     ),
     maxWidth: "100px",

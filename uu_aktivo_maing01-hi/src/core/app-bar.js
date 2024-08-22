@@ -4,6 +4,7 @@ import Config from "./config/config.js";
 import Logo from "./logo.js";
 import { ActionGroup, RichIcon } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -33,6 +34,7 @@ const AppBar = createVisualComponent({
 
   render({ handleCloseSideMenu, handleOpenSideMenu, sideMenuOpen }) {
     //@@viewOn:private
+    const { isAuthority, isExecutive } = useAuthorization();
     const { state } = useSession();
     const [, setRoute] = useRoute();
     const [screenSize] = useScreenSize();
@@ -46,25 +48,24 @@ const AppBar = createVisualComponent({
       {
         children: <Lsi import={importLsi} path={["Menu", "my-activities"]} />,
         onClick: () => {
-          handleCloseSideMenu();
           setRoute("my-activities");
         },
-        icon: "uugdsstencil-weather-bolt",
+        icon: "uugdsstencil-chart-pulse",
         colorScheme: "building",
+        order: -1,
       },
       {
         children: <Lsi import={importLsi} path={["Menu", "invitations"]} />,
         onClick: () => {
-          handleCloseSideMenu();
           setRoute("invitations");
         },
         icon: "uugds-email",
         colorScheme: "building",
+        order: -1,
       },
       {
         children: <Lsi import={importLsi} path={["Menu", "about"]} />,
         onClick: () => {
-          handleCloseSideMenu();
           setRoute("about");
         },
         icon: "uugds-info",
@@ -72,6 +73,32 @@ const AppBar = createVisualComponent({
         collapsed: true,
       },
     ];
+
+    if (isAuthority || isExecutive) {
+      itemList.push({
+        children: <Lsi import={importLsi} path={["Menu", "management"]} />,
+        itemList: [
+          {
+            children: <Lsi import={importLsi} path={["Menu", "management/activities"]} />,
+            icon: "uugdsstencil-chart-pulse",
+            onClick: () => {
+              setRoute("management/activities");
+            },
+          },
+          {
+            children: <Lsi import={importLsi} path={["Menu", "management/invitations"]} />,
+            icon: "uugds-email",
+            colorScheme: "building",
+            onClick: () => {
+              setRoute("management/invitations");
+            },
+          },
+        ],
+        icon: "mdi-wrench-outline",
+        colorScheme: "building",
+        order: -1,
+      });
+    }
 
     //@@viewOn:render
     if (state !== "authenticated") {
@@ -90,7 +117,6 @@ const AppBar = createVisualComponent({
                 backgroundColor: "transparent",
               }}
             />
-            <div style={{ height: "36px", width: "1px", backgroundColor: "#f9f9f9", margin: "0 8px 0 8px" }} />
             <Logo />
           </>
         );

@@ -12,6 +12,7 @@ import AppBar from "./app-bar.js";
 
 const ActivityPage = Utils.Component.lazy(() => import("../routes/activity-page.js"));
 const ActivityManagement = Utils.Component.lazy(() => import("../routes/activity-management.js"));
+const InvitationManagement = Utils.Component.lazy(() => import("../routes/invitation-management.js"));
 const MyActivities = Utils.Component.lazy(() => import("../routes/my-activities.js"));
 const Invitations = Utils.Component.lazy(() => import("../routes/invitations.js"));
 const About = Utils.Component.lazy(() => import("../routes/about.js"));
@@ -25,6 +26,7 @@ const ROUTE_MAP = {
   home: (props) => <Home {...props} />,
   "my-activities": (props) => <MyActivities {...props} />,
   "management/activities": (props) => <ActivityManagement {...props} />,
+  "management/invitations": (props) => <InvitationManagement {...props} />,
   invitations: (props) => <Invitations {...props} />,
   activity: ({ params }) => <ActivityPage id={params.id} />,
   about: (props) => <About {...props} />,
@@ -66,22 +68,22 @@ const Spa = createVisualComponent({
     return (
       <Plus4U5.SpaProvider initialLanguageList={["en", "cs"]}>
         <Uu5Elements.ModalBus>
-          <Plus4U5App.Top.View
-            topBgColor="rgb(33, 150, 243)"
-            textBackground="full"
-            unitName={
-              <AppBar
-                handleCloseSideMenu={() => setMenuOpen(false)}
-                handleOpenSideMenu={() => setMenuOpen(true)}
-                sideMenuOpen={menuOpen}
-              />
-            }
-          />
-          <SideMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
-            <AuthorizationContextProvider>
+          <AuthorizationContextProvider>
+            <Plus4U5App.Top.View
+              topBgColor="rgb(33, 150, 243)"
+              textBackground="full"
+              unitName={
+                <AppBar
+                  handleCloseSideMenu={() => setMenuOpen(false)}
+                  handleOpenSideMenu={() => setMenuOpen(true)}
+                  sideMenuOpen={menuOpen}
+                />
+              }
+            />
+            <SideMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
               <Plus4U5App.Spa routeMap={ROUTE_MAP} displayTop={false} />
-            </AuthorizationContextProvider>
-          </SideMenuDrawer>
+            </SideMenuDrawer>
+          </AuthorizationContextProvider>
         </Uu5Elements.ModalBus>
       </Plus4U5.SpaProvider>
     );

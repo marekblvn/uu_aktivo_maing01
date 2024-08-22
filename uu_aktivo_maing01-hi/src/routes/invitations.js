@@ -186,7 +186,7 @@ let Invitations = createVisualComponent({
           </div>
         );
       }
-      const dataToRender = data.filter(item != null);
+      const dataToRender = data.filter((item) => item != null);
       return (
         <InvitationList
           itemList={dataToRender}
@@ -211,7 +211,7 @@ let Invitations = createVisualComponent({
             title={<Lsi lsi={{ en: "Invitations", cs: "Pozvánky" }} />}
             icon={
               <RichIcon
-                icon="mdi-email"
+                icon="uugds-email"
                 colorScheme="steel"
                 significance="subdued"
                 borderRadius="moderate"
@@ -222,7 +222,12 @@ let Invitations = createVisualComponent({
             level={["xs", "s"].includes(screenSize) ? 5 : 4}
           />
         </div>
-        <InvitationListProvider>
+        <InvitationListProvider
+          filters={{
+            uuIdentity: identity.uuIdentity,
+          }}
+          pageSize={10}
+        >
           {({ state, data, errorData, pendingData, handlerMap }) => {
             loadRef.current = handlerMap.load;
             switch (state) {

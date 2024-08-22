@@ -3,9 +3,9 @@ import { AutoLoad, createVisualComponent, Lsi, useCallback, useState } from "uu5
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { Table } from "uu5tilesg02-elements";
-import { FilterManagerModal, FilterButton, FilterBar } from "uu5tilesg02-controls";
+import { FilterButton, FilterBar, SorterButton, SorterBar } from "uu5tilesg02-controls";
 import { PersonItem } from "uu_plus4u5g02-elements";
-import { Block, Icon, RichIcon, Text } from "uu5g05-elements";
+import { Block, Icon, Link, RichIcon, Text } from "uu5g05-elements";
 import { FREQUENCY_LSI, getIndexByValues } from "../../utils/frequency-utils.js";
 import { notificationOffsetToLsi } from "../../utils/notification-offset-utils.js";
 //@@viewOff:imports
@@ -31,23 +31,14 @@ const SORTER_LIST = [
 
 const COLUMN_LIST = [
   {
-    value: "id",
-    maxWidth: "68px",
-    cell: ({ data }) => (
-      <RichIcon
-        icon="mdi-open-in-new"
-        tooltip={{ en: "Go to activity page", cs: "Přejít na stránku aktivity" }}
-        colorScheme="neutral"
-        significance="subdued"
-        borderRadius="moderate"
-        onClick={() => data.onClickGoToActivity(data.id)}
-      />
-    ),
-  },
-  {
     value: "name",
     header: <Lsi lsi={{ en: "Name", cs: "Název" }} />,
     headerComponent: <Table.HeaderCell sorterKey="name" filterKey="name" />,
+    cell: ({ data }) => (
+      <Link href={`activity?id=${data.id}`} target="_blank">
+        {data.name}
+      </Link>
+    ),
   },
   {
     value: "owner",
@@ -89,7 +80,7 @@ const COLUMN_LIST = [
         significance="subdued"
         borderRadius="moderate"
         tooltip={{ en: "Go to datetime detail", cs: "Přejít na detail termínu" }}
-        onClick={() => data.onClickGoToDatetime(data.datetimeId)}
+        onClick={() => data.onClickDatetime(data.datetimeId, data)}
       />
     ),
     maxWidth: "100px",
@@ -197,7 +188,7 @@ const ActivityList = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ data, onLoadNext, onDeleteActivity }) {
+  render({ data, onLoadNext, onRefresh, onDeleteActivity }) {
     //@@viewOn:private
     const [sorterList, setSorterList] = useState();
     const [filterList, setFilterList] = useState();
@@ -239,10 +230,22 @@ const ActivityList = createVisualComponent({
               <Lsi lsi={{ en: "Activity management", cs: "Správa aktivit" }} />
             </Text>
           }
-          actionList={[{ component: <FilterButton type="bar" /> }]}
+          actionList={[
+            { component: <SorterButton type="bar" /> },
+            { component: <FilterButton type="bar" /> },
+            { divider: true },
+            {
+              icon: "mdi-refresh",
+              tooltip: { en: "Refresh", cs: "Obnovit" },
+              onClick: onRefresh,
+              colorScheme: "dim",
+              significance: "subdued",
+              order: 1,
+            },
+          ]}
         >
-          <FilterBar />
-          <FilterManagerModal />
+          <SorterBar displayManagerButton={false} />
+          <FilterBar displayManagerButton={false} />
           <Table
             columnList={COLUMN_LIST}
             verticalAlignment="center"

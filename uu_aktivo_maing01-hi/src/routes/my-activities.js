@@ -177,7 +177,7 @@ let MyActivities = createVisualComponent({
               title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
               icon={
                 <RichIcon
-                  icon="mdi-pulse"
+                  icon="uugdsstencil-chart-pulse"
                   colorScheme="primary"
                   significance="subdued"
                   borderRadius="moderate"

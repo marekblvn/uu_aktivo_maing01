@@ -31,6 +31,9 @@
     "home": "Welcome",
     "my-activities": "My Activities",
     "invitations": "Invitations",
+    "management": "Management",
+    "management/activities": "Activity management",
+    "management/invitations": "Invitation management",
     "about": "About Application"
   },
   "Placeholder": {
@@ -84,9 +87,19 @@
       "submit": "Delete"
     },
     "declineInvitation": {
-      "header": "Are you sure you want to decline invitation to %s?",
+      "header": "Are you sure you want to decline invitation to '%s'?",
       "info": "The invitation will be deleted.",
       "submit": "Decline"
+    },
+    "acceptInvitation": {
+      "header": "You are about to accept an invitation to '%s'",
+      "info": "By accepting this invitation you will become a member of the activity.",
+      "submit": "Accept"
+    },
+    "deleteInvitation": {
+      "header": "Are you sure you want to delete this invitation?",
+      "info": "Both the recipient and the sender will not be notified about this action, are you sure you want to proceed?",
+      "submit": "Delete"
     },
     "deleteDatetime": {
       "header": "Are you sure you want to delete the datetime?",

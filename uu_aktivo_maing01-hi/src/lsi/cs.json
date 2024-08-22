@@ -31,6 +31,9 @@
     "home": "Vítejte",
     "my-activities": "Moje aktivity",
     "invitations": "Pozvánky",
+    "management": "Správa",
+    "management/activities": "Správa aktivit",
+    "management/invitations": "Správa pozvánek",
     "about": "O aplikaci"
   },
   "Placeholder": {
@@ -84,9 +87,19 @@
       "submit": "Smazat"
     },
     "declineInvitation": {
-      "header": "Opravdu chcete odmítnout pozvánku do %s?",
+      "header": "Opravdu chcete odmítnout pozvánku do '%s'?",
       "info": "Pozvánka bude smazána.",
       "submit": "Odmítnout"
+    },
+    "acceptInvitation": {
+      "header": "Chystáte se přijmou pozvánku do '%s'",
+      "info": "Přijmutím pozvánky se staneme členem aktivity.",
+      "submit": "Přijmout"
+    },
+    "deleteInvitation": {
+      "header": "Opravdu chcete smazat tuto pozvánku?",
+      "info": "Příjemce ani odesílatel nebudou o této akci informováni, jste si jisti, že chcete pokračovat?",
+      "submit": "Smazat"
     },
     "deleteDatetime": {
       "header": "Opravdu chcete smazat termín aktivity?",

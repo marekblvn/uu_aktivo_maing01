@@ -3,6 +3,7 @@ import { createVisualComponent, Lsi, useEffect, useRoute, useScrollDirection, Ut
 import Config from "./config/config.js";
 import { Drawer, MenuList } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -32,6 +33,7 @@ const SideMenuDrawer = createVisualComponent({
 
   render(props) {
     //@@viewOn:private
+    const { isAuthority, isExecutive } = useAuthorization();
     const { children, open, onClose } = props;
     const scrollDirection = useScrollDirection(window);
     const [, setRoute] = useRoute();
@@ -50,8 +52,9 @@ const SideMenuDrawer = createVisualComponent({
           onClose();
           setRoute("my-activities");
         },
-        icon: "uugdsstencil-weather-bolt",
+        icon: "uugdsstencil-chart-pulse",
         colorScheme: "building",
+        order: -1,
       },
       {
         children: <Lsi import={importLsi} path={["Menu", "invitations"]} />,
@@ -61,17 +64,39 @@ const SideMenuDrawer = createVisualComponent({
         },
         icon: "uugds-email",
         colorScheme: "building",
-      },
-      {
-        children: <Lsi import={importLsi} path={["Menu", "about"]} />,
-        onClick: () => {
-          onClose();
-          setRoute("about");
-        },
-        icon: "uugds-info",
-        colorScheme: "building",
+        order: -1,
       },
     ];
+
+    if (isAuthority || isExecutive) {
+      itemList.push({
+        children: <Lsi import={importLsi} path={["Menu", "management"]} />,
+        itemList: [
+          {
+            children: <Lsi import={importLsi} path={["Menu", "management/activities"]} />,
+            icon: "uugdsstencil-chart-pulse",
+            onClick: () => {
+              handleCloseSideMenu();
+              setRoute("management/activities");
+            },
+          },
+        ],
+        icon: "mdi-wrench-outline",
+        colorScheme: "building",
+        order: -1,
+      });
+    }
+
+    itemList.push({
+      children: <Lsi import={importLsi} path={["Menu", "about"]} />,
+      onClick: () => {
+        onClose();
+        setRoute("about");
+      },
+      icon: "uugds-info",
+      colorScheme: "building",
+      order: 1,
+    });
 
     //@@viewOn:render
     const attrs = Utils.VisualComponent.getAttrs(props, Css.main(props));

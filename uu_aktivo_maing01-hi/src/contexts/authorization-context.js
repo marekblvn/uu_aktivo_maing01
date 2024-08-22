@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createComponent, Utils, useDataObject } from "uu5g05";
+import { createComponent, Utils, useDataObject, useSession } from "uu5g05";
 import { Error, SpaPending } from "uu_plus4u5g02-app";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
@@ -19,20 +19,21 @@ export const AuthorizationContextProvider = createComponent({
   //@@viewOff:statics
 
   render({ children }) {
-    // const { state: sessionState, identity } = useSession();
-    // if (sessionState === "pending") return <SpaPending />;
+    const { state: sessionState } = useSession();
 
     const {
       state: authorizationState,
       data,
       errorData,
-    } = useDataObject({
-      handlerMap: {
-        load: Calls.getAuthorizedProfiles,
+    } = useDataObject(
+      {
+        skipInitialLoad: sessionState === "pending" || sessionState === "pendingNoData",
+        handlerMap: {
+          load: Calls.getAuthorizedProfiles,
+        },
       },
-    });
-
-    if (authorizationState === "pending" || authorizationState === "pendingData") return <SpaPending />;
+      [sessionState],
+    );
 
     const authorizedProfiles = data?.authorizedProfiles ?? [];
     const isAuthority = authorizedProfiles.includes(PROFILE_CODES.Authorities);
@@ -43,7 +44,6 @@ export const AuthorizationContextProvider = createComponent({
       isExecutive,
     };
 
-    if (errorData) return <Error error={errorData.error} title="Authorization error" />;
     return <AuthorizationContext.Provider value={authorization}>{children}</AuthorizationContext.Provider>;
   },
 });

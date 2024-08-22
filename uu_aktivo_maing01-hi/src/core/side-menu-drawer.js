@@ -36,7 +36,7 @@ const SideMenuDrawer = createVisualComponent({
     const { isAuthority, isExecutive } = useAuthorization();
     const { children, open, onClose } = props;
     const scrollDirection = useScrollDirection(window);
-    const [, setRoute] = useRoute();
+    const [route, setRoute] = useRoute();
     //@@viewOff:private
 
     useEffect(() => {
@@ -45,11 +45,14 @@ const SideMenuDrawer = createVisualComponent({
       }
     }, [scrollDirection]);
 
+    useEffect(() => {
+      onClose();
+    }, [route]);
+
     const itemList = [
       {
         children: <Lsi import={importLsi} path={["Menu", "my-activities"]} />,
         onClick: () => {
-          onClose();
           setRoute("my-activities");
         },
         icon: "uugdsstencil-chart-pulse",
@@ -59,7 +62,6 @@ const SideMenuDrawer = createVisualComponent({
       {
         children: <Lsi import={importLsi} path={["Menu", "invitations"]} />,
         onClick: () => {
-          onClose();
           setRoute("invitations");
         },
         icon: "uugds-email",
@@ -76,8 +78,15 @@ const SideMenuDrawer = createVisualComponent({
             children: <Lsi import={importLsi} path={["Menu", "management/activities"]} />,
             icon: "uugdsstencil-chart-pulse",
             onClick: () => {
-              handleCloseSideMenu();
               setRoute("management/activities");
+            },
+          },
+          {
+            children: <Lsi import={importLsi} path={["Menu", "management/invitations"]} />,
+            icon: "uugds-email",
+            colorScheme: "building",
+            onClick: () => {
+              setRoute("management/invitations");
             },
           },
         ],
@@ -90,7 +99,6 @@ const SideMenuDrawer = createVisualComponent({
     itemList.push({
       children: <Lsi import={importLsi} path={["Menu", "about"]} />,
       onClick: () => {
-        onClose();
         setRoute("about");
       },
       icon: "uugds-info",

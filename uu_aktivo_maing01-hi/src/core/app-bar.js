@@ -48,7 +48,6 @@ const AppBar = createVisualComponent({
       {
         children: <Lsi import={importLsi} path={["Menu", "my-activities"]} />,
         onClick: () => {
-          handleCloseSideMenu();
           setRoute("my-activities");
         },
         icon: "uugdsstencil-chart-pulse",
@@ -58,7 +57,6 @@ const AppBar = createVisualComponent({
       {
         children: <Lsi import={importLsi} path={["Menu", "invitations"]} />,
         onClick: () => {
-          handleCloseSideMenu();
           setRoute("invitations");
         },
         icon: "uugds-email",
@@ -68,7 +66,6 @@ const AppBar = createVisualComponent({
       {
         children: <Lsi import={importLsi} path={["Menu", "about"]} />,
         onClick: () => {
-          handleCloseSideMenu();
           setRoute("about");
         },
         icon: "uugds-info",
@@ -85,8 +82,15 @@ const AppBar = createVisualComponent({
             children: <Lsi import={importLsi} path={["Menu", "management/activities"]} />,
             icon: "uugdsstencil-chart-pulse",
             onClick: () => {
-              handleCloseSideMenu();
               setRoute("management/activities");
+            },
+          },
+          {
+            children: <Lsi import={importLsi} path={["Menu", "management/invitations"]} />,
+            icon: "uugds-email",
+            colorScheme: "building",
+            onClick: () => {
+              setRoute("management/invitations");
             },
           },
         ],

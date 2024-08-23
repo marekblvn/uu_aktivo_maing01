@@ -10,7 +10,7 @@ import {
   useSlide,
   useState,
 } from "uu5g05";
-import { Header, PlaceholderBox, Tabs, Text } from "uu5g05-elements";
+import { Grid, PlaceholderBox, Tabs, Text } from "uu5g05-elements";
 import Config from "./config/config.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
@@ -280,17 +280,22 @@ const ActivityDetail = createVisualComponent({
     const { userSelect, ...restStyles } = style;
 
     return (
-      <div ref={ref} style={restStyles}>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <Header
-            title={name}
-            level={4}
-            style={{ marginBottom: screenSize === "xs" ? "4px" : "8px", textAlign: "center" }}
-          />
-        </div>
-        {renderNavigation()}
-        {renderContent()}
-      </div>
+      <Grid templateRows={{ xs: "auto auto" }} rowGap="8px" ref={ref} style={restStyles}>
+        <Grid justifyContent="center">
+          <Text
+            category="story"
+            segment="heading"
+            type={["xs", "s"].includes(screenSize) ? "h5" : "h4"}
+            style={{ marginBottom: "12px" }}
+          >
+            {name}
+          </Text>
+        </Grid>
+        <Grid rowGap={0}>
+          {renderNavigation()}
+          {renderContent()}
+        </Grid>
+      </Grid>
     );
     //@@viewOff:render
   },

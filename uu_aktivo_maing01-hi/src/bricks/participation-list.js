@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useSession } from "uu5g05";
+import { createVisualComponent } from "uu5g05";
 import Config from "./config/config.js";
-import { Panel, ScrollableBox } from "uu5g05-elements";
+import { Grid, PlaceholderBox } from "uu5g05-elements";
 import ParticipationItem from "./participation-item.js";
 //@@viewOff:imports
 
@@ -28,27 +28,32 @@ const ParticipationList = createVisualComponent({
 
   //@@viewOn:defaultProps
   defaultProps: {
-    items: { confirmed: [], undecided: [], denied: [] },
-    maxHeight: 300,
-    minHeight: 300,
-    width: "100%",
+    confirmed: [],
+    undecided: [],
+    denied: [],
   },
   //@@viewOff:defaultProps
 
-  render({ items, maxHeight, minHeight, width }) {
+  render({ confirmed, denied, undecided }) {
     //@@viewOn:private
-    const { confirmed, undecided, denied } = items;
     //@@viewOff:private
 
     //@@viewOn:render
+    if ([...confirmed, ...denied, ...undecided].length === 0) {
+      return (
+        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <PlaceholderBox
+            code="users"
+            header={{ en: "There are no other members", cs: "Nejsou žádní další členové" }}
+            info={{ en: "You are the sole member of the activity.", cs: "Jste jediným členem aktivity." }}
+          />
+        </div>
+      );
+    }
+
     return (
-      <ScrollableBox
-        maxHeight={maxHeight}
-        minHeight={minHeight}
-        scrollbarWidth={10}
-        style={{ padding: "0px 8px 0px 0px", width: width }}
-      >
-        <div style={{ marginTop: "8px" }}>
+      <Grid templateRows={{ xs: "repeat(3,auto)" }} rowGap="8px">
+        <Grid templateRows={{ xs: `repeat(${4}, auto)` }} alignItems="start" rowGap="2px">
           {confirmed.map((item, idx) => {
             return (
               <ParticipationItem
@@ -59,13 +64,13 @@ const ParticipationList = createVisualComponent({
               />
             );
           })}
-        </div>
-        <div style={{ margin: "8px 0 8px" }}>
+        </Grid>
+        <Grid templateRows={{ xs: `repeat(${3}, auto)` }} alignItems="start" rowGap="2px">
           {undecided.map((item, idx) => {
             return <ParticipationItem key={idx} uuIdentity={item} colorScheme="neutral" icon="uugds-help" />;
           })}
-        </div>
-        <div style={{ marginBottom: "8px" }}>
+        </Grid>
+        <Grid templateRows={{ xs: `repeat(${5}, auto)` }} alignItems="start" rowGap="2px">
           {denied.map((item, idx) => {
             return (
               <ParticipationItem
@@ -76,8 +81,8 @@ const ParticipationList = createVisualComponent({
               />
             );
           })}
-        </div>
-      </ScrollableBox>
+        </Grid>
+      </Grid>
     );
     //@@viewOff:render
   },

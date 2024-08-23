@@ -1,17 +1,17 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useLsi, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Button, Grid, ListItem, Panel, Pending, PlaceholderBox, Text } from "uu5g05-elements";
-import ParticipationList from "./participation-list.js";
-import DatetimeBlock from "./datetime-block.js";
-import UserParticipationBlock from "./user-participation-block.js";
-import ParticipationInfoText from "./participation-info-text.js";
+import { Button, Grid, Line, PlaceholderBox, Skeleton } from "uu5g05-elements";
+import DateBlock from "./date-block.js";
+import UserStatusBlock from "./user-status-block.js";
+import ParticipationStatusBlock from "./participation-status-block.js";
 import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import DatetimeProvider from "../providers/datetime-provider.js";
 import importLsi from "../lsi/import-lsi.js";
 import CreateDatetimeModal from "./create-datetime-modal.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
+import ParticipationBlock from "./participation-block.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -59,18 +59,22 @@ const DatetimeDetail = createVisualComponent({
     //@@viewOn:private
     const { identity } = useSession();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
-    const [screenSize] = useScreenSize();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
     const [modalOpen, setModalOpen] = useState(false);
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner } = useActivityAuthorization();
+    //@@viewOff:private
 
     const handleOpenModal = () => setModalOpen(true);
     const handleCloseModal = () => setModalOpen(false);
 
     function renderLoading() {
-      return <Pending size="l" colorScheme="secondary" type="horizontal" />;
+      return (
+        <div style={{ width: "100%", height: "400px" }}>
+          <Skeleton width="100%" height="100%" borderRadius="moderate" />
+        </div>
+      );
     }
 
     function renderError(errorData) {
@@ -160,81 +164,26 @@ const DatetimeDetail = createVisualComponent({
       };
 
       return (
-        <div style={{ display: "grid", rowGap: "16px" }}>
-          <DatetimeBlock datetime={datetime} />
-          <ParticipationInfoText
+        <Grid templateRows={{ xs: "repeat(3,1fr) auto" }} rowGap={{ xs: "8px", m: "12px" }}>
+          <DateBlock datetime={datetime} />
+          <ParticipationStatusBlock
             idealParticipants={idealParticipants}
             minParticipants={minParticipants}
             confirmedCount={confirmed.length}
             deniedCount={denied.length}
             undecidedCount={undecided.length}
           />
-          <UserParticipationBlock
+          <UserStatusBlock
             onChangeParticipation={handleChangeParticipation}
             userParticipationType={currentUserParticipationType}
           />
-          {["xs", "s", "m"].includes(screenSize) ? (
-            <Panel
-              header={
-                <Text category="interface" segment="content" type={screenSize === "m" ? "medium" : "small"}>
-                  <Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />
-                </Text>
-              }
-              effect="ground"
-              style={{ backgroundColor: "rgba(33, 33, 33, 0.02)" }}
-              colorScheme="neutral"
-            >
-              {[...confirmed, ...denied, ...undecided].length > 1 ? (
-                <ParticipationList
-                  items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}
-                />
-              ) : (
-                <PlaceholderBox
-                  code="users"
-                  header={{ en: "There are no other members", cs: "Nejsou žádní další členové" }}
-                  info={{ en: "You are the sole member of this activity.", cs: "Jste jediným členem této aktivity." }}
-                />
-              )}
-            </Panel>
-          ) : (
-            <ListItem colorScheme="neutral" className={Css.listItem()}>
-              <Text
-                category="interface"
-                segment="interactive"
-                type="medium"
-                colorScheme="neutral"
-                significance="common"
-                className={Css.text()}
-              >
-                <Lsi lsi={{ en: "How did the other members decide?", cs: "Jak se rozhodli ostatní členové?" }} />
-              </Text>
-              <div style={{ padding: "0 20px" }}>
-                {[...confirmed, ...denied, ...undecided].length > 1 ? (
-                  <ParticipationList
-                    items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}
-                  />
-                ) : (
-                  <div style={{ height: "320px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <PlaceholderBox
-                      code="users"
-                      header={{ en: "There are no other members", cs: "Nejsou žádní další členové" }}
-                      info={{
-                        en: "You are the sole member of this activity.",
-                        cs: "Jste jediným členem této aktivity.",
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            </ListItem>
-          )}
-        </div>
+          <Line colorScheme="neutral" significance="subdued" />
+          <ParticipationBlock
+            items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}
+          />
+        </Grid>
       );
     }
-
-    //@@viewOn:render
-
-    //@@viewOff:private
 
     //@@viewOn:render
     return (

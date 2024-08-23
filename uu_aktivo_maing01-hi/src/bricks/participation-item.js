@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Box, Icon, RichIcon } from "uu5g05-elements";
+import { Box, RichIcon } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
 import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports

@@ -64,52 +64,52 @@
     "addAdministrator": {
       "header": "Opravdu chcete tohoto člena povýšit na správce?",
       "info": "Správci mohou odstranit obyčejné členy z aktivity, editovat informace o aktivitě, zvát další uživatele a mazat příspěvky.",
-      "submit": "Povýšit"
+      "confirm": "Povýšit"
     },
     "removeAdministrator": {
       "header": "Opravdu chcete tomuto členovi odebrat správcovství?",
       "info": "",
-      "submit": "Odebrat"
+      "confirm": "Odebrat"
     },
     "removeMember": {
       "header": "Opravdu chcete tohoto člena odebrat z aktivity?",
       "info": "Uživatel ztratí přístup do této aktivity. Toto rozhodnutí nelze vrátit zpět.",
-      "submit": "Odebrat"
+      "confirm": "Odebrat"
     },
     "leaveActivity": {
       "header": "Opravdu chcete opustit aktivitu?",
       "info": "Tímto ztratíte přístup do aktivity.  Toto rozhodnutí nelze vrátit zpět.",
-      "submit": "Opustit"
+      "confirm": "Opustit"
     },
     "deletePost": {
       "header": "Opravdu chcete smazat tento příspěvek?",
       "info": "Příspěvek bude navždy smazán.",
-      "submit": "Smazat"
+      "confirm": "Smazat"
     },
     "declineInvitation": {
       "header": "Opravdu chcete odmítnout pozvánku do '%s'?",
       "info": "Pozvánka bude smazána.",
-      "submit": "Odmítnout"
+      "confirm": "Odmítnout"
     },
     "acceptInvitation": {
       "header": "Chystáte se přijmou pozvánku do '%s'",
       "info": "Přijmutím pozvánky se staneme členem aktivity.",
-      "submit": "Přijmout"
+      "confirm": "Přijmout"
     },
     "deleteInvitation": {
       "header": "Opravdu chcete smazat tuto pozvánku?",
       "info": "Příjemce ani odesílatel nebudou o této akci informováni, jste si jisti, že chcete pokračovat?",
-      "submit": "Smazat"
+      "confirm": "Smazat"
     },
     "deleteDatetime": {
       "header": "Opravdu chcete smazat termín aktivity?",
       "info": "Termín bude trvale smazán a přeruší se tak jeho opakování (pokud je nastaveno). Vezměte prosím na vědomí, že smazáním termínu ztratíte všechna data o účasti členů na tomto termínu!",
-      "submit": "Smazat"
+      "confirm": "Smazat"
     },
     "deleteActivity": {
       "header": "Opravdu chcete smazat tuto aktivitu?",
       "info": "Tato aktivita a všechny informace v ní obsažené budou trvale ztraceny. Vezměte prosím na vědomí, že toto rozhodnutí nelze vzít zpět.",
-      "submit": "Smazat"
+      "confirm": "Smazat"
     }
   },
   "Errors": {

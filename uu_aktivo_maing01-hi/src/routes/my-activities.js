@@ -16,9 +16,11 @@ import Container from "../bricks/container.js";
 import ActivityListProvider from "../providers/activity-list-provider.js";
 import { ActionGroup, Dialog, Grid, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
 import ActivityAlbum from "../bricks/activity-album.js";
-import CreateActivityModal from "../bricks/create-activity-modal.js";
+import CreateActivityForm from "../bricks/create-activity-form.js";
 import importLsi from "../lsi/import-lsi.js";
 import { useAlertBus } from "uu_plus4u5g02-elements";
+import { CancelButton, SubmitButton } from "uu5g05-forms";
+import FormModal from "../bricks/form-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -50,12 +52,12 @@ let MyActivities = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
-    const { showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
+    const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const loadRef = useRef();
     const createActivityRef = useRef();
     const loadNextRef = useRef();
-    const [dialogProps, setDialogProps] = useState();
-    const [openModal, setOpenModal] = useState(false);
+    const [dialogProps, setDialogProps] = useState(null);
+    const [modalProps, setModalProps] = useState(null);
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noActivityList"] });
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     //@@viewOff:private
@@ -75,31 +77,33 @@ let MyActivities = createVisualComponent({
             },
           },
           {
-            children: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "submit"]} />,
-            onClick: async (e) => {
-              e.preventDefault();
-              try {
-                await onConfirm();
-                setDialogProps(null);
-                loadRef.current({ filters: { members: [identity.uuIdentity] } });
-              } catch (error) {
-                showError(error);
-                return;
-              }
-            },
+            children: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "confirm"]} />,
+            onClick: onConfirm,
             colorScheme: "negative",
           },
         ],
       });
     }, []);
 
-    const handleLeaveActivity = useCallback(
-      (item) => {
-        showDialog(async () => {
-          return await item.handlerMap.leave({ id: item.data.id });
+    const showModal = useCallback(
+      (onSubmit) => {
+        setModalProps({
+          open: true,
+          onClose: () => setModalProps(false),
+          onSubmit: onSubmit,
+          header: <Lsi lsi={{ en: "Create new activity", cs: "Vytvořit novou aktivitu" }} />,
+          footer: (
+            <Grid templateColumns={{ xs: "repeat(2,1fr)", s: "repeat(2,auto)" }} justifyContent={{ s: "end" }}>
+              <CancelButton onClick={() => setModalProps(false)} />
+              <SubmitButton>
+                <Lsi lsi={{ en: "Create", cs: "Vytvořit" }} />
+              </SubmitButton>
+            </Grid>
+          ),
+          children: <CreateActivityForm />,
         });
       },
-      [showDialog],
+      [modalProps],
     );
     //@@viewOff:methods
 
@@ -168,6 +172,52 @@ let MyActivities = createVisualComponent({
         );
       }
 
+      const handleCreateActivity = () => {
+        showModal(async (e) => {
+          e.preventDefault();
+          try {
+            let activity = await handlerMap.create(e.data.value);
+            setModalProps(null);
+            addAlert({
+              priority: "success",
+              header: { en: "New activity created!", cs: "Nová aktivita byla vytvořena!" },
+              message: {
+                en: `Activity '${activity.name}' was successfully created.`,
+                cs: `Aktivita '${activity.name}' byla úspěšně vytvořena.`,
+              },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        });
+      };
+
+      const handleLeaveActivity = (item) => {
+        showDialog(async (e) => {
+          e.preventDefault();
+          try {
+            await item.handlerMap.leave({ id: item.data.id });
+            setDialogProps(null);
+            addAlert({
+              priority: "info",
+              header: {
+                en: `You have left the activity '${item.data.name}'`,
+                cs: `Opustil(a) jste aktivitu '${item.data.name}'`,
+              },
+              message: {
+                en: "The activity will no longer be visible for you.",
+                cs: "Aktivita pro vás již nebude přístupná.",
+              },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+            return;
+          }
+        });
+      };
+
       const dataToRender = data.filter((item) => item != null);
 
       return (
@@ -193,7 +243,7 @@ let MyActivities = createVisualComponent({
                   children: <Lsi lsi={{ en: "Create new activity", cs: "Vytvořit novou aktivitu" }} />,
                   colorScheme: "primary",
                   significance: "common",
-                  onClick: () => setOpenModal(true),
+                  onClick: handleCreateActivity,
                   order: -1,
                   icon: "mdi-plus",
                   collapsed: false,
@@ -246,11 +296,7 @@ let MyActivities = createVisualComponent({
           }}
         </ActivityListProvider>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
-        <CreateActivityModal
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-          onSubmit={createActivityRef.current}
-        />
+        <FormModal {...modalProps} />
       </Container>
     );
     //@@viewOff:render

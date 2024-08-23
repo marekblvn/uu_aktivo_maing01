@@ -1,8 +1,28 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useLsiValues, useScreenSize, useState, Utils } from "uu5g05";
+import {
+  createVisualComponent,
+  Lsi,
+  useCallback,
+  useLsi,
+  useLsiValues,
+  useRef,
+  useScreenSize,
+  useState,
+  Utils,
+} from "uu5g05";
 import Config from "./config/config.js";
-import { Error } from "uu_plus4u5g02-elements";
-import { DateTime, Grid, Line, ListLayout, Modal, Pending, PlaceholderBox } from "uu5g05-elements";
+import { Error, useAlertBus } from "uu_plus4u5g02-elements";
+import {
+  DateTime,
+  Dialog,
+  Grid,
+  Line,
+  ListLayout,
+  Modal,
+  Pending,
+  PlaceholderBox,
+  ScrollableBox,
+} from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
 import DatetimeProvider from "../providers/datetime-provider.js";
 import ParticipationList from "./participation-list.js";
@@ -35,15 +55,15 @@ const DatetimeManagementModal = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ open, onClose, id, activity }) {
+  render({ open, onClose, datetimeId, activity, onDeleteDatetime }) {
     //@@viewOn:private
-    const [screenSize] = useScreenSize();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
+    const [dialogProps, setDialogProps] = useState(null);
+    const deleteDatetimeRef = useRef();
     //@@viewOff:private
 
     //@@viewOn:render
-
     function renderLoading() {
       return (
         <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -73,6 +93,8 @@ const DatetimeManagementModal = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
+      if (!data) return null;
+
       const itemList = [
         {
           label: { en: "Activity", cs: "Aktivita" },
@@ -114,22 +136,11 @@ const DatetimeManagementModal = createVisualComponent({
       }
 
       return (
-        <Grid templateColumns={{ xs: "100%", m: "2fr 1fr" }} alignItems="start">
+        <Grid templateColumns={{ xs: "100%" }} alignItems="start">
           <ListLayout itemList={itemList} />
-          <ListLayout
-            itemList={[
-              {
-                label: { en: "Participation", cs: "Účast" },
-                children: (
-                  <ParticipationList
-                    items={{ confirmed: data.confirmed, denied: data.denied, undecided: data.undecided }}
-                    maxHeight={300}
-                    width={["xs", "s"].includes(screenSize) ? "auto" : 300}
-                  />
-                ),
-              },
-            ]}
-          />
+          <ScrollableBox maxHeight={300} minHeight={300}>
+            <ParticipationList confirmed={data.confirmed} undecided={data.undecided} denied={data.denied} />
+          </ScrollableBox>
         </Grid>
       );
     }
@@ -139,24 +150,34 @@ const DatetimeManagementModal = createVisualComponent({
         open={open}
         onClose={onClose}
         header={<Lsi lsi={{ en: `Datetime: ${activity.name}`, cs: `Termín: ${activity.name}` }} />}
-        width="auto"
+        width="800px"
+        actionList={[
+          {
+            icon: "mdi-delete",
+            colorScheme: "negative",
+            significance: "subdued",
+            onClick: () => onDeleteDatetime(deleteDatetimeRef.current, datetimeId),
+          },
+        ]}
       >
-        <DatetimeProvider datetimeId={id}>
+        <DatetimeProvider datetimeId={datetimeId}>
           {({ state, data, errorData, pendingData, handlerMap }) => {
             switch (state) {
-              case "pending":
               case "pendingNoData":
                 return renderLoading();
-              case "error":
               case "errorNoData":
                 return renderError(errorData);
-              case "ready":
-                return renderReady(data, handlerMap);
               case "readyNoData":
                 return renderEmpty();
+              case "pending":
+              case "ready":
+              case "error":
+                deleteDatetimeRef.current = handlerMap.delete;
+                return renderReady(data, handlerMap);
             }
           }}
         </DatetimeProvider>
+        <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
       </Modal>
     );
     //@@viewOff:render

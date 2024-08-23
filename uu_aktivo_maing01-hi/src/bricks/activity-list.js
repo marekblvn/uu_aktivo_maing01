@@ -200,7 +200,7 @@ const ActivityList = createVisualComponent({
           {
             icon: "mdi-delete",
             tooltip: { en: "Delete activity", cs: "Smazat aktivitu" },
-            onClick: (e) => onDeleteActivity(data),
+            onClick: () => onDeleteActivity(data),
             colorScheme: "negative",
             significance: "subdued",
             order: 1,

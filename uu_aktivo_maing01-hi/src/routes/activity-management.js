@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useLsi, useRoute, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useRef, useRoute, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { withRoute } from "uu_plus4u5g02-app";
 import { useAuthorization } from "../contexts/authorization-context.js";
@@ -46,9 +46,10 @@ let ActivityManagement = createVisualComponent({
     const { isAuthority, isExecutive } = useAuthorization();
     const [dialogProps, setDialogProps] = useState(null);
     const [modalProps, setModalProps] = useState(null);
+    const reloadRef = useRef();
     //@@viewOff:private
 
-    const showDeleteActivityDialog = useCallback((activityName, onConfirm) => {
+    const showDeleteActivityDialog = useCallback((onConfirm) => {
       setDialogProps({
         header: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "header"]} />,
         icon: "mdi-delete",
@@ -60,24 +61,8 @@ let ActivityManagement = createVisualComponent({
             onClick: (e) => setDialogProps(null),
           },
           {
-            children: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "submit"]} />,
-            onClick: async (e) => {
-              e.preventDefault();
-              try {
-                await onConfirm();
-                setDialogProps(null);
-                addAlert({
-                  priority: "info",
-                  header: { en: "Activity deleted", cs: "Aktivita smazána" },
-                  message: {
-                    en: `Activity '${activityName}' was successfully deleted.`,
-                    cs: `Aktivita '${activityName}' byla úspěšně smazána.`,
-                  },
-                });
-              } catch (error) {
-                showError(error);
-              }
-            },
+            children: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "confirm"]} />,
+            onClick: onConfirm,
             colorScheme: "negative",
           },
         ],
@@ -96,34 +81,36 @@ let ActivityManagement = createVisualComponent({
             onClick: () => setDialogProps(null),
           },
           {
-            children: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "submit"]} />,
+            children: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "confirm"]} />,
             colorScheme: "negative",
-            onClick: async (e) => {
-              e.preventDefault();
-              try {
-                await onConfirm();
-                setDialogProps(null);
-                addAlert({
-                  priority: "info",
-                  header: { en: "Datetime deleted", cs: "Termín smazán" },
-                  message: {
-                    en: `Datetime was successfully deleted.`,
-                    cs: `Termín byl úspěšně smazán.`,
-                  },
-                });
-              } catch (error) {
-                showError(error);
-              }
-            },
+            onClick: onConfirm,
           },
         ],
       });
-    });
+    }, []);
+
+    const handleDeleteDatetime = (deleteFunc, datetimeId) => {
+      showDeleteDatetimeDialog(async () => {
+        try {
+          await deleteFunc({ id: datetimeId });
+          setDialogProps(null);
+          setModalProps(null);
+          reloadRef.current();
+          addAlert({
+            priority: "info",
+            header: { en: "Datetime deleted", cs: "Termín smazán" },
+            message: { en: "Datetime was successfully deleted.", cs: "Termín byl úspěšně smazán" },
+            durationMs: 2000,
+          });
+        } catch (error) {
+          showError(error);
+        }
+      });
+    };
 
     const goToActivity = useCallback((id) => setRoute("activity", { id }), []);
 
-    const showDatetimeModal = useCallback((id, activity) => setModalProps({ id, activity }));
-    const handleDeleteDatetime = async (deleteHandler) => showDeleteDatetimeDialog(deleteHandler);
+    const showDatetimeModal = useCallback((datetimeId, activity) => setModalProps({ datetimeId, activity }, []));
 
     //@@viewOn:render
     if (!isAuthority && !isExecutive) {
@@ -159,11 +146,26 @@ let ActivityManagement = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
-      if (!data || !data.length) return null;
+      if (!data) return null;
 
       const handleDeleteActivity = (activity) =>
-        showDeleteActivityDialog(activity.name, async () => {
-          return await handlerMap.delete({ id: activity.id });
+        showDeleteActivityDialog(async (e) => {
+          e.preventDefault();
+          try {
+            await activity.handlerMap.delete({ id: activity.id });
+            setDialogProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Activity deleted", cs: "Aktivita smazána" },
+              message: {
+                en: `Activity '${activity.name}' was successfully deleted.`,
+                cs: `Aktivita '${activity.name}' byla úspěšně smazána.`,
+              },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
         });
 
       const handleRefresh = async () => {
@@ -190,6 +192,7 @@ let ActivityManagement = createVisualComponent({
       >
         <ActivityListProvider pageSize={50}>
           {({ state, data, errorData, pendingData, handlerMap }) => {
+            reloadRef.current = handlerMap.load;
             switch (state) {
               case "pendingNoData":
                 return renderLoading();
@@ -203,7 +206,7 @@ let ActivityManagement = createVisualComponent({
                   if (item == null) return item;
                   return {
                     ...item.data,
-                    members: item.data.members.length,
+                    handlerMap: item.handlerMap,
                     onClickGoToActivity: goToActivity,
                     onClickDatetime: showDatetimeModal,
                   };

@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Error, Unauthorized, useAlertBus } from "uu_plus4u5g02-elements";
 import importLsi from "../lsi/import-lsi.js";
@@ -42,9 +42,28 @@ let InvitationManagement = createVisualComponent({
     const [screenSize] = useScreenSize();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
-
     const [dialogProps, setDialogProps] = useState(null);
     //@@viewOff:private
+
+    const showDeleteInvitationDialog = useCallback((onConfirm) => {
+      setDialogProps({
+        header: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "header"]} />,
+        icon: "mdi-email-remove",
+        info: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "info"]} />,
+        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+        actionList: [
+          {
+            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+            onClick: (e) => setDialogProps(null),
+          },
+          {
+            children: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "confirm"]} />,
+            onClick: onConfirm,
+            colorScheme: "negative",
+          },
+        ],
+      });
+    }, []);
 
     //@@viewOn:render
     if (!isAuthority && !isExecutive) {
@@ -82,8 +101,9 @@ let InvitationManagement = createVisualComponent({
     function renderReady(data, handlerMap) {
       if (!data || !data.length) return null;
 
-      const handleDeleteInvitation = (invitation) => {
-        const deleteInvitation = async () => {
+      const handleDeleteInvitation = (invitation) =>
+        showDeleteInvitationDialog(async (e) => {
+          e.preventDefault();
           try {
             await invitation.handlerMap.delete({ id: invitation.id });
             setDialogProps(null);
@@ -99,26 +119,7 @@ let InvitationManagement = createVisualComponent({
           } catch (error) {
             showError(error);
           }
-        };
-
-        setDialogProps({
-          header: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "header"]} />,
-          icon: "mdi-email-remove",
-          info: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "info"]} />,
-          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-          actionList: [
-            {
-              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-              onClick: (e) => setDialogProps(null),
-            },
-            {
-              children: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "submit"]} />,
-              onClick: deleteInvitation,
-              colorScheme: "negative",
-            },
-          ],
         });
-      };
 
       const handleRefresh = async () => {
         return await handlerMap.load();

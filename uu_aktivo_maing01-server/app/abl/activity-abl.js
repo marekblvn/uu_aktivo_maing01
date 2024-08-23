@@ -694,7 +694,6 @@ class ActivityAbl {
       throw new Errors.Leave.UserIsOwner({ uuAppErrorMap });
     }
 
-    let dtoOut;
     const updateObject = {
       id: dtoIn.id,
       awid,
@@ -705,7 +704,7 @@ class ActivityAbl {
     };
 
     try {
-      dtoOut = await this.activityDao.update(updateObject);
+      await this.activityDao.update(updateObject);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Leave.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
@@ -747,6 +746,8 @@ class ActivityAbl {
         throw error;
       }
     }
+
+    let dtoOut = {};
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

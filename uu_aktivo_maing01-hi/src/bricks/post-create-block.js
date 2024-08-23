@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Box, Grid, RichIcon } from "uu5g05-elements";
+import { Grid, RichIcon } from "uu5g05-elements";
 import { TextArea } from "uu5g05-forms";
 //@@viewOff:imports
 
@@ -10,17 +10,7 @@ import { TextArea } from "uu5g05-forms";
 
 //@@viewOn:css
 const Css = {
-  box: (props) =>
-    Config.Css.css({
-      padding: "8px",
-      borderRadius: "8px",
-      display: "flex",
-    }),
-  grid: () =>
-    Config.Css.css({
-      width: "100%",
-      alignItems: "center",
-    }),
+  main: Config.Css.css({}),
 };
 //@@viewOff:css
 
@@ -37,24 +27,16 @@ const PostCreateBlock = createVisualComponent({
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    onSubmit: () => {},
+    disabled: false,
+    inputProps: {},
+  },
   //@@viewOff:defaultProps
 
-  render({ onSubmit }) {
+  render({ onSubmit, disabled, inputProps }) {
     //@@viewOn:private
-    const [screenSize] = useScreenSize();
     const [value, setValue] = useState("");
-
-    const size = (() => {
-      switch (screenSize) {
-        case "xl":
-        case "l":
-        case "m":
-          return "m";
-        default:
-          return screenSize;
-      }
-    })();
     //@@viewOff:private
 
     const handleSubmit = async (e) => {
@@ -63,39 +45,64 @@ const PostCreateBlock = createVisualComponent({
     };
 
     const handleChange = ({ data }) => {
-      if (data.value?.length > 256) return;
       setValue(data.value);
     };
 
     //@@viewOn:render
 
     return (
-      <Box className={Css.box()}>
-        <Grid templateRows="1fr" templateColumns="1fr auto" className={Css.grid()}>
+      <Grid
+        templateAreas={{
+          xs: `
+        input input input input input input input input input input btn
+        `,
+        }}
+        style={{
+          position: "absolute",
+          bottom: 0,
+          backgroundColor: "rgb(255,255,255)",
+          boxShadow: "0px -6px 5px -5px rgba(0,0,0,0.5)",
+          zIndex: 20,
+          padding: "8px 8px 0px",
+          width: "100%",
+        }}
+      >
+        <Grid.Item gridArea="input" colSpan={10}>
           <TextArea
-            minLength={1}
-            maxLength={512}
-            rows={3}
-            maxRows={3}
-            size={size}
-            spellCheck
             name="content"
+            rows={1}
+            minLength={0}
+            maxLength={256}
+            validateOnChange
+            validationMap={{
+              maxLength: {
+                feedback: "error",
+                message: {
+                  en: "Your message is too long!",
+                  cs: "Vaše zpráva je moc dlouhá!",
+                },
+              },
+            }}
+            autoResize={false || inputProps.autoResize}
+            style={{ width: "100%", resize: "none !important" }}
             value={value}
-            placeholder={{ en: "Type something...", cs: "Napište něco..." }}
             onChange={handleChange}
-            style={{ height: "100%" }}
+            disabled={disabled}
+            placeholder={{ en: "Type something...", cs: "Napište něco..." }}
+            {...inputProps}
           />
+        </Grid.Item>
+        <Grid.Item gridArea="btn" colSpan={1}>
           <RichIcon
-            icon="mdi-send"
+            icon="uugds-send"
             colorScheme="primary"
-            significance="highlighted"
-            size={size}
-            style={{ paddingTop: "2px", paddingLeft: "1px" }}
+            significance="subdued"
+            borderRadius="moderate"
+            disabled={disabled || !value || value?.length === 0 || value?.length > 256}
             onClick={handleSubmit}
-            disabled={value === ""}
           />
-        </Grid>
-      </Box>
+        </Grid.Item>
+      </Grid>
     );
     //@@viewOff:render
   },

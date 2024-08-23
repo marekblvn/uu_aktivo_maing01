@@ -2,8 +2,8 @@
 import { createVisualComponent, Lsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Line, LinkPanel, RichIcon, Text } from "uu5g05-elements";
-import PostListProvider from "../providers/post-list-provider.js";
 import DatetimeDetail from "./datetime-detail.js";
+import PostBlock from "./post-block.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -39,21 +39,6 @@ const ActivityInformationView = createVisualComponent({
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const [openDescription, setOpenDescription] = useState(false);
-
-    const handleToggleDescription = () => setOpenDescription((prev) => !prev);
-
-    const textType = (() => {
-      switch (screenSize) {
-        case "xl":
-        case "l":
-          return "large";
-        case "m":
-          return "medium";
-        case "s":
-        case "xs":
-          return "small";
-      }
-    })();
     //@@viewOff:private
 
     //@@viewOn:render
@@ -123,7 +108,10 @@ const ActivityInformationView = createVisualComponent({
           </Grid>
         </Grid>
         <Line colorScheme="neutral" significance="subdued" />
-        <Grid templateColumns={{ xl: "2fr 1fr", m: "3fr 2fr", xs: "100%" }} templateRows={{ xs: "100%" }}>
+        <Grid
+          templateColumns={{ xl: "2fr 1fr", m: "3fr 2fr", xs: "100%" }}
+          templateRows={{ xs: "auto auto", m: "100%" }}
+        >
           <DatetimeDetail
             activityId={activityId}
             datetimeId={datetimeId}
@@ -131,7 +119,7 @@ const ActivityInformationView = createVisualComponent({
             minParticipants={minParticipants}
             onReload={onReload}
           />
-          {/* <PostListProvider activityId={activityId} /> */}
+          <PostBlock activityId={activityId} />
         </Grid>
       </Grid>
     );

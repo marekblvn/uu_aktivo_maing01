@@ -1,8 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
 import { ActionGroup, Box, DateTime, Text } from "uu5g05-elements";
-import { PersonItem } from "uu_plus4u5g02-elements";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
@@ -12,23 +11,7 @@ import { useAuthorization } from "../contexts/authorization-context.js";
 
 //@@viewOn:css
 const Css = {
-  box: (type) =>
-    Config.Css.css({
-      padding: "8px",
-      display: "grid",
-      border: type === "important" ? "solid 2px rgba(244, 67, 54, 0.65)" : "",
-      backgroundColor: type === "important" ? "rgba(244, 67, 54, 0.12)" : "",
-    }),
-  headerDiv: () =>
-    Config.Css.css({
-      display: "flex",
-      marginBottom: "4px",
-    }),
-  text: () =>
-    Config.Css.css({
-      padding: "8px 8px 4px",
-      textAlign: "left",
-    }),
+  main: Config.Css.css({}),
 };
 //@@viewOff:css
 
@@ -48,25 +31,13 @@ const PostCard = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ id, content, type, createdAt, uuIdentity, uuIdentityName, onEdit, onDelete }) {
+  render({ onEdit, onDelete, ...props }) {
+    const { id, content, type, createdAt, uuIdentity, uuIdentityName } = props;
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner, isAdministrator, checkIfAdministrator, checkIfOwner } = useActivityAuthorization();
-
-    const contentTextType = (() => {
-      switch (screenSize) {
-        case "xl":
-        case "l":
-          return "large";
-        case "m":
-          return "medium";
-        case "s":
-        case "xs":
-          return "small";
-      }
-    })();
 
     const getActionList = () => {
       const list = [];
@@ -102,17 +73,42 @@ const PostCard = createVisualComponent({
 
     //@@viewOn:render
     return (
-      <Box shape="ground" significance="common" borderRadius="moderate" colorScheme="neutral" className={Css.box(type)}>
-        <div className={Css.headerDiv()}>
-          <PersonItem
-            uuIdentity={uuIdentity}
-            title={uuIdentityName}
-            subtitle={<DateTime value={createdAt} timeFormat="short" dateFormat="medium" />}
-            direction={screenSize === "xs" ? "vertical" : "horizontal"}
-          />
+      <Box
+        shape="ground"
+        significance="common"
+        borderRadius="moderate"
+        colorScheme="building"
+        style={{
+          margin: "8px",
+          padding: "10px 12px 10px 16px",
+          border: type === "important" ? "solid 1px rgb(255,165,0)" : "none",
+          backgroundColor: type === "important" ? "rgba(255,165,0, 0.2)" : "rgb(255,255,255)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", columnGap: "8px" }}>
+          <Fragment>
+            <Text
+              category="story"
+              segment="body"
+              type={["xs", "s"].includes(screenSize) ? "minor" : "common"}
+              colorScheme="neutral"
+            >
+              {uuIdentityName}
+            </Text>
+            <Text
+              category="story"
+              segment="body"
+              type={["xs", "s"].includes(screenSize) ? "minor" : "common"}
+              colorScheme="dim"
+              significance="subdued"
+              style={{ fontStyle: "italic" }}
+            >
+              <DateTime value={createdAt} format="DD.MM.YY HH:mm" />
+            </Text>
+          </Fragment>
           {uuIdentity === identity.uuIdentity && <ActionGroup size="s" itemList={getActionList()} />}
         </div>
-        <Text className={Css.text()} autoFit category="interface" segment="content" type={contentTextType}>
+        <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
           {content}
         </Text>
       </Box>

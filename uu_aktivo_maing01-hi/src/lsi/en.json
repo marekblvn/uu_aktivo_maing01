@@ -132,6 +132,10 @@
     "transferOwnership": {
       "header": "Transfer activity ownership",
       "submit": "Transfer"
+    },
+    "updatePost": {
+      "header": "Edit post",
+      "submit": "Edit"
     }
   },
   "Errors": {

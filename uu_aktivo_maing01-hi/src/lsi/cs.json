@@ -132,6 +132,10 @@
     "transferOwnership": {
       "header": "Převést vlastnictví aktivity",
       "submit": "Převést"
+    },
+    "updatePost": {
+      "header": "Upravit příspěvek",
+      "submit": "Upravit"
     }
   },
   "Errors": {

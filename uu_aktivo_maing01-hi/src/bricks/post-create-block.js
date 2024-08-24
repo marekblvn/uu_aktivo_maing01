@@ -63,7 +63,8 @@ const PostCreateBlock = createVisualComponent({
           backgroundColor: "rgb(255,255,255)",
           boxShadow: "0px -6px 5px -5px rgba(0,0,0,0.5)",
           zIndex: 20,
-          padding: "8px 8px 0px",
+          padding: "8px 8px",
+          borderRadius: "8px",
           width: "100%",
         }}
       >

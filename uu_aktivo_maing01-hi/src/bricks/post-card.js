@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Fragment, Lsi, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { ActionGroup, Box, DateTime, Text } from "uu5g05-elements";
+import { ActionGroup, Box, DateTime, Grid, Text } from "uu5g05-elements";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
@@ -79,33 +79,33 @@ const PostCard = createVisualComponent({
         borderRadius="moderate"
         colorScheme="building"
         style={{
-          margin: "8px",
+          margin: "16px 8px",
           padding: "10px 12px 10px 16px",
           border: type === "important" ? "solid 1px rgb(255,165,0)" : "none",
           backgroundColor: type === "important" ? "rgba(255,165,0, 0.2)" : "rgb(255,255,255)",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", columnGap: "8px" }}>
-          <Fragment>
-            <Text
-              category="story"
-              segment="body"
-              type={["xs", "s"].includes(screenSize) ? "minor" : "common"}
-              colorScheme="neutral"
-            >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            columnGap: "8px",
+            marginBottom: "8px",
+          }}
+        >
+          <Grid
+            templateColumns={{ xs: "100%", s: "auto auto", m: "100%", l: "auto auto" }}
+            templateRows={{ xs: "1fr 1fr", s: "100%", m: "1fr 1fr", l: "100%" }}
+            rowGap="2px"
+          >
+            <Text category="interface" segment="interactive" type="medium" colorScheme="neutral">
               {uuIdentityName}
             </Text>
-            <Text
-              category="story"
-              segment="body"
-              type={["xs", "s"].includes(screenSize) ? "minor" : "common"}
-              colorScheme="dim"
-              significance="subdued"
-              style={{ fontStyle: "italic" }}
-            >
+            <Text category="interface" segment="content" type="small" colorScheme="dim" significance="subdued">
               <DateTime value={createdAt} format="DD.MM.YY HH:mm" />
             </Text>
-          </Fragment>
+          </Grid>
           {uuIdentity === identity.uuIdentity && <ActionGroup size="s" itemList={getActionList()} />}
         </div>
         <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>

@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useLsi, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useLsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Button, Grid, Line, PlaceholderBox, Skeleton } from "uu5g05-elements";
 import DateBlock from "./date-block.js";
@@ -12,8 +12,6 @@ import CreateDatetimeForm from "./create-datetime-form.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import ParticipationBlock from "./participation-block.js";
-import { CancelButton, SubmitButton } from "uu5g05-forms";
-import FormModal from "./form-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -60,6 +58,7 @@ const DatetimeDetail = createVisualComponent({
   render({ idealParticipants, minParticipants, datetimeId, activityId, onReload }) {
     //@@viewOn:private
     const { identity } = useSession();
+    const [screenSize] = useScreenSize();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
@@ -181,6 +180,7 @@ const DatetimeDetail = createVisualComponent({
           <ParticipationBlock
             items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}
           />
+          {["xs", "s"].includes(screenSize) && <Line colorScheme="neutral" significance="subdued" margin="6px 0" />}
         </Grid>
       );
     }

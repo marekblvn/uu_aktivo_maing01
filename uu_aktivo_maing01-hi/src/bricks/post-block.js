@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import PostListProvider from "../providers/post-list-provider.js";
 import { Button, Dialog, Grid, Pending, PlaceholderBox, RichIcon, ScrollableBox, Text } from "uu5g05-elements";
@@ -42,8 +42,10 @@ const PostBlock = createVisualComponent({
     const [screenSize] = useScreenSize();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
+    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noPosts"] });
     const [dialogProps, setDialogProps] = useState(null);
     const [modalProps, setModalProps] = useState(null);
+    const [initialScroll, setInitialScroll] = useState(window.innerHeight + 576);
     //@@viewOff:private
 
     const showDeleteDialog = useCallback(
@@ -170,104 +172,101 @@ const PostBlock = createVisualComponent({
         });
       };
 
+      const handleLoadOlderPosts = async () => {
+        await handlerMap.loadNext({ filters: { activityId }, sort: { createdAt: -1 } });
+        setInitialScroll(0);
+      };
+
       return (
-        <Grid
-          templateColumns={{ xs: "100%" }}
-          templateRows={{ xs: "auto auto 44px" }}
-          style={{ position: "relative", marginTop: "10px" }}
-          rowGap={0}
-        >
-          <div
-            style={{
-              padding: "0px 8px 2px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              columnGap: 0,
-              marginRight: "18px",
-            }}
-          >
-            <RichIcon icon="uugds-comment-text" colorScheme="building" significance="subdued" />
-            <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"} bold>
-              <Lsi lsi={{ en: "Posts", cs: "Příspěvky" }} />
-            </Text>
-          </div>
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.05)",
-              borderRadius: "8px",
-            }}
-          >
-            <ScrollableBox
-              maxHeight="530px"
-              minHeight="530px"
-              initialScrollY={window.innerHeight + 550}
-              disableOverscroll
-            >
-              {data && firstNotYetLoadedIndex >= 0 ? (
-                <Button
-                  children={<Lsi lsi={{ en: "Load older posts", cs: "Načíst starší příspěvky" }} />}
-                  colorScheme="steel"
-                  significance="subdued"
-                  onClick={() => handlerMap.loadNext({ filters: { activityId }, sort: { createdAt: -1 } })}
-                  width="100%"
-                  icon="uugdsstencil-arrow-chevron-double-up"
-                  iconRight="uugdsstencil-arrow-chevron-double-up"
-                  size="xs"
-                  style={{ backgroundColor: "transparent" }}
-                />
-              ) : null}
-              {data && data.length ? (
-                data
-                  .filter((item) => item != null)
-                  .reverse()
-                  .map((item) => {
-                    return (
-                      <PostCard
-                        key={item.data.id}
-                        {...item.data}
-                        onDelete={() => handlePostDelete(item)}
-                        onEdit={() => handleUpdatePost(item)}
-                      />
-                    );
-                  })
-              ) : (
-                <PlaceholderBox code="items" header={{ en: "no posts" }} />
-              )}
-            </ScrollableBox>
-          </div>
+        <Fragment>
+          <ScrollableBox maxHeight="576px" minHeight="576px" initialScrollY={initialScroll} disableOverscroll>
+            {data && firstNotYetLoadedIndex >= 0 ? (
+              <Button
+                children={<Lsi lsi={{ en: "Load older posts", cs: "Načíst starší příspěvky" }} />}
+                colorScheme="steel"
+                significance="subdued"
+                onClick={handleLoadOlderPosts}
+                width="100%"
+                icon="uugdsstencil-arrow-chevron-double-up"
+                iconRight="uugdsstencil-arrow-chevron-double-up"
+                size="xs"
+                style={{ backgroundColor: "transparent" }}
+              />
+            ) : null}
+            {data && data.length ? (
+              data
+                .filter((item) => item != null)
+                .reverse()
+                .map((item) => {
+                  return (
+                    <PostCard
+                      key={item.data.id}
+                      {...item.data}
+                      onDelete={() => handlePostDelete(item)}
+                      onEdit={() => handleUpdatePost(item)}
+                    />
+                  );
+                })
+            ) : (
+              <div style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <PlaceholderBox code="items" header={placeholderLsi.header} />
+              </div>
+            )}
+          </ScrollableBox>
           <PostCreateBlock inputProps={{ autoResize: true }} onSubmit={handleCreatePost} />
-        </Grid>
+        </Fragment>
       );
     }
 
     return (
-      <Grid
-        templateColumns={{ xs: "100%" }}
-        templateRows={{ xs: "auto" }}
-        style={{ border: "solid 1px rgba(0,0,0,0.4)", borderRadius: "8px", padding: "0 8px 8px" }}
-      >
-        <PostListProvider filters={{ activityId }} sort={{ createdAt: -1 }} pageSize={10}>
-          {({ state, data, pendingData, errorData, handlerMap }) => {
-            switch (state) {
-              case "pendingNoData":
-                return renderLoading();
-              case "errorNoData":
-                return renderError(errorData);
-              case "error":
-                showError(errorData);
-              case "pending":
-              case "ready":
-              case "readyNoData":
-                return renderReady(data, handlerMap);
-            }
+      <Fragment>
+        <Grid
+          templateColumns={{ xs: "100%" }}
+          templateRows={{ xs: "40px auto" }}
+          rowGap={0}
+          style={{
+            border: "solid 1px rgba(0,0,0,0.4)",
+            borderRadius: "8px",
+            padding: "0 8px",
+            height: "669px",
+            position: "relative",
           }}
-        </PostListProvider>
+        >
+          <div
+            style={{
+              padding: "0px 8px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              columnGap: 0,
+              borderBottom: "solid 1px rgba(0,0,0,0.09)",
+            }}
+          >
+            <RichIcon icon="uugds-comment-text" colorScheme="building" significance="subdued" />
+            <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
+              <Lsi lsi={{ en: "Posts", cs: "Příspěvky" }} />
+            </Text>
+          </div>
+          <PostListProvider filters={{ activityId }} sort={{ createdAt: -1 }} pageSize={10}>
+            {({ state, data, pendingData, errorData, handlerMap }) => {
+              switch (state) {
+                case "pendingNoData":
+                  return renderLoading();
+                case "errorNoData":
+                  return renderError(errorData);
+                case "error":
+                  showError(errorData.error);
+                case "pending":
+                case "ready":
+                case "readyNoData":
+                  return renderReady(data, handlerMap);
+              }
+            }}
+          </PostListProvider>
+        </Grid>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
         <FormModal {...modalProps} />
-      </Grid>
+      </Fragment>
     );
     //@@viewOff:render
   },

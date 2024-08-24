@@ -113,6 +113,10 @@
     }
   },
   "Forms": {
+    "createDatetime": {
+      "header": "Create new datetime",
+      "submit": "Create"
+    },
     "updateActivity": {
       "header": "Edit activity settings",
       "submit": "Edit"

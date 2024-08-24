@@ -113,6 +113,10 @@
     }
   },
   "Forms": {
+    "createDatetime": {
+      "header": "Vytvořit nový termín",
+      "submit": "Vytvořit"
+    },
     "updateActivity": {
       "header": "Upravit nastavení aktivity",
       "submit": "Upravit"

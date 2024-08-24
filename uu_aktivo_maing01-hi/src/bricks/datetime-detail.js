@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Button, Grid, Line, PlaceholderBox, Skeleton } from "uu5g05-elements";
 import DateBlock from "./date-block.js";
@@ -8,10 +8,12 @@ import ParticipationStatusBlock from "./participation-status-block.js";
 import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import DatetimeProvider from "../providers/datetime-provider.js";
 import importLsi from "../lsi/import-lsi.js";
-import CreateDatetimeModal from "./create-datetime-modal.js";
+import CreateDatetimeForm from "./create-datetime-form.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import ParticipationBlock from "./participation-block.js";
+import { CancelButton, SubmitButton } from "uu5g05-forms";
+import FormModal from "./form-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -61,13 +63,31 @@ const DatetimeDetail = createVisualComponent({
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
-    const [modalOpen, setModalOpen] = useState(false);
+    const [modalProps, setModalProps] = useState(false);
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner } = useActivityAuthorization();
     //@@viewOff:private
 
-    const handleOpenModal = () => setModalOpen(true);
-    const handleCloseModal = () => setModalOpen(false);
+    const showModal = useCallback(
+      (onSubmit) => {
+        setModalProps({
+          open: true,
+          onClose: () => setModalProps(null),
+          onSubmit: onSubmit,
+          header: <Lsi import={importLsi} path={["Forms", "createDatetime", "header"]} />,
+          footer: (
+            <Grid templateColumns={{ xs: "repeat(2,1fr)", s: "repeat(2,auto)" }} justifyContent={{ s: "end" }}>
+              <CancelButton onClick={() => setModalProps(null)} />
+              <SubmitButton>
+                <Lsi import={importLsi} path={["Forms", "createDatetime", "submit"]} />
+              </SubmitButton>
+            </Grid>
+          ),
+          children: <CreateDatetimeForm />,
+        });
+      },
+      [setModalProps],
+    );
 
     function renderLoading() {
       return (
@@ -94,26 +114,28 @@ const DatetimeDetail = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
-      const handleCreateDatetime = async ({ value }) => {
-        try {
-          const createdDatetime = await handlerMap.create({ activityId, ...value });
-          await onReload(activityId);
-          const formattedDatetime = new Date(createdDatetime.datetime).toLocaleString(undefined, {
-            dateStyle: "medium",
-            timeStyle: "short",
-          });
-          addAlert({
-            priority: "success",
-            header: { en: "New datetime was successfully created!", cs: "Nový termín by úspěšně vytvořen!" },
-            message: {
-              en: `Every member can now update their participation until ${formattedDatetime}.`,
-              cs: `Každý člen může nyní změnit svoji účast do ${formattedDatetime}.`,
-            },
-          });
-        } catch (error) {
-          showError(error);
-        }
-      };
+      const handleCreateDatetime = () =>
+        showModal(async ({ value }) => {
+          try {
+            const createdDatetime = await handlerMap.create({ activityId, ...value });
+            setModalProps(null);
+            const formattedDatetime = new Date(createdDatetime.datetime).toLocaleString(undefined, {
+              dateStyle: "medium",
+              timeStyle: "short",
+            });
+            addAlert({
+              priority: "success",
+              header: { en: "New datetime was successfully created!", cs: "Nový termín by úspěšně vytvořen!" },
+              message: {
+                en: `Every member can now update their participation until ${formattedDatetime}.`,
+                cs: `Každý člen může nyní změnit svoji účast do ${formattedDatetime}.`,
+              },
+            });
+            await onReload(activityId);
+          } catch (error) {
+            showError(error);
+          }
+        });
 
       if (!data)
         return (
@@ -134,12 +156,12 @@ const DatetimeDetail = createVisualComponent({
                 colorScheme="secondary"
                 significance="common"
                 icon="mdi-calendar-plus-outline"
-                onClick={handleOpenModal}
+                onClick={handleCreateDatetime}
               >
                 <Lsi lsi={{ en: "Create new datetime", cs: "Vytvořit nový termín" }} />
               </Button>
             )}
-            <CreateDatetimeModal open={modalOpen} onClose={handleCloseModal} onSubmit={handleCreateDatetime} />
+            <FormModal {...modalProps} />
           </div>
         );
 

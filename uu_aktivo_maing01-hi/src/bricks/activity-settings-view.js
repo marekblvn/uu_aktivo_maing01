@@ -1,20 +1,36 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCall, useCallback, useRoute, useScreenSize, useState } from "uu5g05";
+import {
+  createVisualComponent,
+  Lsi,
+  useCall,
+  useCallback,
+  useRoute,
+  useScreenSize,
+  useSession,
+  useState,
+} from "uu5g05";
 import Config from "./config/config.js";
 import Container from "./container.js";
-import { Dialog, Line } from "uu5g05-elements";
-import UpdateActivitySettingsModal from "./update-activity-settings-modal.js";
-import UpdateFrequencyModal from "./update-frequency-modal.js";
+import { Dialog, Grid, Line } from "uu5g05-elements";
+import UpdateActivityForm from "./update-activity-form.js";
+import UpdateFrequencyForm from "./update-frequency-form.js";
 import ActivitySettingsBlock from "./activity-settings-block.js";
 import DatetimeSettingsBlock from "./datetime-settings-block.js";
-import UpdateNotificationOffsetModal from "./update-notification-offset-modal.js";
+import UpdateNotificationOffsetForm from "./update-notification-offset-form.js";
 import { useAlertBus } from "uu_plus4u5g02-elements";
 import importLsi from "../lsi/import-lsi.js";
 import Calls from "../calls.js";
-import TransferOwnershipModal from "./transfer-ownership-modal.js";
+import TransferOwnershipForm from "./transfer-ownership-form.js";
+import { CancelButton, ResetButton, SubmitButton } from "uu5g05-forms";
+import FormModal from "./form-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
+const UC_COLOR_SCHEME = {
+  deleteActivity: "negative",
+  deleteDatetime: "negative",
+  changeRecurrence: "warning",
+};
 //@@viewOff:constants
 
 //@@viewOn:css
@@ -51,7 +67,7 @@ const ActivitySettingsView = createVisualComponent({
     frequency,
     notificationOffset,
     recurrent,
-    onUpdateActivityInfo,
+    onUpdateActivity,
     onTransferOwnership,
     onDeleteActivity,
     onChangeRecurrence,
@@ -60,108 +76,71 @@ const ActivitySettingsView = createVisualComponent({
     onReload,
   }) {
     //@@viewOn:private
+    const { identity } = useSession();
     const [, setRoute] = useRoute();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const [screenSize] = useScreenSize();
-    const [activitySettingsFormOpen, setActivitySettingsFormOpen] = useState(false);
-    const [transferOwnershipFormOpen, setTransferOwnershipFormOpen] = useState(false);
-    const [frequencyFormOpen, setFrequencyFormOpen] = useState(false);
-    const [notificationOffsetFormOpen, setNotificationOffsetFormOpen] = useState(false);
-    const [dialogProps, setDialogProps] = useState();
+    const [dialogProps, setDialogProps] = useState(null);
+    const [modalProps, setModalProps] = useState(null);
     const { call: callDatetimeDelete } = useCall(Calls.Datetime.delete);
     //@@viewOff:private
 
-    const handleOpenActivitySettingsForm = () => setActivitySettingsFormOpen(true);
-    const handleCloseActivitySettingsForm = () => setActivitySettingsFormOpen(false);
+    const showDialog = useCallback(
+      (useCase, onConfirm) => {
+        setDialogProps({
+          header: <Lsi import={importLsi} path={["Dialog", useCase, "header"]} />,
+          info: <Lsi import={importLsi} path={["Dialog", useCase, "info"]} />,
+          icon: "mdi-delete",
+          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+          actionList: [
+            {
+              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+              onClick: () => setDialogProps(null),
+            },
+            {
+              children: <Lsi import={importLsi} path={["Dialog", useCase, "confirm"]} />,
+              colorScheme: UC_COLOR_SCHEME[useCase],
+              onClick: onConfirm,
+            },
+          ],
+        });
+      },
+      [setDialogProps],
+    );
 
-    const handleOpenFrequencyForm = () => setFrequencyFormOpen(true);
-    const handleCloseFrequencyForm = () => setFrequencyFormOpen(false);
-
-    const handleOpenNotificationOffsetForm = () => setNotificationOffsetFormOpen(true);
-    const handleCloseNotificationOffsetForm = () => setNotificationOffsetFormOpen(false);
-
-    const handleOpenTransferOwnershipForm = () => setTransferOwnershipFormOpen(true);
-    const handleCloseTransferOwnershipForm = () => setTransferOwnershipFormOpen(false);
-
-    const showChangeRecurrenceDialog = useCallback((onConfirm) => {
-      setDialogProps({
-        header: (
-          <Lsi
-            lsi={{ en: "Are you sure you want to change this setting?", cs: "Opravdu chcete změnit toto nastavení?" }}
-          />
-        ),
-        info: (
-          <Lsi
-            lsi={{
-              en: "This will prevent the activity from periodically creating the next datetime. After the upcoming datetime passes, the activity will not have a datetime assigned.",
-              cs: "Změnou tohoto nastavení zabráníte aktivitě v pravidelném vytváření dalšího termínu. Po uplynutí nadcházejícího termínu nebude mít aktivita přiřazený žádný termín.",
-            }}
-          />
-        ),
-
-        icon: "mdi-calendar-refresh",
-        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-        actionList: [
-          {
-            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: handleCloseDialog,
-          },
-          {
-            children: <Lsi lsi={{ en: "Change", cs: "Změnit" }} />,
-            colorScheme: "warning",
-            onClick: onConfirm,
-          },
-        ],
-      });
-    }, []);
-
-    const showDeleteDatetimeDialog = useCallback((onConfirm) => {
-      setDialogProps({
-        header: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "header"]} />,
-        info: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "info"]} />,
-        icon: "mdi-delete",
-        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-        actionList: [
-          {
-            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: handleCloseDialog,
-          },
-          {
-            children: <Lsi import={importLsi} path={["Dialog", "deleteDatetime", "submit"]} />,
-            colorScheme: "negative",
-            onClick: onConfirm,
-          },
-        ],
-      });
-    });
-
-    const showDeleteActivityDialog = useCallback((onConfirm) => {
-      setDialogProps({
-        header: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "header"]} />,
-        info: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "info"]} />,
-        icon: "mdi-delete",
-        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-        actionList: [
-          {
-            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: handleCloseDialog,
-          },
-          {
-            children: <Lsi import={importLsi} path={["Dialog", "deleteActivity", "submit"]} />,
-            colorScheme: "negative",
-            onClick: onConfirm,
-          },
-        ],
-      });
-    });
-
-    const handleCloseDialog = () => setDialogProps(null);
+    const showModal = useCallback(
+      (useCase, children, onSubmit) => {
+        setModalProps({
+          open: true,
+          onClose: () => setModalProps(null),
+          onSubmit: onSubmit,
+          header: <Lsi import={importLsi} path={["Forms", useCase, "header"]} />,
+          footer: (
+            <Grid
+              templateColumns={{
+                xs: `${useCase === "transferOwnership" ? "" : "auto"} repeat(2, 1fr)`,
+                s: `repeat(${useCase === "transferOwnership" ? 2 : 3}, auto)`,
+              }}
+              justifyContent={{ xs: "center", s: "end" }}
+            >
+              {useCase !== "transferOwnership" ? <ResetButton icon="uugds-refresh" significance="subdued" /> : null}
+              <CancelButton onClick={() => setModalProps(null)} />
+              <SubmitButton>
+                <Lsi import={importLsi} path={["Forms", useCase, "submit"]} />
+              </SubmitButton>
+            </Grid>
+          ),
+          children,
+        });
+      },
+      [setModalProps],
+    );
 
     const handleDeleteDatetime = () => {
-      showDeleteDatetimeDialog(async () => {
+      showDialog("deleteDatetime", async () => {
         try {
           await callDatetimeDelete({ id: datetimeId });
-          handleCloseDialog();
+          setDialogProps(null);
           await onReload(id);
           addAlert({
             priority: "info",
@@ -176,10 +155,10 @@ const ActivitySettingsView = createVisualComponent({
     };
 
     const handleDeleteActivity = () => {
-      showDeleteActivityDialog(async () => {
+      showDialog("deleteActivity", async () => {
         try {
           await onDeleteActivity(id);
-          handleCloseDialog();
+          setDialogProps(null);
           addAlert({
             priority: "info",
             header: { en: "Activity deleted", cs: "Aktivita smazána" },
@@ -193,45 +172,53 @@ const ActivitySettingsView = createVisualComponent({
       });
     };
 
-    const handleUpdateActivityInfo = async ({ data }) => {
-      try {
-        await onUpdateActivityInfo(data);
-        handleCloseActivitySettingsForm();
-        addAlert({
-          priority: "info",
-          header: { en: "Activity settings edited", cs: "Nastavení aktivity upraveno" },
-          message: { en: "Changes you made were successfully saved.", cs: "Provedené změny byly úspěšně uloženy." },
-          durationMs: 2000,
-        });
-      } catch (error) {
-        showError(error);
-      }
-    };
+    const handleUpdateActivity = () =>
+      showModal(
+        "updateActivity",
+        <UpdateActivityForm initialValues={{ name, description, location, minParticipants, idealParticipants }} />,
+        async ({ data }) => {
+          try {
+            await onUpdateActivity(data);
+            setModalProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Activity settings edited", cs: "Nastavení aktivity upraveno" },
+              message: { en: "Changes you made were successfully saved.", cs: "Provedené změny byly úspěšně uloženy." },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        },
+      );
 
-    const handleTransferOwnership = async ({ data }) => {
-      delete data.value.consent;
-      try {
-        await onTransferOwnership(data);
-        handleCloseTransferOwnershipForm();
-        addAlert({
-          priority: "info",
-          header: { en: "Activity ownership transferred", cs: "Vlastnictví aktivity převedeno" },
-          message: {
-            en: "The ownership of the activity was successfully transferred.",
-            cs: "Vlastnictví aktivity bylo úspěšně převedeno.",
-          },
-          durationMs: 2000,
-        });
-      } catch (error) {
-        showError(error);
-      }
+    const handleTransferOwnership = () => {
+      const filteredMembers = members.filter((i) => i !== identity.uuIdentity);
+      showModal("transferOwnership", <TransferOwnershipForm members={filteredMembers} />, async ({ data }) => {
+        delete data.value.consent;
+        try {
+          await onTransferOwnership(data);
+          setModalProps(null);
+          addAlert({
+            priority: "info",
+            header: { en: "Activity ownership transferred", cs: "Vlastnictví aktivity převedeno" },
+            message: {
+              en: "The ownership of the activity was successfully transferred.",
+              cs: "Vlastnictví aktivity bylo úspěšně převedeno.",
+            },
+            durationMs: 2000,
+          });
+        } catch (error) {
+          showError(error);
+        }
+      });
     };
 
     const handleChangeRecurrence = () => {
-      showChangeRecurrenceDialog(async () => {
+      showDialog("changeRecurrence", async () => {
         try {
           await onChangeRecurrence();
-          handleCloseDialog();
+          setDialogProps(null);
           addAlert({
             priority: "info",
             header: { en: "Functionality not yet implemented" },
@@ -244,41 +231,51 @@ const ActivitySettingsView = createVisualComponent({
       });
     };
 
-    const handleUpdateFrequency = async ({ data }) => {
-      try {
-        await onUpdateFrequency(data);
-        handleCloseFrequencyForm();
-        addAlert({
-          priority: "info",
-          header: {
-            en: "Frequency changed",
-            cs: "Frekvence změněna",
-          },
-          message: { en: "Changes you made were successfully saved.", cs: "Provedené změny byly úspěšně uloženy." },
-          durationMs: 2000,
-        });
-      } catch (error) {
-        showError(error, { displayDetailButton: false });
-      }
-    };
+    const handleUpdateFrequency = () =>
+      showModal(
+        "updateFrequency",
+        <UpdateFrequencyForm initialValues={frequency} notificationOffset={notificationOffset} />,
+        async ({ data }) => {
+          try {
+            await onUpdateFrequency(data);
+            setModalProps(null);
+            addAlert({
+              priority: "info",
+              header: {
+                en: "Frequency changed",
+                cs: "Frekvence změněna",
+              },
+              message: { en: "Changes you made were successfully saved.", cs: "Provedené změny byly úspěšně uloženy." },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        },
+      );
 
-    const handleUpdateNotificationOffset = async ({ data }) => {
-      try {
-        await onUpdateNotificationOffset(data);
-        handleCloseNotificationOffsetForm();
-        addAlert({
-          priority: "info",
-          header: {
-            en: "Notification offset changed",
-            cs: "Posun upozornění změněn",
-          },
-          message: { en: "Changes you made were successfully saved.", cs: "Provedené změny byly úspěšně uloženy." },
-          durationMs: 2000,
-        });
-      } catch (error) {
-        showError(error, { displayDetailButton: false });
-      }
-    };
+    const handleUpdateNotificationOffset = () =>
+      showModal(
+        "updateNotificationOffset",
+        <UpdateNotificationOffsetForm initialValues={notificationOffset} frequency={frequency} />,
+        async ({ data }) => {
+          try {
+            await onUpdateNotificationOffset(data);
+            setModalProps(null);
+            addAlert({
+              priority: "info",
+              header: {
+                en: "Notification offset changed",
+                cs: "Posun upozornění změněn",
+              },
+              message: { en: "Changes you made were successfully saved.", cs: "Provedené změny byly úspěšně uloženy." },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        },
+      );
 
     //@@viewOn:render
     return (
@@ -295,8 +292,8 @@ const ActivitySettingsView = createVisualComponent({
       >
         <ActivitySettingsBlock
           data={{ name, description, location, minParticipants, idealParticipants, members, datetimeId }}
-          onClickEdit={handleOpenActivitySettingsForm}
-          onClickTransferOwnership={handleOpenTransferOwnershipForm}
+          onClickEdit={handleUpdateActivity}
+          onClickTransferOwnership={handleTransferOwnership}
           onClickDeleteActivity={handleDeleteActivity}
         />
         <Line direction="horizontal" colorScheme="building" significance="subdued" margin="16px 0" />
@@ -306,40 +303,13 @@ const ActivitySettingsView = createVisualComponent({
           frequency={frequency}
           notificationOffset={notificationOffset}
           onChangeRecurrence={handleChangeRecurrence}
-          onEditFrequency={handleOpenFrequencyForm}
-          onEditNotificationOffset={handleOpenNotificationOffsetForm}
+          onEditFrequency={handleUpdateFrequency}
+          onEditNotificationOffset={handleUpdateNotificationOffset}
           onDeleteDatetime={handleDeleteDatetime}
         />
         {/* </Grid> */}
-        <Dialog {...dialogProps} open={!!dialogProps} onClose={handleCloseDialog} />
-        <UpdateActivitySettingsModal
-          open={activitySettingsFormOpen}
-          onClose={handleCloseActivitySettingsForm}
-          initialValues={{ name, description, location, minParticipants, idealParticipants }}
-          onSubmit={handleUpdateActivityInfo}
-        />
-        <UpdateFrequencyModal
-          open={frequencyFormOpen}
-          onClose={handleCloseFrequencyForm}
-          initialValues={frequency}
-          activityId={id}
-          notificationOffset={notificationOffset}
-          onSubmit={handleUpdateFrequency}
-        />
-        <UpdateNotificationOffsetModal
-          open={notificationOffsetFormOpen}
-          onClose={handleCloseNotificationOffsetForm}
-          initialValues={notificationOffset}
-          activityId={id}
-          frequency={frequency}
-          onSubmit={handleUpdateNotificationOffset}
-        />
-        <TransferOwnershipModal
-          open={transferOwnershipFormOpen}
-          onClose={handleCloseTransferOwnershipForm}
-          members={members}
-          onSubmit={handleTransferOwnership}
-        />
+        <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
+        <FormModal {...modalProps} />
       </Container>
     );
     //@@viewOff:render

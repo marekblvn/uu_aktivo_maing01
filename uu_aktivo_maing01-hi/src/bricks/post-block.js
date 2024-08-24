@@ -7,6 +7,9 @@ import PostCreateBlock from "./post-create-block.js";
 import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import importLsi from "../lsi/import-lsi.js";
 import PostCard from "./post-card.js";
+import FormModal from "./form-modal.js";
+import { CancelButton, ResetButton, SubmitButton } from "uu5g05-forms";
+import UpdatePostForm from "./update-post-form.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -40,43 +43,53 @@ const PostBlock = createVisualComponent({
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const [dialogProps, setDialogProps] = useState(null);
+    const [modalProps, setModalProps] = useState(null);
     //@@viewOff:private
 
-    const showDeleteDialog = useCallback((onSubmit) => {
-      setDialogProps({
-        header: <Lsi import={importLsi} path={["Dialog", "deletePost", "header"]} />,
-        info: <Lsi import={importLsi} path={["Dialog", "deletePost", "info"]} />,
-        icon: "mdi-delete",
-        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-        actionList: [
-          {
-            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: () => setDialogProps(null),
-          },
-          {
-            children: <Lsi import={importLsi} path={["Dialog", "deletePost", "submit"]} />,
-            colorScheme: "negative",
-            onClick: async (e) => {
-              e.preventDefault();
-              try {
-                await onSubmit();
-                setDialogProps(null);
-                addAlert({
-                  priority: "info",
-                  header: { en: "Post deleted", cs: "Příspěvek smazán" },
-                  message: {
-                    en: "The post you chose to delete was successfully deleted.",
-                    cs: "Vámi vybraný příspěvek byl úspěšně smazán.",
-                  },
-                });
-              } catch (error) {
-                showError(error);
-              }
+    const showDeleteDialog = useCallback(
+      (onConfirm) => {
+        setDialogProps({
+          header: <Lsi import={importLsi} path={["Dialog", "deletePost", "header"]} />,
+          info: <Lsi import={importLsi} path={["Dialog", "deletePost", "info"]} />,
+          icon: "mdi-delete",
+          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+          actionList: [
+            {
+              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+              onClick: () => setDialogProps(null),
             },
-          },
-        ],
+            {
+              children: <Lsi import={importLsi} path={["Dialog", "deletePost", "confirm"]} />,
+              colorScheme: "negative",
+              onClick: onConfirm,
+            },
+          ],
+        });
+      },
+      [setDialogProps],
+    );
+
+    const showUpdatePostForm = useCallback((post, onSubmit) => {
+      setModalProps({
+        open: true,
+        onClose: () => setModalProps(null),
+        onSubmit: onSubmit,
+        header: <Lsi import={importLsi} path={["Forms", "updatePost", "header"]} />,
+        footer: (
+          <Grid
+            templateColumns={{ xs: "auto repeat(2,1fr)", s: "repeat(3, auto)" }}
+            justifyContent={{ xs: "center", s: "end" }}
+          >
+            <ResetButton icon="uugds-refresh" significance="subdued" />
+            <CancelButton onClick={() => setModalProps(null)} />
+            <SubmitButton>
+              <Lsi import={importLsi} path={["Forms", "updatePost", "submit"]} />
+            </SubmitButton>
+          </Grid>
+        ),
+        children: <UpdatePostForm initialValues={post.data} />,
       });
-    }, []);
+    });
 
     //@@viewOn:render
     function renderLoading() {
@@ -121,8 +134,39 @@ const PostBlock = createVisualComponent({
       };
 
       const handlePostDelete = (item) => {
-        showDeleteDialog(async () => {
-          return await item.handlerMap.delete({ id: item.id });
+        showDeleteDialog(async (e) => {
+          e.preventDefault();
+          try {
+            await item.handlerMap.delete({ id: item.data.id });
+            setDialogProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Post deleted", cs: "Příspěvek smazán" },
+              message: {
+                en: "The post you chose to delete was successfully deleted.",
+                cs: "Vámi vybraný příspěvek byl úspěšně smazán.",
+              },
+            });
+          } catch (error) {
+            showError(error);
+          }
+        });
+      };
+
+      const handleUpdatePost = (item) => {
+        showUpdatePostForm(item, async (e) => {
+          e.preventDefault();
+          try {
+            await item.handlerMap.update({ id: item.data.id, ...e.data.value });
+            setModalProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Post updated", cs: "Příspěvek upraven" },
+              message: { en: "The post was successfully updated.", cs: "Příspěvek byl úspěšně upraven." },
+            });
+          } catch (error) {
+            showError(error);
+          }
         });
       };
 
@@ -185,7 +229,7 @@ const PostBlock = createVisualComponent({
                         key={item.data.id}
                         {...item.data}
                         onDelete={() => handlePostDelete(item)}
-                        onEdit={() => {}} //TODO
+                        onEdit={() => handleUpdatePost(item)}
                       />
                     );
                   })
@@ -222,6 +266,7 @@ const PostBlock = createVisualComponent({
           }}
         </PostListProvider>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
+        <FormModal {...modalProps} />
       </Grid>
     );
     //@@viewOff:render

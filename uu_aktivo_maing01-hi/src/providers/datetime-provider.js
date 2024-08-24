@@ -38,6 +38,7 @@ const DatetimeProvider = createVisualComponent({
         load: Calls.Datetime.get,
         updateParticipation: Calls.Datetime.updateParticipation,
         create: Calls.Datetime.create,
+        delete: Calls.Datetime.delete,
       },
     });
     const { state, data, errorData, pendingData, handlerMap } = dataObject;

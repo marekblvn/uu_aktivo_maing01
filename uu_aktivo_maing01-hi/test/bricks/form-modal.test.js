@@ -1,5 +1,5 @@
 import { Test, VisualComponent } from "uu5g05-test";
-import PostList from "../../src/bricks/post-list.js";
+import FormModal from "../../src/bricks/form-modal.js";
 
 function getDefaultProps() {
   return {
@@ -8,10 +8,10 @@ function getDefaultProps() {
 }
 
 async function setup(props = {}, opts) {
-  return VisualComponent.setup(PostList, { ...getDefaultProps(), ...props }, opts);
+  return VisualComponent.setup(FormModal, { ...getDefaultProps(), ...props }, opts);
 }
 
-describe("UuAktivo.Bricks.PostList", () => {
+describe("UuAktivo.Bricks.FormModal", () => {
   VisualComponent.testProperties(setup);
 
   it("checks default property values", async () => {

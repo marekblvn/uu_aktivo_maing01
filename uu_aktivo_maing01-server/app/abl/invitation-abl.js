@@ -245,10 +245,9 @@ class InvitationAbl {
       throw new Errors.Accept.UserAlreadyMember({ uuAppErrorMap });
     }
 
-    let dtoOut;
     const updateObject = { id: invitation.activityId, awid, $push: { members: invitation.uuIdentity } };
     try {
-      dtoOut = await this.activityDao.update(updateObject);
+      await this.activityDao.update(updateObject);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Accept.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
@@ -256,8 +255,9 @@ class InvitationAbl {
       throw error;
     }
 
+    let dtoOut;
     try {
-      await this.invitationDao.delete(awid, dtoIn.id);
+      dtoOut = await this.invitationDao.delete(awid, dtoIn.id);
     } catch (error) {
       throw new Errors.Accept.InvitationDaoDeleteFailed({ uuAppErrorMap }, error);
     }
@@ -288,6 +288,7 @@ class InvitationAbl {
       }
     }
 
+    dtoOut = dtoOut || {};
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

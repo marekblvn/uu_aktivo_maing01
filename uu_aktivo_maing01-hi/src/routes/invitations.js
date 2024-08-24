@@ -40,7 +40,6 @@ let Invitations = createVisualComponent({
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
-    const loadRef = useRef();
     const [dialogProps, setDialogProps] = useState();
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noInvitations"] });
     //@@viewOff:private
@@ -56,108 +55,40 @@ let Invitations = createVisualComponent({
         actionList: [
           {
             children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: (e) => {
-              e.preventDefault();
-              setDialogProps(null);
-            },
+            onClick: () => setDialogProps(null),
           },
           {
-            children: <Lsi import={importLsi} path={["Dialog", "declineInvitation", "submit"]} />,
-            onClick: async (e) => {
-              e.preventDefault();
-              try {
-                await onConfirm();
-                setDialogProps(null);
-                await loadRef.current({ filters: { uuIdentity: identity.uuIdentity } });
-                addAlert({
-                  header: { en: "Invitation denied", cs: "Pozvánka odmítnuta" },
-                  message: {
-                    en: `Invitation to ${invitation.activityName} was denied.`,
-                    cs: `Pozvánka do ${invitation.activityName} byla odmítnuta.`,
-                  },
-                  priority: "info",
-                  durationMs: 2_000,
-                });
-              } catch (error) {
-                showError(error);
-                return;
-              }
-            },
+            children: <Lsi import={importLsi} path={["Dialog", "declineInvitation", "confirm"]} />,
+            onClick: onConfirm,
             colorScheme: "negative",
             significance: "highlighted",
           },
         ],
       });
-    });
+    }, []);
 
     const showAcceptDialog = useCallback((invitation = {}, onConfirm) => {
       setDialogProps({
         header: (
-          <Lsi
-            lsi={{
-              cs: `Chystáte se přijmout pozvánku do ${invitation.activityName}.`,
-              en: `You are about to accept an invitation to ${invitation.activityName}.`,
-            }}
-          />
+          <Lsi import={importLsi} path={["Dialog", "acceptInvitation", "header"]} params={[invitation.activityName]} />
         ),
-        info: (
-          <Lsi
-            lsi={{
-              cs: "Přijmutím pozvánky se stanete členem aktivity.",
-              en: "By accepting the invitation you become a member of the activity.",
-            }}
-          />
-        ),
+        info: <Lsi import={importLsi} path={["Dialog", "acceptInvitation", "info"]} />,
         icon: "mdi-email-check",
         actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
         actionList: [
           {
             children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: (e) => {
-              e.preventDefault();
-              setDialogProps(null);
-            },
+            onClick: () => setDialogProps(null),
           },
           {
-            children: <Lsi lsi={{ en: "Accept", cs: "Přijmout" }} />,
+            children: <Lsi import={importLsi} path={["Dialog", "acceptInvitation", "confirm"]} />,
             colorScheme: "positive",
             significance: "highlighted",
-            onClick: async (e) => {
-              e.preventDefault();
-              try {
-                await onConfirm();
-                addAlert({
-                  header: { en: "Invitation accepted", cs: "Pozvánka přijata" },
-                  message: {
-                    en: `Invitation to ${invitation.activityName} was accepted. You are now a member of this activity.`,
-                    cs: `Pozvánka do ${invitation.activityName} byla odmítnuta. Nyní jste členem této aktivity.`,
-                  },
-                  priority: "success",
-                  durationMs: 3_000,
-                });
-              } catch (error) {
-                showError(error);
-                return;
-              }
-              setDialogProps(null);
-              await loadRef.current({ filters: { uuIdentity: identity.uuIdentity } });
-            },
+            onClick: onConfirm,
           },
         ],
       });
-    });
-
-    const handleDeleteInvitation = useCallback((item) => {
-      showDeleteDialog(item.data, async () => {
-        return await item.handlerMap.delete(item.data.id);
-      });
-    });
-
-    const handleAcceptInvitation = useCallback((item) => {
-      showAcceptDialog(item.data, async () => {
-        return await item.handlerMap.accept(item.data.id);
-      });
-    });
+    }, []);
 
     function renderLoading() {
       return <Pending size="max" colorScheme="primary" />;
@@ -173,19 +104,59 @@ let Invitations = createVisualComponent({
       );
     }
 
+    function renderEmpty() {
+      <div>
+        <PlaceholderBox
+          code="items"
+          header={placeholderLsi.header}
+          info={placeholderLsi.info}
+          style={{ marginTop: "10%", padding: "0 16px" }}
+        />
+      </div>;
+    }
+
     function renderReady(data) {
-      if (!data.length) {
-        return (
-          <div>
-            <PlaceholderBox
-              code="items"
-              header={placeholderLsi.header}
-              info={placeholderLsi.info}
-              style={{ marginTop: "10%", padding: "0 16px" }}
-            />
-          </div>
-        );
-      }
+      const handleDeleteInvitation = (item) => {
+        showDeleteDialog(item.data, async (e) => {
+          e.preventDefault();
+          try {
+            await item.handlerMap.delete({ id: item.data.id });
+            setDialogProps(null);
+            addAlert({
+              header: { en: "Invitation denied", cs: "Pozvánka odmítnuta" },
+              message: {
+                en: `Invitation to ${item.data.activityName} was denied.`,
+                cs: `Pozvánka do ${item.data.activityName} byla odmítnuta.`,
+              },
+              priority: "info",
+              durationMs: 2_000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        });
+      };
+
+      const handleAcceptInvitation = (item) =>
+        showAcceptDialog(item.data, async (e) => {
+          e.preventDefault();
+          try {
+            await item.handlerMap.accept({ id: item.data.id });
+            setDialogProps(null);
+            addAlert({
+              header: { en: "Invitation accepted", cs: "Pozvánka přijata" },
+              message: {
+                en: `Invitation to ${item.data.activityName} was accepted. You are now a member of this activity.`,
+                cs: `Pozvánka do ${item.data.activityName} byla odmítnuta. Nyní jste členem této aktivity.`,
+              },
+              priority: "success",
+              durationMs: 2_000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        });
+
       const dataToRender = data.filter((item) => item != null);
       return (
         <InvitationList
@@ -229,7 +200,6 @@ let Invitations = createVisualComponent({
           pageSize={10}
         >
           {({ state, data, errorData, pendingData, handlerMap }) => {
-            loadRef.current = handlerMap.load;
             switch (state) {
               case "pending":
                 return renderReady(data);
@@ -240,8 +210,9 @@ let Invitations = createVisualComponent({
               case "errorNoData":
                 return renderError(errorData);
               case "ready":
-              case "readyNoData":
                 return renderReady(data);
+              case "readyNoData":
+                return renderEmpty();
             }
           }}
         </InvitationListProvider>

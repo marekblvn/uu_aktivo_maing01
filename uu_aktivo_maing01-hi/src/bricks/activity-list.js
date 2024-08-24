@@ -25,7 +25,7 @@ const SORTER_LIST = [
   {
     key: "members",
     label: <Lsi lsi={{ en: "No. of members", cs: "Poč. členů" }} />,
-    sort: (a, b) => a.members - b.members,
+    sort: (a, b) => a.members.length - b.members.length,
   },
 ];
 
@@ -33,7 +33,7 @@ const COLUMN_LIST = [
   {
     value: "name",
     header: <Lsi lsi={{ en: "Name", cs: "Název" }} />,
-    headerComponent: <Table.HeaderCell sorterKey="name" filterKey="name" />,
+    headerComponent: <Table.HeaderCell filterKey="name" />,
     cell: ({ data }) => (
       <Link href={`activity?id=${data.id}`} target="_blank">
         {data.name}
@@ -49,14 +49,15 @@ const COLUMN_LIST = [
   {
     value: "members",
     header: <Lsi lsi={{ en: "No. of members", cs: "Poč. členů" }} />,
-    headerComponent: <Table.HeaderCell sorterKey="members" horizontalAlignment="center" />,
+    headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
     maxWidth: "100px",
     cellComponent: <Table.Cell horizontalAlignment="center" />,
+    cell: ({ data }) => data.members.length,
   },
   {
     value: "location",
     header: <Lsi lsi={{ en: "Location", cs: "Lokace" }} />,
-    headerComponent: <Table.HeaderCell sorterKey="location" filterKey="location" />,
+    headerComponent: <Table.HeaderCell filterKey="location" />,
   },
   {
     value: "description",
@@ -200,7 +201,7 @@ const ActivityList = createVisualComponent({
           {
             icon: "mdi-delete",
             tooltip: { en: "Delete activity", cs: "Smazat aktivitu" },
-            onClick: (e) => onDeleteActivity(data),
+            onClick: () => onDeleteActivity(data),
             colorScheme: "negative",
             significance: "subdued",
             order: 1,

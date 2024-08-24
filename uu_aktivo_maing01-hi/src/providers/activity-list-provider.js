@@ -40,11 +40,11 @@ const ActivityListProvider = createVisualComponent({
       handlerMap: {
         load: Calls.Activity.list,
         create: Calls.Activity.create,
-        delete: Calls.Activity.delete,
-        update: Calls.Activity.update,
       },
       itemHandlerMap: {
         leave: Calls.Activity.leave,
+        delete: Calls.Activity.delete,
+        update: Calls.Activity.update,
       },
     });
     let { state, data, errorData, pendingData, handlerMap } = dataList;

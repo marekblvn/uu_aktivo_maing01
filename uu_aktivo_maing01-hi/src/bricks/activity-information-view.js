@@ -35,7 +35,7 @@ const ActivityInformationView = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ description, location, minParticipants, idealParticipants, activityId, datetimeId, onReload }) {
+  render({ description, location, minParticipants, idealParticipants, id: activityId, datetimeId, onReload }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const [openDescription, setOpenDescription] = useState(false);
@@ -69,7 +69,7 @@ const ActivityInformationView = createVisualComponent({
               tooltip={{ en: "Location", cs: "Lokace" }}
             />
             <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
-              {location}
+              {location || "—"}
             </Text>
           </Grid>
           <Grid
@@ -97,12 +97,12 @@ const ActivityInformationView = createVisualComponent({
                 style={{ marginTop: "8px" }}
               >
                 <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
-                  {description}
+                  {description || "—"}
                 </Text>
               </LinkPanel>
             ) : (
               <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
-                {description}
+                {description || "—"}
               </Text>
             )}
           </Grid>

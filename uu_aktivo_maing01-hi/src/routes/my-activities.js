@@ -35,7 +35,7 @@ const Css = {
 //@@viewOn:helpers
 //@@viewOff:helpers
 
-let MyActivities = createVisualComponent({
+const _MyActivities = createVisualComponent({
   //@@viewOn:statics
   uu5Tag: Config.TAG + "MyActivities",
   //@@viewOff:statics
@@ -63,27 +63,30 @@ let MyActivities = createVisualComponent({
     //@@viewOff:private
 
     //@@viewOn:methods
-    const showDialog = useCallback((onConfirm) => {
-      setDialogProps({
-        header: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "header"]} />,
-        icon: "mdi-exit-run",
-        info: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "info"]} />,
-        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-        actionList: [
-          {
-            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: (e) => {
-              setDialogProps(null);
+    const showDialog = useCallback(
+      (onConfirm) => {
+        setDialogProps({
+          header: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "header"]} />,
+          icon: "mdi-exit-run",
+          info: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "info"]} />,
+          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+          actionList: [
+            {
+              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+              onClick: (e) => {
+                setDialogProps(null);
+              },
             },
-          },
-          {
-            children: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "confirm"]} />,
-            onClick: onConfirm,
-            colorScheme: "negative",
-          },
-        ],
-      });
-    }, []);
+            {
+              children: <Lsi import={importLsi} path={["Dialog", "leaveActivity", "confirm"]} />,
+              onClick: onConfirm,
+              colorScheme: "negative",
+            },
+          ],
+        });
+      },
+      [setDialogProps],
+    );
 
     const showModal = useCallback(
       (onSubmit) => {
@@ -103,7 +106,7 @@ let MyActivities = createVisualComponent({
           children: <CreateActivityForm />,
         });
       },
-      [modalProps],
+      [setModalProps],
     );
     //@@viewOff:methods
 
@@ -113,11 +116,11 @@ let MyActivities = createVisualComponent({
     }
 
     function renderError(errorData) {
+      const errorCode = errorData.error?.code;
       switch (errorData.operation) {
         case "load":
         case "loadNext":
         default:
-          const errorCode = errorData.error?.code;
           return (
             <Error
               title={errorLsi[errorCode]?.header || { en: "Something went wrong", cs: "Něco se pokazilo" }}
@@ -176,7 +179,7 @@ let MyActivities = createVisualComponent({
         showModal(async (e) => {
           e.preventDefault();
           try {
-            let activity = await handlerMap.create(e.data.value);
+            const activity = await handlerMap.create(e.data.value);
             setModalProps(null);
             addAlert({
               priority: "success",
@@ -303,7 +306,7 @@ let MyActivities = createVisualComponent({
   },
 });
 
-MyActivities = withRoute(MyActivities, { authenticated: true });
+const MyActivities = withRoute(_MyActivities, { authenticated: true });
 
 //@@viewOn:exports
 export { MyActivities };

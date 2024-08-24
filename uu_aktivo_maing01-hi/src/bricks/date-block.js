@@ -61,7 +61,13 @@ const DateBlock = createVisualComponent({
             </Text>
           )}
         </Grid>
-        <Text category="story" segment="body" type={`${["xs", "s"].includes(screenSize) ? "minor" : "common"}`} bold>
+        <Text
+          category="story"
+          segment="body"
+          type={`${["xs", "s"].includes(screenSize) ? "minor" : "common"}`}
+          bold
+          style={{ textAlign: "right" }}
+        >
           <DateTime value={datetime} dateFormat="long" timeFormat="medium" />
         </Text>
       </Grid>

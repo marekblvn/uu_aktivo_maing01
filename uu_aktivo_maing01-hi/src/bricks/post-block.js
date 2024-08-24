@@ -45,7 +45,7 @@ const PostBlock = createVisualComponent({
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noPosts"] });
     const [dialogProps, setDialogProps] = useState(null);
     const [modalProps, setModalProps] = useState(null);
-    const [initialScroll, setInitialScroll] = useState(576);
+    const [initialScroll, setInitialScroll] = useState(window.innerHeight + 576);
     //@@viewOff:private
 
     const showDeleteDialog = useCallback(
@@ -179,12 +179,7 @@ const PostBlock = createVisualComponent({
 
       return (
         <Fragment>
-          <ScrollableBox
-            maxHeight="576px"
-            minHeight="576px"
-            initialScrollY={window.innerHeight + 576}
-            disableOverscroll
-          >
+          <ScrollableBox maxHeight="576px" minHeight="576px" initialScrollY={initialScroll} disableOverscroll>
             {data && firstNotYetLoadedIndex >= 0 ? (
               <Button
                 children={<Lsi lsi={{ en: "Load older posts", cs: "Načíst starší příspěvky" }} />}

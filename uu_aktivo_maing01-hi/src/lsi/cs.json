@@ -112,6 +112,24 @@
       "confirm": "Smazat"
     }
   },
+  "Forms": {
+    "updateActivity": {
+      "header": "Upravit nastavení aktivity",
+      "submit": "Upravit"
+    },
+    "updateFrequency": {
+      "header": "Změnit frekvenci termínu",
+      "submit": "Změnit"
+    },
+    "updateNotificationOffset": {
+      "header": "Změnit posun upozornění",
+      "submit": "Změnit"
+    },
+    "transferOwnership": {
+      "header": "Převést vlastnictví aktivity",
+      "submit": "Převést"
+    }
+  },
   "Errors": {
     "uu-aktivo-main/activity/create/invalidDtoIn": {
       "header": "Při pokusu o vytvoření aktivity nastala chyba",

@@ -8,7 +8,7 @@ import Calls from "../calls.js";
 import Config from "./config/config.js";
 import Container from "./container.js";
 import MemberList from "./member-list.js";
-import CreateInvitationForm from "./create-invitation-modal.js";
+import CreateInvitationForm from "./create-invitation-form.js";
 import importLsi from "../lsi/import-lsi.js";
 import { CancelButton, SubmitButton } from "uu5g05-forms";
 import FormModal from "./form-modal.js";
@@ -116,7 +116,7 @@ const ActivityMembersView = createVisualComponent({
               </SubmitButton>
             </Grid>
           ),
-          children: ({ style }) => <CreateInvitationForm style={style} members={members} />,
+          children: <CreateInvitationForm members={members} />,
         });
       },
       [setModalProps],
@@ -285,7 +285,7 @@ const ActivityMembersView = createVisualComponent({
           />
         </Grid>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
-        <FormModal {...modalProps} open={!!modalProps} onClose={() => setModalProps(null)} />
+        <FormModal {...modalProps} />
       </Container>
     );
     //@@viewOff:render

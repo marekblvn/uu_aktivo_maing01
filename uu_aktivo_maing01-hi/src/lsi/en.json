@@ -112,6 +112,24 @@
       "confirm": "Delete"
     }
   },
+  "Forms": {
+    "updateActivity": {
+      "header": "Edit activity settings",
+      "submit": "Edit"
+    },
+    "updateFrequency": {
+      "header": "Update datetime frequency",
+      "submit": "Update"
+    },
+    "updateNotificationOffset": {
+      "header": "Update notification offset",
+      "submit": "Update"
+    },
+    "transferOwnership": {
+      "header": "Transfer activity ownership",
+      "submit": "Transfer"
+    }
+  },
   "Errors": {
     "uu-aktivo-main/activity/create/invalidDtoIn": {
       "header": "Error occurred while creating activity",

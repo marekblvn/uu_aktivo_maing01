@@ -51,18 +51,7 @@ const ActivityDetail = createVisualComponent({
 
   render({ data, handlerMap }) {
     //@@viewOn:private
-    const {
-      id,
-      name,
-      location,
-      description,
-      members,
-      administrators,
-      owner,
-      idealParticipants,
-      minParticipants,
-      datetimeId,
-    } = data;
+    const { id, name } = data;
 
     const [, setRoute] = useRoute();
     const { nextRoute, allow } = useRouteLeave();
@@ -101,6 +90,8 @@ const ActivityDetail = createVisualComponent({
       }
     }, [nextRoute, allow]);
 
+    const canAccessSettings = isAuthority || isExecutive || isOwner || isAdministrator;
+
     const tabDirections = {
       info: {
         left: "info",
@@ -112,7 +103,7 @@ const ActivityDetail = createVisualComponent({
       },
       attendance: {
         left: "members",
-        right: isOwner || isAdministrator || isAuthority || isExecutive ? "settings" : "attendance",
+        right: canAccessSettings ? "settings" : "attendance",
       },
       settings: {
         left: "attendance",
@@ -152,7 +143,7 @@ const ActivityDetail = createVisualComponent({
         code: "attendance",
       },
     ];
-    if (isOwner || isAdministrator || isAuthority || isExecutive) {
+    if (canAccessSettings) {
       tabItemList.push({
         label:
           ["xs", "s"].includes(screenSize) && activeTab !== "settings" ? undefined : (
@@ -192,7 +183,7 @@ const ActivityDetail = createVisualComponent({
       });
     };
 
-    const handleUpdateActivityInfo = async ({ value }) => {
+    const handleUpdateActivity = async ({ value }) => {
       return await handlerMap.update({ id, ...value });
     };
 
@@ -233,24 +224,11 @@ const ActivityDetail = createVisualComponent({
     function renderContent() {
       switch (activeTab) {
         case "info":
-          return (
-            <ActivityInformationView
-              description={description}
-              location={location}
-              activityId={id}
-              datetimeId={datetimeId}
-              minParticipants={minParticipants}
-              idealParticipants={idealParticipants}
-              onReload={handleReload}
-            />
-          );
+          return <ActivityInformationView {...data} onReload={handleReload} />;
         case "members":
           return (
             <ActivityMembersView
-              activityId={id}
-              members={members}
-              administrators={administrators}
-              owner={owner}
+              {...data}
               onRemoveMember={handleRemoveMember}
               onPromoteAdmin={handleAddAdministrator}
               onDemoteAdmin={handleRemoveAdministrator}
@@ -261,7 +239,7 @@ const ActivityDetail = createVisualComponent({
           return (
             <ActivitySettingsView
               {...data}
-              onUpdateActivityInfo={handleUpdateActivityInfo}
+              onUpdateActivity={handleUpdateActivity}
               onChangeRecurrence={handleChangeRecurrence}
               onUpdateFrequency={handleUpdateFrequency}
               onUpdateNotificationOffset={handleUpdateNotificationOffset}

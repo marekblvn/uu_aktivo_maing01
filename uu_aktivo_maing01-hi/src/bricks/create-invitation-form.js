@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, Utils } from "uu5g05";
-import { Grid, Modal } from "uu5g05-elements";
-import { CancelButton, Form, FormText, SubmitButton, useFormApi } from "uu5g05-forms";
+import { createVisualComponent } from "uu5g05";
+import { Grid } from "uu5g05-elements";
+import { Form, FormText } from "uu5g05-forms";
 import { PersonalCard } from "uu_plus4upeopleg01-forms";
 import Config from "./config/config.js";
 //@@viewOff:imports
@@ -31,15 +31,14 @@ const CreateInvitationForm = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ members, style }) {
+  render({ members }) {
     //@@viewOn:private
-    const {} = useFormApi();
     //@@viewOff:private
 
     //@@viewOn:render
 
     return (
-      <Form.View style={style}>
+      <Form.View>
         <Grid>
           {/* <PersonalCard.FormSelect disabled={true} /> */}
           <FormText

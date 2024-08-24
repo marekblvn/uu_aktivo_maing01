@@ -92,12 +92,12 @@ const _MyActivities = createVisualComponent({
       (onSubmit) => {
         setModalProps({
           open: true,
-          onClose: () => setModalProps(false),
+          onClose: () => setModalProps(null),
           onSubmit: onSubmit,
           header: <Lsi lsi={{ en: "Create new activity", cs: "Vytvořit novou aktivitu" }} />,
           footer: (
             <Grid templateColumns={{ xs: "repeat(2,1fr)", s: "repeat(2,auto)" }} justifyContent={{ s: "end" }}>
-              <CancelButton onClick={() => setModalProps(false)} />
+              <CancelButton onClick={() => setModalProps(null)} />
               <SubmitButton>
                 <Lsi lsi={{ en: "Create", cs: "Vytvořit" }} />
               </SubmitButton>

@@ -63,31 +63,10 @@ const DatetimeDetail = createVisualComponent({
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
-    const [modalProps, setModalProps] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner } = useActivityAuthorization();
     //@@viewOff:private
-
-    const showModal = useCallback(
-      (onSubmit) => {
-        setModalProps({
-          open: true,
-          onClose: () => setModalProps(null),
-          onSubmit: onSubmit,
-          header: <Lsi import={importLsi} path={["Forms", "createDatetime", "header"]} />,
-          footer: (
-            <Grid templateColumns={{ xs: "repeat(2,1fr)", s: "repeat(2,auto)" }} justifyContent={{ s: "end" }}>
-              <CancelButton onClick={() => setModalProps(null)} />
-              <SubmitButton>
-                <Lsi import={importLsi} path={["Forms", "createDatetime", "submit"]} />
-              </SubmitButton>
-            </Grid>
-          ),
-          children: <CreateDatetimeForm />,
-        });
-      },
-      [setModalProps],
-    );
 
     function renderLoading() {
       return (
@@ -114,28 +93,27 @@ const DatetimeDetail = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
-      const handleCreateDatetime = () =>
-        showModal(async ({ value }) => {
-          try {
-            const createdDatetime = await handlerMap.create({ activityId, ...value });
-            setModalProps(null);
-            const formattedDatetime = new Date(createdDatetime.datetime).toLocaleString(undefined, {
-              dateStyle: "medium",
-              timeStyle: "short",
-            });
-            addAlert({
-              priority: "success",
-              header: { en: "New datetime was successfully created!", cs: "Nový termín by úspěšně vytvořen!" },
-              message: {
-                en: `Every member can now update their participation until ${formattedDatetime}.`,
-                cs: `Každý člen může nyní změnit svoji účast do ${formattedDatetime}.`,
-              },
-            });
-            await onReload(activityId);
-          } catch (error) {
-            showError(error);
-          }
-        });
+      const handleCreateDatetime = async ({ value }) => {
+        try {
+          const createdDatetime = await handlerMap.create({ activityId, ...value });
+          setModalOpen(false);
+          const formattedDatetime = new Date(createdDatetime.datetime).toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          });
+          addAlert({
+            priority: "success",
+            header: { en: "New datetime was successfully created!", cs: "Nový termín by úspěšně vytvořen!" },
+            message: {
+              en: `Every member can now update their participation until ${formattedDatetime}.`,
+              cs: `Každý člen může nyní změnit svoji účast do ${formattedDatetime}.`,
+            },
+          });
+          await onReload(activityId);
+        } catch (error) {
+          showError(error);
+        }
+      };
 
       if (!data)
         return (
@@ -156,12 +134,12 @@ const DatetimeDetail = createVisualComponent({
                 colorScheme="secondary"
                 significance="common"
                 icon="mdi-calendar-plus-outline"
-                onClick={handleCreateDatetime}
+                onClick={() => setModalOpen(true)}
               >
                 <Lsi lsi={{ en: "Create new datetime", cs: "Vytvořit nový termín" }} />
               </Button>
             )}
-            <FormModal {...modalProps} />
+            <CreateDatetimeForm open={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleCreateDatetime} />
           </div>
         );
 

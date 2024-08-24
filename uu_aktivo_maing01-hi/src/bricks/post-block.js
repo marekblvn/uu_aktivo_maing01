@@ -76,7 +76,10 @@ const PostBlock = createVisualComponent({
         onSubmit: onSubmit,
         header: <Lsi import={importLsi} path={["Forms", "updatePost", "header"]} />,
         footer: (
-          <Grid templateColumns={{ xs: "repeat(3,1fr)", s: "repeat(3, auto)" }} justifyContent={{ s: "end" }}>
+          <Grid
+            templateColumns={{ xs: "auto repeat(2,1fr)", s: "repeat(3, auto)" }}
+            justifyContent={{ xs: "center", s: "end" }}
+          >
             <ResetButton icon="uugds-refresh" significance="subdued" />
             <CancelButton onClick={() => setModalProps(null)} />
             <SubmitButton>

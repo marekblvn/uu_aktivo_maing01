@@ -118,10 +118,10 @@ const ActivitySettingsView = createVisualComponent({
           footer: (
             <Grid
               templateColumns={{
-                xs: `repeat(${useCase === "transferOwnership" ? 2 : 3}, 1fr)`,
+                xs: `${useCase === "transferOwnership" ? "" : "auto"} repeat(2, 1fr)`,
                 s: `repeat(${useCase === "transferOwnership" ? 2 : 3}, auto)`,
               }}
-              justifyContent={{ s: "end" }}
+              justifyContent={{ xs: "center", s: "end" }}
             >
               {useCase !== "transferOwnership" ? <ResetButton icon="uugds-refresh" significance="subdued" /> : null}
               <CancelButton onClick={() => setModalProps(null)} />

@@ -448,7 +448,7 @@ class DatetimeAbl {
     const nextDatetimeObject = {
       awid,
       id: datetime.id,
-      activityId: activity.id,
+      activityId: datetime.activityId,
       datetime: nextDatetime,
       notification: nextNotification,
       undecided: activity.members,

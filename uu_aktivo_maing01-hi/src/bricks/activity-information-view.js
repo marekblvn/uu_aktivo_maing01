@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Line, LinkPanel, RichIcon, Text } from "uu5g05-elements";
 import DatetimeDetail from "./datetime-detail.js";
@@ -35,9 +35,10 @@ const ActivityInformationView = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ description, location, minParticipants, idealParticipants, id: activityId, datetimeId, onReload }) {
+  render({ description, location, members, minParticipants, idealParticipants, id: activityId, datetimeId, onReload }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const { identity } = useSession();
     const [openDescription, setOpenDescription] = useState(false);
     //@@viewOff:private
 
@@ -118,6 +119,7 @@ const ActivityInformationView = createVisualComponent({
             idealParticipants={idealParticipants}
             minParticipants={minParticipants}
             onReload={onReload}
+            isMember={members.includes(identity.uuIdentity)}
           />
           <PostBlock activityId={activityId} />
         </Grid>

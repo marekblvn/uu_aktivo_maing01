@@ -55,7 +55,7 @@ const DatetimeDetail = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ idealParticipants, minParticipants, datetimeId, activityId, onReload }) {
+  render({ idealParticipants, minParticipants, isMember, datetimeId, activityId, onReload }) {
     //@@viewOn:private
     const { identity } = useSession();
     const [screenSize] = useScreenSize();
@@ -172,10 +172,12 @@ const DatetimeDetail = createVisualComponent({
             deniedCount={denied.length}
             undecidedCount={undecided.length}
           />
-          <UserStatusBlock
-            onChangeParticipation={handleChangeParticipation}
-            userParticipationType={currentUserParticipationType}
-          />
+          {isMember && (
+            <UserStatusBlock
+              onChangeParticipation={handleChangeParticipation}
+              userParticipationType={currentUserParticipationType}
+            />
+          )}
           <Line colorScheme="neutral" significance="subdued" />
           <ParticipationBlock
             items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}

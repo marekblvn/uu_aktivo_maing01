@@ -104,18 +104,20 @@ let Invitations = createVisualComponent({
       );
     }
 
-    function renderEmpty() {
-      <div>
-        <PlaceholderBox
-          code="items"
-          header={placeholderLsi.header}
-          info={placeholderLsi.info}
-          style={{ marginTop: "10%", padding: "0 16px" }}
-        />
-      </div>;
-    }
-
     function renderReady(data) {
+      if (!data || !data.length) {
+        return (
+          <div>
+            <PlaceholderBox
+              code="items"
+              header={placeholderLsi.header}
+              info={placeholderLsi.info}
+              style={{ marginTop: "10%", padding: "0 16px" }}
+            />
+          </div>
+        );
+      }
+
       const handleDeleteInvitation = (item) => {
         showDeleteDialog(item.data, async (e) => {
           e.preventDefault();
@@ -210,9 +212,8 @@ let Invitations = createVisualComponent({
               case "errorNoData":
                 return renderError(errorData);
               case "ready":
-                return renderReady(data);
               case "readyNoData":
-                return renderEmpty();
+                return renderReady(data);
             }
           }}
         </InvitationListProvider>

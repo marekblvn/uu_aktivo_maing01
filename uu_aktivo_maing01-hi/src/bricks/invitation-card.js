@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useTimeZone } from "uu5g05";
+import { createVisualComponent, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { ActionGroup, Box, ButtonGroup, DateTime, Text } from "uu5g05-elements";
+import { ActionGroup, Box, DateTime, Grid, Text } from "uu5g05-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -32,103 +32,46 @@ const InvitationCard = createVisualComponent({
   render({ data, onInvitationAccept, onInvitationDelete }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
-    const [timeZone] = useTimeZone();
-    const buttonGroupList = [
+    const itemList = [
       {
-        children: <Lsi lsi={{ en: "Accept", cs: "Přijmout" }} />,
         icon: "mdi-check",
         onClick: onInvitationAccept,
         colorScheme: "positive",
-        significance: "common",
+        significance: "subdued",
       },
       {
-        children: <Lsi lsi={{ en: "Decline", cs: "Odmítnout" }} />,
         icon: "mdi-close",
         onClick: onInvitationDelete,
         colorScheme: "negative",
-        significance: "common",
-      },
-    ];
-
-    const iconGroupList = [
-      {
-        icon: "mdi-check",
-        onClick: onInvitationAccept,
-      },
-      {
-        icon: "mdi-close",
-        onClick: onInvitationDelete,
+        significance: "subdued",
       },
     ];
     //@@viewOff:private
 
-    function provideButtonGroupList(screenSize) {
-      if (screenSize === "s") {
-        return iconGroupList;
-      }
-      return buttonGroupList;
-    }
-
     //@@viewOn:render
     return (
-      <Box
-        style={{
-          display: ["xs"].includes(screenSize) ? "grid" : "flex",
-          justifyContent: ["xs"].includes(screenSize) ? "center" : "space-between",
-          alignItems: "center",
-          padding: ["xs"].includes(screenSize) ? "16px 24px" : "10px 10px 10px 16px",
-          borderRadius: "8px",
-          rowGap: "16px",
-        }}
-        shape="ground"
-        colorScheme="neutral"
-        width="100%"
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            columnGap: "16px",
-            justifyContent: ["xs"].includes(screenSize) ? "space-between" : "center",
-          }}
-        >
-          <Text
-            category="interface"
-            segment="content"
-            type={`${["xs", "s"].includes(screenSize) ? "medium" : "large"}`}
-            autoFit
-            bold
-            colorScheme="neutral"
-            significance="common"
+      <Box borderRadius="moderate" style={{ padding: "8px 16px" }}>
+        <Grid templateColumns={{ xs: "auto auto" }} templateRows={{ xs: "100%" }}>
+          <Grid
+            templateColumns={{ xs: "100%", m: "auto auto" }}
+            templateRows={{ xs: "1fr 1fr", m: "100%" }}
+            alignItems="center"
+            rowGap="2px"
           >
-            {data.activityName}
-          </Text>
-          <Text
-            category="interface"
-            segment="content"
-            type={`${["xs", "s"].includes(screenSize) ? "small" : "medium"}`}
-            autoFit
-          >
-            <DateTime
-              value={data.createdAt}
-              timeZone={timeZone}
-              timeFormat="short"
-              dateFormat="short"
-              style={{ paddingRight: "8px", textAlign: ["xs"].includes(screenSize) ? "right" : "left" }}
-            />
-          </Text>
-        </div>
-        {["xl", "l", "m", "s"].includes(screenSize) ? (
-          <ActionGroup
-            colorScheme="neutral"
-            significance="subdued"
-            itemList={buttonGroupList}
-            size={screenSize === "xl" ? "l" : screenSize}
-            alignment="right"
-          />
-        ) : (
-          <ButtonGroup itemList={provideButtonGroupList(screenSize)} size={screenSize === "xs" ? "m" : screenSize} />
-        )}
+            <Text category="interface" segment="content" type="medium" bold={!["xs", "s"].includes(screenSize)}>
+              {data.activityName}
+            </Text>
+            <Text
+              category="interface"
+              segment="content"
+              type={["xs", "s"].includes(screenSize) ? "small" : "medium"}
+              colorScheme="neutral"
+            >
+              <DateTime value={data.createdAt} />
+            </Text>
+          </Grid>
+          <ActionGroup itemList={itemList} />
+        </Grid>
       </Box>
     );
     //@@viewOff:render

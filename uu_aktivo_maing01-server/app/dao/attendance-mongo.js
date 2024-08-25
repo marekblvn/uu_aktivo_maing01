@@ -9,6 +9,9 @@ class AttendanceMongo extends UuObjectDao {
   async createSchema() {
     await super.createIndex({ awid: 1, _id: 1 }, { unique: true });
     await super.createIndex({ awid: 1, activityId: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, activityId: 1, datetime: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, activityId: 1, datetime: 1, archived: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, datetimeId: 1 }, { unique: false });
   }
 
   /**
@@ -45,6 +48,29 @@ class AttendanceMongo extends UuObjectDao {
       id: uuObject.id,
     };
     return await super.findOneAndUpdate(filter, uuObject, "NONE");
+  }
+
+  async updateMany(awid, filterObject, updateObject) {
+    let filter = {
+      awid,
+      ...filterObject,
+    };
+    let aggregationPipeline = [
+      {
+        $match: filter,
+      },
+      {
+        $set: { ...updateObject },
+      },
+      {
+        $merge: {
+          into: "attendance",
+          whenMatched: "merge",
+          whenNotMatched: "discard",
+        },
+      },
+    ];
+    return await super.aggregate(aggregationPipeline);
   }
 
   /**

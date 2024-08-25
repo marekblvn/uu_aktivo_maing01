@@ -66,8 +66,11 @@ class AttendanceAbl {
     const attendanceObject = {
       awid,
       ...datetime,
-      notification: undefined,
+      datetimeId: dtoIn.datetimeId,
+      archived: false,
     };
+
+    delete attendanceObject.notification;
 
     let dtoOut;
     try {
@@ -124,17 +127,18 @@ class AttendanceAbl {
     const { filters } = dtoIn || {};
     const queryFilters = {};
     if (filters) {
-      const { after, before, activityId } = filters;
+      const { after, before, activityId, archived } = filters;
       if (activityId) {
         queryFilters.activityId = activityId;
       }
       if (after) {
-        queryFilters.datetime = { $gte: after };
+        queryFilters.datetime = { $gte: new Date(after) };
       }
       if (before) {
         queryFilters.datetime = queryFilters.datetime || {};
-        queryFilters.datetime.$lt = before;
+        queryFilters.datetime.$lt = new Date(before);
       }
+      queryFilters.archived = archived;
     }
 
     let dtoOut;
@@ -194,7 +198,7 @@ class AttendanceAbl {
     const { filters } = dtoIn;
     const queryFilters = {};
     if (filters) {
-      const { after, before, activityId } = filters;
+      const { after, before, activityId, archived } = filters;
       if (activityId) {
         queryFilters.activityId = activityId;
       }
@@ -205,6 +209,7 @@ class AttendanceAbl {
         queryFilters.datetime = queryFilters.datetime || {};
         queryFilters.datetime.$lt = new Date(before);
       }
+      queryFilters.archived = archived;
     }
 
     let sort = null;

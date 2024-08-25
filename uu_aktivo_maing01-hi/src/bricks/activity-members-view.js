@@ -1,7 +1,29 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCall, useCallback, useScreenSize, useState } from "uu5g05";
-import { useAlertBus, PersonItem } from "uu_plus4u5g02-elements";
-import { Button, Dialog, Grid } from "uu5g05-elements";
+import {
+  AutoLoad,
+  createVisualComponent,
+  Fragment,
+  Lsi,
+  useCall,
+  useCallback,
+  useLsi,
+  useScreenSize,
+  useState,
+} from "uu5g05";
+import { useAlertBus, PersonItem, Error } from "uu_plus4u5g02-elements";
+import {
+  ActionGroup,
+  Box,
+  DateTime,
+  Dialog,
+  Grid,
+  Icon,
+  Line,
+  LinkPanel,
+  Pending,
+  PlaceholderBox,
+  Text,
+} from "uu5g05-elements";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import Calls from "../calls.js";
@@ -9,9 +31,11 @@ import Config from "./config/config.js";
 import Container from "./container.js";
 import MemberList from "./member-list.js";
 import CreateInvitationForm from "./create-invitation-form.js";
+import InvitationListProvider from "../providers/invitation-list-provider.js";
 import importLsi from "../lsi/import-lsi.js";
 import { CancelButton, SubmitButton } from "uu5g05-forms";
 import FormModal from "./form-modal.js";
+import { List, Table } from "uu5tilesg02-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -20,12 +44,14 @@ const DIALOG_ICONS = {
   removeAdministrator: "mdi-star-minus",
   removeMember: "mdi-account-remove",
   leaveActivity: "mdi-exit-run",
+  deleteInvitation: "mdi-email-remove-outline",
 };
 const DIALOG_COLOR = {
   addAdministrator: "primary",
   removeAdministrator: "negative",
   removeMember: "negative",
   leaveActivity: "negative",
+  deleteInvitation: "negative",
 };
 //@@viewOff:constants
 
@@ -64,12 +90,14 @@ const ActivityMembersView = createVisualComponent({
   }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
-    const { addAlert, showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const { call: callInvitationCreate } = useCall(Calls.Invitation.create);
+    const { addAlert, showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
+    const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner, isAdministrator } = useActivityAuthorization();
     const [dialogProps, setDialogProps] = useState(null);
     const [modalProps, setModalProps] = useState(null);
+    const [openInvitations, setOpenInvitations] = useState(false);
     const membersFiltered = members.filter((item) => !administrators.includes(item) && item !== owner);
     //@@viewOff:private
 
@@ -228,12 +256,124 @@ const ActivityMembersView = createVisualComponent({
     };
 
     //@@viewOn:render
+    function renderLoading() {
+      return <Pending size="xl" colorScheme="primary" />;
+    }
+
+    function renderError(errorData) {
+      switch (errorData.operation) {
+        case "load":
+        case "loadNext":
+          const errorCode = errorData.error?.code;
+          return (
+            <Error title={errorLsi[errorCode]?.header} subtitle={errorLsi[errorCode]?.info} error={errorData.error} />
+          );
+      }
+    }
+
+    function renderReady(data, handlerMap) {
+      const handleDeleteInvitation = (item) =>
+        showDialog("deleteInvitation", async (e) => {
+          e.preventDefault();
+          try {
+            await item.handlerMap.delete({ id: item.id });
+            setDialogProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Invitation deleted", cs: "Pozvánka smazána" },
+              message: { en: "You successfully deleted an invitation.", cs: "Úspěšně jste smazali pozvánku." },
+            });
+          } catch (error) {
+            showError(error);
+          }
+        });
+
+      const getActionList = ({ rowIndex, data }) => {
+        return [
+          {
+            icon: "mdi-email-remove-outline",
+            tooltip: { en: "Delete invitation", cs: "Smazat pozvánku" },
+            onClick: () => handleDeleteInvitation(data),
+          },
+        ];
+      };
+
+      const dataToRender = data.map((item) => ({ ...item.data, handlerMap: item.handlerMap }));
+
+      return (
+        <Fragment>
+          <ActionGroup
+            itemList={[
+              {
+                icon: "uugds-refresh",
+                onClick: () => handlerMap.load(),
+              },
+            ]}
+            size="s"
+            style={{ margin: "-12px 0 4px" }}
+          />
+          <List
+            data={dataToRender}
+            verticalAlignment="center"
+            getActionList={getActionList}
+            emptyState={
+              <PlaceholderBox
+                code="items"
+                header={{ en: "No invitations to display", cs: "Žádné pozvánky k zobrazení" }}
+                info={{
+                  en: "There are no active invitations to this activity.",
+                  cs: "Neexistují žádné aktivní pozvánky do této aktivity.",
+                }}
+              />
+            }
+            columnList={[
+              {
+                value: "uuIdentity",
+                header: <Lsi lsi={{ en: "User", cs: "Uživatel" }} />,
+                cell: ({ data }) => (
+                  <PersonItem
+                    uuIdentity={data.uuIdentity}
+                    subtitle={isAuthority || isExecutive ? data.uuIdentity : null}
+                  />
+                ),
+              },
+              {
+                value: "createdAt",
+                header: <Lsi lsi={{ en: "Invitation created", cs: "Pozván" }} />,
+                cell: ({ data }) => <DateTime value={data.createdAt} timeFormat="short" />,
+              },
+            ]}
+          >
+            {({ data }) => {
+              return (
+                <Box borderRadius="moderate" style={{ padding: "8px", display: "flex" }}>
+                  <PersonItem
+                    uuIdentity={data.uuIdentity}
+                    subtitle={<DateTime value={data.createdAt} />}
+                    direction="vertical"
+                  />
+                  <ActionGroup
+                    itemList={[
+                      {
+                        icon: "mdi-email-remove-outline",
+                        onClick: () => handleDeleteInvitation(data),
+                      },
+                    ]}
+                  />
+                </Box>
+              );
+            }}
+          </List>
+          <AutoLoad data={data} handleLoadNext={handlerMap.loadNext} distance={window.innerHeight} />
+        </Fragment>
+      );
+    }
 
     return (
       <Container
         style={{
           width: "100%",
-          padding: "12px 8px 10px",
+          padding: "12px 16px 24px",
           border: "solid 1px rgb(33,33,33, 0.11)",
           borderTop: "none",
           borderBottomLeftRadius: "8px",
@@ -241,49 +381,60 @@ const ActivityMembersView = createVisualComponent({
           height: "100%",
         }}
       >
-        <Grid templateColumns="1fr">
-          {(isOwner || isAdministrator || isAuthority || isExecutive) && (
-            <Button
-              style={{ marginLeft: "auto" }}
-              icon="mdi-account-plus"
-              colorScheme="primary"
-              size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
-              onClick={handleOpenCreateInvitationModal}
-              tooltip={{ en: "Invite user to activity", cs: "Pozvat uživatele do aktivity" }}
-            />
-          )}
-          <MemberList
-            items={[owner]}
-            colorScheme="primary"
-            lsiTitle={{ en: "Activity owner", cs: "Vlastník aktivity" }}
-            icon="mdi-crown"
-            iconColor="rgb(218,165,32)"
+        {(isOwner || isAdministrator || isAuthority || isExecutive) && (
+          <ActionGroup
+            itemList={[
+              {
+                icon: "mdi-account-plus",
+                children: ["xs", "s"].includes(screenSize) ? null : (
+                  <Lsi lsi={{ en: "Invite user", cs: "Pozvat uživatele" }} />
+                ),
+                tooltip: { en: "Invite user to activity", cs: "Pozvat uživatele do aktivity" },
+                onClick: handleOpenCreateInvitationModal,
+              },
+            ]}
           />
-          <MemberList
-            items={administrators}
-            colorScheme="secondary"
-            lsiTitle={{ en: "Administrators", cs: "Správci" }}
-            icon="mdi-star"
-            iconColor="rgb(117, 145, 170)"
-            collapsible={true}
-            onRemoveMember={handleRemoveMember}
-            onPromoteAdmin={() => {}}
-            onDemoteAdmin={handleDemoteAdmin}
-            onLeaveActivity={handleLeaveActivity}
-          />
-          <MemberList
-            items={membersFiltered}
-            colorScheme="neutral"
-            lsiTitle={{ en: "Members", cs: " Členové" }}
-            icon="mdi-account"
-            iconColor="rgb(128,128,128)"
-            collapsible={true}
-            onRemoveMember={handleRemoveMember}
-            onPromoteAdmin={handlePromoteAdmin}
-            onDemoteAdmin={() => {}}
-            onLeaveActivity={handleLeaveActivity}
-          />
-        </Grid>
+        )}
+        <MemberList
+          owner={owner}
+          administrators={administrators}
+          members={membersFiltered}
+          onPromoteAdmin={handlePromoteAdmin}
+          onDemoteAdmin={handleDemoteAdmin}
+          onRemoveMember={handleRemoveMember}
+          onLeaveActivity={handleLeaveActivity}
+        />
+        {(isAdministrator || isOwner || isAuthority || isExecutive) && (
+          <Fragment>
+            <Line colorScheme="neutral" significance="subdued" margin="16px 0" />
+            <LinkPanel
+              open={openInvitations}
+              onChange={(e) => setOpenInvitations(e.data.open)}
+              header={
+                <Text category="interface" segment="highlight" type="common" autoFit>
+                  <Icon icon={"mdi-card-account-mail-outline"} colorScheme={"neutral"} margin={{ right: "4px" }} />
+                  <Lsi lsi={{ en: "Invited users", cs: "Pozvaní uživatelé" }} />
+                </Text>
+              }
+            >
+              <InvitationListProvider filters={{ activityId: activityId }} pageSize={10}>
+                {({ state, data, pendingData, errorData, handlerMap }) => {
+                  switch (state) {
+                    case "pendingNoData":
+                      return renderLoading();
+                    case "error":
+                    case "errorNoData":
+                      return renderError(errorData);
+                    case "pending":
+                    case "ready":
+                    case "readyNoData":
+                      return renderReady(data, handlerMap);
+                  }
+                }}
+              </InvitationListProvider>
+            </LinkPanel>
+          </Fragment>
+        )}
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
         <FormModal {...modalProps} />
       </Container>

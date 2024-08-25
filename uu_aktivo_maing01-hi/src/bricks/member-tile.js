@@ -1,8 +1,8 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { ActionGroup, Box, Grid, Text } from "uu5g05-elements";
-import { PersonItem } from "uu_plus4u5g02-elements";
+import { ActionGroup, Box, Grid, RichIcon, Text } from "uu5g05-elements";
+import { PersonItem, PersonPhoto, usePersonPhoto } from "uu_plus4u5g02-elements";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
@@ -19,9 +19,9 @@ const Css = {
 //@@viewOn:helpers
 //@@viewOff:helpers
 
-const MemberItem = createVisualComponent({
+const MemberTile = createVisualComponent({
   //@@viewOn:statics
-  uu5Tag: Config.TAG + "MemberItem",
+  uu5Tag: Config.TAG + "MemberTile",
   //@@viewOff:statics
 
   //@@viewOn:propTypes
@@ -37,9 +37,8 @@ const MemberItem = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ uuIdentity, colorScheme, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity }) {
+  render({ uuIdentity, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity }) {
     //@@viewOn:private
-    const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner, isAdministrator, checkIfAdministrator, checkIfOwner } = useActivityAuthorization();
@@ -53,7 +52,6 @@ const MemberItem = createVisualComponent({
       tooltip: { en: "Leave Activity", cs: "Opustit aktivitu" },
       collapsed: "always",
       colorScheme: "negative",
-      significance: "common",
     };
 
     const promoteAdminAction = {
@@ -62,9 +60,7 @@ const MemberItem = createVisualComponent({
       onClick: () => onPromoteAdmin(uuIdentity),
       order: -1,
       tooltip: { en: "Promote to administrator", cs: "Povýšit na správce" },
-      collapsed: ["xs", "s"].includes(screenSize),
-      colorScheme: ["xs", "s"].includes(screenSize) ? "warning" : "neutral",
-      significance: ["xs", "s"].includes(screenSize) ? "common" : "subdued",
+      collapsed: "always",
     };
 
     const demoteAdminAction = {
@@ -73,9 +69,8 @@ const MemberItem = createVisualComponent({
       onClick: () => onDemoteAdmin(uuIdentity),
       order: 0,
       tooltip: { en: "Demote administrator", cs: "Odebrat správcovství" },
-      collapsed: ["xs", "s"].includes(screenSize),
+      collapsed: "always",
       colorScheme: "neutral",
-      significance: ["xs", "s"].includes(screenSize) ? "common" : "subdued",
     };
 
     const removeMemberAction = {
@@ -86,7 +81,6 @@ const MemberItem = createVisualComponent({
       tooltip: { en: "Remove member", cs: "Odebrat člena" },
       collapsed: "always",
       colorScheme: "negative",
-      significance: "common",
     };
 
     const itemList = (() => {
@@ -122,34 +116,10 @@ const MemberItem = createVisualComponent({
 
     //@@viewOn:render
     return (
-      <Box
-        colorScheme={colorScheme}
-        shape="ground"
-        significance="distinct"
-        borderRadius="moderate"
-        style={{ padding: "4px" }}
-        size={["xl", "l"].includes(screenSize) ? "l" : screenSize === "m" ? "m" : "s"}
-      >
-        <Grid templateColumns={{ xs: "3fr 1fr", m: "3fr 2fr" }}>
-          <div style={{ display: "flex", alignItems: "center", columnGap: "8px" }}>
-            <PersonItem
-              uuIdentity={uuIdentity}
-              size={["xl", "l"].includes(screenSize) ? "l" : screenSize === "m" ? "m" : "s"}
-            />
-            {identity.uuIdentity === uuIdentity && (
-              <Text category="interface" segment="content" type="small">
-                <Lsi lsi={{ en: "(You)", cs: "(Vy)" }} />
-              </Text>
-            )}
-          </div>
-          <ActionGroup
-            alignment="right"
-            itemList={itemList}
-            collapsedMenuProps={{
-              colorScheme: "neutral",
-              significance: "subdued",
-            }}
-          />
+      <Box shape="ground" borderRadius="moderate" style={{ padding: "8px", margin: "8px" }}>
+        <Grid templateRows={{ xs: "100%" }} templateColumns={{ xs: "auto 36px" }}>
+          <PersonItem uuIdentity={uuIdentity} subtitle={isAuthority || isExecutive ? uuIdentity : null} />
+          <ActionGroup itemList={itemList} alignment="left" />
         </Grid>
       </Box>
     );
@@ -158,6 +128,6 @@ const MemberItem = createVisualComponent({
 });
 
 //@@viewOn:exports
-export { MemberItem };
-export default MemberItem;
+export { MemberTile };
+export default MemberTile;
 //@@viewOff:exports

@@ -1,16 +1,80 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useEffect, useLsi, useScreenSize, useState } from "uu5g05";
 import { Error } from "uu_plus4u5g02-elements";
-import { ActionGroup, Line, Pending, PlaceholderBox } from "uu5g05-elements";
+import { ActionGroup, Block, CollapsibleBox, Pending } from "uu5g05-elements";
 import { DateRange } from "uu5g05-forms";
 import Config from "./config/config.js";
 import Container from "./container.js";
 import AttendanceListProvider from "../providers/attendance-list-provider.js";
 import AttendanceList from "./attendance-list.js";
 import importLsi from "../lsi/import-lsi.js";
+import { ControllerProvider } from "uu5tilesg02";
+import { FormSerieManager, SerieButton, SerieManagerModal, SorterBar, SorterButton } from "uu5tilesg02-controls";
 //@@viewOff:imports
 
 //@@viewOn:constants
+const SERIE_LIST = [
+  {
+    value: "uuIdentity",
+    label: { en: "Member", cs: "Člen" },
+    visible: "always",
+    fixed: "start",
+  },
+  {
+    value: "confirmedCount",
+    label: { en: "Came", cs: "Přišel(a)" },
+    visible: true,
+  },
+  {
+    value: "confirmedPercentage",
+    label: { en: "Percentage of attended datetimes", cs: "Podíl navštívených termínů" },
+    visible: false,
+  },
+  {
+    value: "undecidedCount",
+    label: { en: "Didn't decide", cs: "Nerozhodl(a) se" },
+    visible: true,
+  },
+  {
+    value: "undecidedPercentage",
+    label: { en: "Percentage of undecided datetimes", cs: "Podíl nerozhodnutých termínů" },
+    visible: false,
+  },
+  {
+    value: "deniedCount",
+    label: { en: "Didn't come", cs: "Nepřišel(a)" },
+    visible: true,
+  },
+  {
+    value: "deniedPercentage",
+    label: { en: "Percentage of unattended datetimes", cs: "Podíl nenavštívených termínů" },
+    visible: false,
+  },
+  {
+    value: "total",
+    label: { en: "Total datetimes", cs: "Celkem termínů" },
+    visible: "always",
+    fixed: "end",
+  },
+];
+
+const SORTER_LIST = [
+  {
+    key: "confirmedCount",
+    label: <Lsi lsi={{ en: "Came", cs: "Přišel(a)" }} />,
+    sort: (a, b) => a.confirmedCount - b.confirmedCount,
+  },
+  {
+    key: "undecidedCount",
+    label: <Lsi lsi={{ en: "Didn't decide", cs: "Nerozhodl(a) se" }} />,
+    sort: (a, b) => a.undecidedCount - b.undecidedCount,
+  },
+  {
+    key: "deniedCount",
+    label: <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel(a)" }} />,
+    sort: (a, b) => a.deniedCount - b.deniedCount,
+  },
+];
 //@@viewOff:constants
 
 //@@viewOn:css
@@ -40,27 +104,17 @@ const ActivityAttendanceView = createVisualComponent({
     const [screenSize] = useScreenSize();
     const [dateRange, setDateRange] = useState(undefined);
     const [dateFilter, setDateFilter] = useState({ before: undefined, after: undefined });
-    const [sort, setSort] = useState({});
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
+    const [collapseDateRange, setCollapseDateRange] = useState(true);
+    const [serieList, setSerieList] = useState(SERIE_LIST);
+    const [sorterList, setSorterList] = useState();
     //@@viewOff:private
 
-    const handleChangeDateRange = ({ data }) => {
-      setDateRange(data.value);
-    };
-
-    const handleLoadAttendance = () => {
-      if (dateRange != undefined) {
+    useEffect(() => {
+      if (dateRange?.filter((i) => i != null).length === 2) {
         setDateFilter({ after: dateRange[0], before: dateRange[1] });
       }
-    };
-
-    const handleChangeSort = (key, order) => {
-      if (sort[key] === order) {
-        return setSort({});
-      }
-      return setSort({ [key]: order });
-    };
-
+    }, [dateRange]);
     //@@viewOn:render
 
     function renderError(errorData) {
@@ -80,32 +134,79 @@ const ActivityAttendanceView = createVisualComponent({
     }
 
     function renderReady(data) {
-      if (!data || data.length === 0)
-        return (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+      if (!data) {
+        data = [];
+      }
+
+      const dataToRender = data
+        .filter((item) => item != null)
+        .map((item) => ({
+          ...item.data,
+          confirmedPercentage: (item.data.confirmedCount / item.data.total) * 100,
+          undecidedPercentage: (item.data.undecidedCount / item.data.total) * 100,
+          deniedPercentage: (item.data.deniedCount / item.data.total) * 100,
+        }));
+
+      return (
+        <ControllerProvider
+          data={dataToRender}
+          itemIdentifier="uuIdentity"
+          selectable="none"
+          serieList={serieList}
+          onSerieChange={(e) => setSerieList(e.data.serieList)}
+          sorterDefinitionList={SORTER_LIST}
+          sorterList={sorterList}
+          onSorterChange={(e) => setSorterList(e.data.sorterList)}
+        >
+          <Block
+            actionList={[
+              {
+                icon: "mdi-calendar",
+                onClick: () => setCollapseDateRange(!collapseDateRange),
+              },
+              { component: <SorterButton type="bar" /> },
+              { component: <SerieButton /> },
+            ]}
           >
-            <PlaceholderBox
-              code="items"
-              header={{ en: "No attendance to display", cs: "Žádná docházka k zobrazení" }}
-              info={{
-                en: "There is no attendance matching the specified parameters.",
-                cs: "Neexistuje žádná docházka vyhovující zadaným parametrům.",
-              }}
-            />
-          </div>
-        );
-
-      const dataToRender = data.filter((item) => item != null).map((item) => item.data);
-
-      return <AttendanceList itemList={dataToRender} dateRange={dateFilter} />;
+            <CollapsibleBox collapsed={collapseDateRange}>
+              <div
+                style={{
+                  display: "flex",
+                  marginLeft: "16px",
+                  padding: "8px 0px",
+                  marginRight: "16px",
+                  justifyContent: "start",
+                }}
+              >
+                <DateRange
+                  displayWeekNumbers={true}
+                  weekStartDay={1}
+                  value={dateRange}
+                  onChange={(e) => setDateRange(e.data.value)}
+                  format="D/M/YY"
+                  style={{
+                    minWidth: ["xl", "l", "m", "s"].includes(screenSize) ? "300px" : "160px",
+                  }}
+                />
+                <ActionGroup
+                  itemList={[
+                    {
+                      icon: "uugds-close",
+                      onClick: () => setCollapseDateRange(true),
+                      colorScheme: "neutral",
+                    },
+                  ]}
+                />
+              </div>
+            </CollapsibleBox>
+            <SerieManagerModal>
+              <FormSerieManager />
+            </SerieManagerModal>
+            <SorterBar />
+            <AttendanceList />
+          </Block>
+        </ControllerProvider>
+      );
     }
 
     return (
@@ -120,137 +221,21 @@ const ActivityAttendanceView = createVisualComponent({
           height: "100%",
         }}
       >
-        <ActionGroup
-          itemList={[
-            {
-              icon: "mdi-magnify",
-              colorScheme: "primary",
-              disabled: !dateRange,
-              tooltip: !dateRange
-                ? { en: "Please select a date range first", cs: "Prosím vyberte datové rozmezí" }
-                : "",
-              onClick: handleLoadAttendance,
-            },
-            {
-              children: (
-                <DateRange
-                  displayWeekNumbers={true}
-                  weekStartDay={1}
-                  value={dateRange}
-                  onChange={handleChangeDateRange}
-                  size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
-                  format="D/M/YY"
-                  style={{
-                    width: ["xs"].includes(screenSize) ? "auto" : "300px",
-                    minWidth: "140px",
-                  }}
-                />
-              ),
-            },
-            {
-              icon: "mdi-sort",
-              iconNotification:
-                Object.keys(sort).length > 0
-                  ? sort["confirmedCount"]
-                    ? { colorScheme: "positive" }
-                    : sort["undecidedCount"]
-                      ? { colorScheme: "neutral" }
-                      : { colorScheme: "negative" }
-                  : false,
-              children: <Lsi lsi={{ en: "Sort by", cs: "Seřadit podle" }} />,
-              openPosition: "bottom-center",
-              colorScheme: "building",
-              itemList: [
-                {
-                  icon: "uugdsstencil-communication-thumb-up",
-                  children: <Lsi lsi={{ en: "Came", cs: "Přišel/la" }} />,
-                  colorScheme: "positive",
-                  significance: sort["confirmedCount"] ? "highlighted" : "common",
-                  collapsible: true,
-                  initialCollapsed: !sort["confirmedCount"],
-                  itemList: [
-                    {
-                      icon: "mdi-arrow-up-thin",
-                      children: <Lsi lsi={{ en: "Ascending", cs: "Vzestupně" }} />,
-                      onClick: () => handleChangeSort("confirmedCount", 1),
-                      iconRight: sort["confirmedCount"] === 1 ? "mdi-check" : "",
-                    },
-                    {
-                      icon: "mdi-arrow-down-thin",
-                      children: <Lsi lsi={{ en: "Descending", cs: "Sestupně" }} />,
-                      onClick: () => handleChangeSort("confirmedCount", -1),
-                      iconRight: sort["confirmedCount"] === -1 ? "mdi-check" : "",
-                    },
-                  ],
-                },
-                {
-                  icon: "uugds-help",
-                  children: <Lsi lsi={{ en: "Did not decide", cs: "Nerozhodl/la se" }} />,
-                  colorScheme: "neutral",
-                  significance: sort["undecidedCount"] ? "highlighted" : "common",
-                  collapsible: true,
-                  initialCollapsed: !sort["undecidedCount"],
-                  itemList: [
-                    {
-                      icon: "mdi-arrow-up-thin",
-                      children: <Lsi lsi={{ en: "Ascending", cs: "Vzestupně" }} />,
-                      onClick: () => handleChangeSort("undecidedCount", 1),
-                      iconRight: sort["undecidedCount"] === 1 ? "mdi-check" : "",
-                    },
-                    {
-                      icon: "mdi-arrow-down-thin",
-                      children: <Lsi lsi={{ en: "Descending", cs: "Sestupně" }} />,
-                      onClick: () => handleChangeSort("undecidedCount", -1),
-                      iconRight: sort["undecidedCount"] === -1 ? "mdi-check" : "",
-                    },
-                  ],
-                },
-                {
-                  icon: "uugdsstencil-communication-thumb-down",
-                  children: <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel/la" }} />,
-                  colorScheme: "negative",
-                  significance: sort["deniedCount"] ? "highlighted" : "common",
-                  collapsible: true,
-                  initialCollapsed: !sort["deniedCount"],
-                  itemList: [
-                    {
-                      icon: "mdi-arrow-up-thin",
-                      children: <Lsi lsi={{ en: "Ascending", cs: "Vzestupně" }} />,
-                      onClick: () => handleChangeSort("deniedCount", 1),
-                      iconRight: sort["deniedCount"] === 1 ? "mdi-check" : "",
-                      pressed: sort["deniedCount"] === 1,
-                    },
-                    {
-                      icon: "mdi-arrow-down-thin",
-                      children: <Lsi lsi={{ en: "Descending", cs: "Sestupně" }} />,
-                      onClick: () => handleChangeSort("deniedCount", -1),
-                      iconRight: sort["deniedCount"] === -1 ? "mdi-check" : "",
-                      pressed: sort["deniedCount"] === -1,
-                    },
-                  ],
-                },
-              ],
-            },
-          ]}
-        />
-        <Line margin="12px 0 6px" significance="subdued" />
-        <div style={{ padding: "2px 8px" }}>
-          <AttendanceListProvider activityId={activityId} dateFilter={dateFilter} sort={sort}>
-            {({ state, data, errorData, pendingData, handlerMap }) => {
-              switch (state) {
-                case "pending":
-                case "pendingNoData":
-                  return <Pending size="max" colorScheme="secondary" />;
-                case "error":
-                case "errorNoData":
-                  return renderError(errorData);
-                case "ready":
-                case "readyNoData":
-                  return renderReady(data);
-              }
-            }}
-          </AttendanceListProvider>
-        </div>
+        <AttendanceListProvider activityId={activityId} dateFilter={dateFilter}>
+          {({ state, data, errorData, pendingData, handlerMap }) => {
+            switch (state) {
+              case "pending":
+              case "pendingNoData":
+                return <Pending size="max" colorScheme="secondary" />;
+              case "error":
+              case "errorNoData":
+                return renderError(errorData);
+              case "ready":
+              case "readyNoData":
+                return renderReady(data);
+            }
+          }}
+        </AttendanceListProvider>
       </Container>
     );
     //@@viewOff:render

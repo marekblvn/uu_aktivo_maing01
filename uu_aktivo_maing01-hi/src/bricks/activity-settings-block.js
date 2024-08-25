@@ -68,11 +68,11 @@ const ActivitySettingsBlock = createVisualComponent({
             },
             {
               label: { en: "Location", cs: "Lokace" },
-              children: location || "-",
+              children: location || "—",
             },
             {
               label: { en: "Description", cs: "Popis" },
-              children: description || "-",
+              children: description || "—",
             },
             {
               label: { en: "Min. number of participants", cs: "Min. počet účastníků" },

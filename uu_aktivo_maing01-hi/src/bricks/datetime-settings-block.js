@@ -89,7 +89,7 @@ const DatetimeSettingsBlock = createVisualComponent({
               },
               {
                 label: { en: "Datetime recurrence frequency", cs: "Frekvence opakování termínu" },
-                children: <Lsi lsi={FREQUENCY_LSI[optionIndex]} />,
+                children: Object.keys(frequency).length > 0 ? <Lsi lsi={FREQUENCY_LSI[optionIndex]} /> : "—",
                 actionList:
                   canEditAndDelete && recurrent
                     ? [

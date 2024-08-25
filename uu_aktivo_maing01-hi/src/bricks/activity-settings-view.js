@@ -281,7 +281,7 @@ const ActivitySettingsView = createVisualComponent({
     return (
       <Container
         style={{
-          width: "auto",
+          width: "100%",
           padding: "16px 24px 10px",
           border: "solid 1px rgb(33,33,33, 0.11)",
           borderTop: "none",

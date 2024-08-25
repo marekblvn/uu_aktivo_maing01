@@ -1,8 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useState } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi } from "uu5g05";
 import Config from "./config/config.js";
-import { Box, CollapsibleBox, Grid, Icon, Text } from "uu5g05-elements";
-import MemberItem from "./member-item.js";
+import { Grid, Icon, Line, LinkPanel, Text } from "uu5g05-elements";
+import MemberTile from "./member-tile.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -32,66 +32,70 @@ const MemberList = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({
-    items,
-    lsiTitle,
-    colorScheme,
-    icon,
-    iconColor,
-    collapsible,
-    onRemoveMember,
-    onPromoteAdmin,
-    onDemoteAdmin,
-    onLeaveActivity,
-  }) {
+  render({ owner, administrators, members, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity }) {
     //@@viewOn:private
-    const [collapsed, setCollapsed] = useState(collapsible);
-    const titleProps = collapsible ? { onClick: () => setCollapsed(!collapsed) } : {};
     //@@viewOff:private
 
     //@@viewOn:render
-
-    function renderItems() {
-      if (items) {
-        const itemComponents = items.map((item, idx) => (
-          <MemberItem
-            key={idx}
-            uuIdentity={item}
-            colorScheme={colorScheme}
-            onLeaveActivity={onLeaveActivity}
-            onRemoveMember={onRemoveMember}
-            onPromoteAdmin={onPromoteAdmin}
-            onDemoteAdmin={onDemoteAdmin}
-          />
-        ));
-        if (collapsible) {
-          return (
-            <CollapsibleBox style={{ display: "grid", rowGap: "4px" }} collapsed={collapsed}>
-              {itemComponents}
-            </CollapsibleBox>
-          );
-        } else return itemComponents;
-      }
-      return null;
-    }
-
     return (
-      <Grid rowGap="8px" templateColumns="1fr" templateRows="auto auto">
-        <Box
-          style={{ display: "flex", columnGap: "4px", alignItems: "center" }}
-          shape="interactiveItem"
-          significance="common"
-          colorScheme="building"
-          {...titleProps}
-        >
-          <Icon icon={icon} style={{ color: iconColor }} />
+      <Grid>
+        <Fragment>
           <Text category="interface" segment="highlight" type="common" autoFit>
-            <Lsi lsi={lsiTitle} />
-            {items && items.length > 1 ? ` (${items.length})` : ""}
+            <Icon icon={"mdi-crown"} margin={{ right: "4px" }} style={{ color: "rgb(218,165,32)" }} />
+            <Lsi lsi={{ en: "Activity owner", cs: "Vlastník aktivity" }} />
           </Text>
-          {collapsible && items.length > 0 && <Icon icon={collapsed ? "mdi-chevron-down" : "mdi-chevron-up"} />}
-        </Box>
-        <Grid templateColumns="1fr">{renderItems()}</Grid>
+          <MemberTile uuIdentity={owner} colorScheme="primary" />
+        </Fragment>
+        <Line colorScheme="neutral" significance="subdued" />
+        <LinkPanel
+          header={
+            <Text category="interface" segment="highlight" type="common" autoFit>
+              <Icon icon={"mdi-star"} colorScheme={"steel"} margin={{ right: "4px" }} />
+              <Lsi
+                lsi={{
+                  en: `Administrators ${administrators.length > 0 ? "(" + administrators.length + ")" : ""}`,
+                  cs: `Správci ${administrators.length > 0 ? "(" + administrators.length + ")" : ""}`,
+                }}
+              />
+            </Text>
+          }
+        >
+          {administrators.map((item, idx) => (
+            <MemberTile
+              key={idx}
+              uuIdentity={item}
+              onLeaveActivity={onLeaveActivity}
+              onRemoveMember={onRemoveMember}
+              onPromoteAdmin={onPromoteAdmin}
+              onDemoteAdmin={onDemoteAdmin}
+            />
+          ))}
+        </LinkPanel>
+        <Line colorScheme="neutral" significance="subdued" />
+        <LinkPanel
+          header={
+            <Text category="interface" segment="highlight" type="common" autoFit>
+              <Icon icon={"mdi-account-multiple"} colorScheme={"building"} margin={{ right: "4px" }} />
+              <Lsi
+                lsi={{
+                  en: `Members ${members.length > 0 ? "(" + members.length + ")" : ""}`,
+                  cs: `Členové ${members.length > 0 ? "(" + members.length + ")" : ""}`,
+                }}
+              />
+            </Text>
+          }
+        >
+          {members.map((item, idx) => (
+            <MemberTile
+              key={idx}
+              uuIdentity={item}
+              onLeaveActivity={onLeaveActivity}
+              onRemoveMember={onRemoveMember}
+              onPromoteAdmin={onPromoteAdmin}
+              onDemoteAdmin={onDemoteAdmin}
+            />
+          ))}
+        </LinkPanel>
       </Grid>
     );
     //@@viewOff:render

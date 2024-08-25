@@ -101,6 +101,7 @@ let ActivityPage = createVisualComponent({
         style={{
           width: `${["xs", "s"].includes(screenSize) ? "100%" : "90%"}`,
           marginTop: "32px",
+          minHeight: "calc(100vh - 88px)",
         }}
       >
         <ActivityProvider activityId={id}>

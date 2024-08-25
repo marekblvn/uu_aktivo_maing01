@@ -98,7 +98,7 @@
     },
     "deleteInvitation": {
       "header": "Opravdu chcete smazat tuto pozvánku?",
-      "info": "Příjemce ani odesílatel nebudou o této akci informováni, jste si jisti, že chcete pokračovat?",
+      "info": "Pozvánka bude smazána.",
       "confirm": "Smazat"
     },
     "deleteDatetime": {

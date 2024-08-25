@@ -1,36 +1,117 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useEffect, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
-import { ActionGroup, Box, Grid, ScrollableBox } from "uu5g05-elements";
-import AttendanceItem from "./attendance-item.js";
-import AttendanceListHeader from "./attendance-list-header.js";
-import SaveAttendanceModal from "./save-attendance-modal.js";
+import { Icon, Number, PlaceholderBox } from "uu5g05-elements";
+import { List } from "uu5tilesg02-elements";
+import { PersonItem } from "uu_plus4u5g02-elements";
+import AttendanceTile from "./attendance-tile.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
+const COLUMN_LIST = [
+  {
+    value: "uuIdentity",
+    header: <Lsi lsi={{ en: "Member", cs: "Člen" }} />,
+    headerComponent: <List.HeaderCell verticalAlignment="center" />,
+    cell: ({ data }) => <PersonItem uuIdentity={data.uuIdentity} />,
+  },
+  {
+    value: "confirmedCount",
+    header: (
+      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
+        <Icon icon="uugdsstencil-communication-thumb-up" colorScheme="positive" />
+        <Lsi lsi={{ cs: "Přišel(a)", en: "Came" }} />
+      </div>
+    ),
+    headerComponent: (
+      <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" sorterKey="confirmedCount" />
+    ),
+    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.confirmedCount} />,
+    maxWidth: "108px",
+  },
+  {
+    value: "confirmedPercentage",
+    header: (
+      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
+        <Icon icon="uugdsstencil-communication-thumb-up" colorScheme="positive" />
+        (%)
+      </div>
+    ),
+    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
+    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.confirmedPercentage} unit="percent" roundingMode="halfExpand" />,
+    maxWidth: "80px",
+  },
+  {
+    value: "undecidedCount",
+    header: (
+      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
+        <Icon icon="uugds-help" colorScheme="neutral" />
+        <Lsi lsi={{ en: "Didn't decide", cs: "Nerozhodnuto" }} />
+      </div>
+    ),
+    headerComponent: (
+      <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" sorterKey="undecidedCount" />
+    ),
+    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.undecidedCount} />,
+    maxWidth: "148px",
+  },
+  {
+    value: "undecidedPercentage",
+    header: (
+      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
+        <Icon icon="uugds-help" colorScheme="neutral" />
+        (%)
+      </div>
+    ),
+    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
+    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.undecidedPercentage} unit="percent" roundingMode="halfExpand" />,
+    maxWidth: "80px",
+  },
+  {
+    value: "deniedCount",
+    header: (
+      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
+        <Icon icon="uugdsstencil-communication-thumb-down" colorScheme="negative" />
+        <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel(la)" }} />
+      </div>
+    ),
+    headerComponent: (
+      <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" sorterKey="deniedCount" />
+    ),
+    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.deniedCount} />,
+    maxWidth: "140px",
+  },
+  {
+    value: "deniedPercentage",
+    header: (
+      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
+        <Icon icon="uugdsstencil-communication-thumb-down" colorScheme="negative" />
+        (%)
+      </div>
+    ),
+    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
+    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.deniedPercentage} unit="percent" roundingMode="halfExpand" />,
+    maxWidth: "80px",
+  },
+  {
+    value: "total",
+    header: <Lsi lsi={{ en: "Total datetimes", cs: "Celkem termínů" }} />,
+    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
+    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.total} />,
+  },
+];
 //@@viewOff:constants
 
 //@@viewOn:css
 const Css = {
-  firstCol: () =>
-    Config.Css.css({
-      backgroundColor: "rgba(0,0,0,0.02)",
-      padding: "8px 0 8px 16px",
-      borderBottom: "solid 1px rgba(0,0,0,0.4)",
-      fontWeight: 700,
-      display: "flex",
-      alignItems: "center",
-    }),
-  nthCol: (position) =>
-    Config.Css.css({
-      backgroundColor: `${position % 2 === 0 ? "rgba(0,0,0,0.02)" : "rgba(0,0,0,0)"}`,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: "8px 0",
-      borderBottom: "solid 1px rgba(0,0,0,0.4)",
-      fontWeight: 700,
-    }),
+  main: Config.Css.css({}),
 };
 //@@viewOff:css
 
@@ -50,57 +131,30 @@ const AttendanceList = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ itemList, dateRange }) {
-    const [screenSize] = useScreenSize();
-    const [modalOpen, setModalOpen] = useState(false);
+  render() {
+    //@@viewOn:private
     //@@viewOff:private
 
-    const handleOpenModal = () => setModalOpen(true);
-    const handleCloseModal = () => setModalOpen(false);
-
-    useEffect(() => {
-      handleCloseModal();
-    }, [screenSize]);
-
     //@@viewOn:render
-    function renderItems(items) {
-      return items.map((item, index) => <AttendanceItem key={index} data={item} />);
-    }
     return (
-      <>
-        {["xl", "l"].includes(screenSize) && (
-          <ActionGroup
-            style={{ marginBottom: "8px" }}
-            alignment="left"
-            itemList={[
-              {
-                icon: "mdi-content-save-outline",
-                children: <Lsi lsi={{ en: "Save attendance", cs: "Uložit docházku" }} />,
-                colorScheme: "neutral",
-                onClick: handleOpenModal,
-              },
-            ]}
+      <List
+        columnList={COLUMN_LIST}
+        stickyHeader={true}
+        displayCellSelection="none"
+        emptyState={
+          <PlaceholderBox
+            code="items"
+            header={{ en: "No attendance to display", cs: "Žádná docházka k zobrazení" }}
+            info={{
+              en: "There is no attendance available in selected date range.",
+              cs: "V zadaném časovém rozmezí není dostupná žádná docházka.",
+            }}
+            style={{ margin: "16px" }}
           />
-        )}
-        <Box>
-          <Grid templateRows={{ xs: `"repeat(${itemList.length + 1}, 1fr)"` }} rowGap={0}>
-            <AttendanceListHeader />
-            <ScrollableBox maxHeight={["xl", "l"].includes(screenSize) ? 624 : screenSize === "m" ? 610 : 594}>
-              {renderItems(itemList)}
-            </ScrollableBox>
-          </Grid>
-          <SaveAttendanceModal
-            open={modalOpen}
-            onClose={handleCloseModal}
-            initialFilename={`${dateRange.after}_${dateRange.before}`}
-          >
-            <Grid templateRows={{ xs: `"repeat(${itemList.length + 1}, 1fr)"` }} rowGap={0}>
-              <AttendanceListHeader />
-              {renderItems(itemList)}
-            </Grid>
-          </SaveAttendanceModal>
-        </Box>
-      </>
+        }
+      >
+        {AttendanceTile}
+      </List>
     );
     //@@viewOff:render
   },

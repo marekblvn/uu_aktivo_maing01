@@ -23,6 +23,10 @@ class AttendanceMongo extends UuObjectDao {
     return await super.insertOne(uuObject);
   }
 
+  async count(filter) {
+    return await super.count(filter);
+  }
+
   /**
    * Finds one uuObject based on awid and id.
    * @param {string} awid
@@ -102,7 +106,7 @@ class AttendanceMongo extends UuObjectDao {
     return await super.find(filter, pageInfo);
   }
 
-  async listStatistics(awid, filterObject = {}, sortObject = null) {
+  async getStatistics(awid, filterObject = {}) {
     let filter = {
       awid,
       ...filterObject,
@@ -113,91 +117,47 @@ class AttendanceMongo extends UuObjectDao {
         $facet: {
           confirmed: [
             { $unwind: "$confirmed" },
-            {
-              $group: {
-                _id: "$confirmed",
-                confirmedCount: {
-                  $sum: 1,
-                },
-              },
-            },
+            { $project: { uuIdentity: "$confirmed", status: "confirmed", datetimeId: 1 } },
           ],
-          denied: [
-            { $unwind: "$denied" },
-            {
-              $group: {
-                _id: "$denied",
-                deniedCount: {
-                  $sum: 1,
-                },
-              },
-            },
-          ],
+          denied: [{ $unwind: "$denied" }, { $project: { uuIdentity: "$denied", status: "denied", datetimeId: 1 } }],
           undecided: [
             { $unwind: "$undecided" },
-            {
-              $group: {
-                _id: "$undecided",
-                undecidedCount: {
-                  $sum: 1,
-                },
-              },
-            },
+            { $project: { uuIdentity: "$undecided", status: "undecided", datetimeId: 1 } },
           ],
         },
       },
       {
         $project: {
-          stats: {
-            $concatArrays: ["$confirmed", "$denied", "$undecided"],
-          },
+          users: { $concatArrays: ["$confirmed", "$denied", "$undecided"] },
         },
       },
-      {
-        $unwind: {
-          path: "$stats",
-        },
-      },
+      { $unwind: "$users" },
+      { $replaceRoot: { newRoot: "$users" } },
       {
         $group: {
-          _id: "$stats._id",
-          confirmedCount: {
-            $sum: {
-              $ifNull: ["$stats.confirmedCount", 0],
-            },
+          _id: "$uuIdentity",
+          confirmed: {
+            $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, 1, 0] },
           },
-          deniedCount: {
-            $sum: {
-              $ifNull: ["$stats.deniedCount", 0],
-            },
+          denied: {
+            $sum: { $cond: [{ $eq: ["$status", "denied"] }, 1, 0] },
           },
-          undecidedCount: {
-            $sum: {
-              $ifNull: ["$stats.undecidedCount", 0],
-            },
+          undecided: {
+            $sum: { $cond: [{ $eq: ["$status", "undecided"] }, 1, 0] },
           },
-          total: {
-            $sum: {
-              $add: [
-                { $ifNull: ["$stats.confirmedCount", 0] },
-                { $ifNull: ["$stats.deniedCount", 0] },
-                { $ifNull: ["$stats.undecidedCount", 0] },
-              ],
-            },
-          },
+          uniqueDatetimeIds: { $addToSet: "$datetimeId" },
         },
       },
       {
         $project: {
           _id: 0,
           uuIdentity: "$_id",
-          confirmedCount: 1,
-          deniedCount: 1,
-          undecidedCount: 1,
-          total: 1,
+          confirmed: 1,
+          denied: 1,
+          undecided: 1,
+          uniqueDatetimeIds: { $size: "$uniqueDatetimeIds" },
         },
       },
-      sortObject ? { $sort: sortObject } : { $sort: { uuIdentity: 1 } },
     ];
     return await super.aggregate(aggregationPipeline);
   }

@@ -151,8 +151,8 @@
         "httpMethod": "GET",
         "type": "CMD"
       },
-      "attendance/listStatistics": {
-        "realization": "api/controllers/AttendanceController.listStatistics",
+      "attendance/getStatistics": {
+        "realization": "api/controllers/AttendanceController.getStatistics",
         "httpMethod": "GET",
         "type": "CMD"
       },

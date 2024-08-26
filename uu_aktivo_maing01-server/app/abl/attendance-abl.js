@@ -154,13 +154,13 @@ class AttendanceAbl {
     return dtoOut;
   }
 
-  async listStatistics(awid, dtoIn, session, authorizationResult) {
-    let validationResult = this.validator.validate("attendanceListStatisticsDtoInType", dtoIn);
+  async getStatistics(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("attendanceGetStatisticsDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
       validationResult,
-      UnsupportedKeysWarning(Errors.ListStatistics),
-      Errors.ListStatistics.InvalidDtoIn,
+      UnsupportedKeysWarning(Errors.GetStatistics),
+      Errors.GetStatistics.InvalidDtoIn,
     );
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
@@ -169,7 +169,7 @@ class AttendanceAbl {
       !authorizedProfiles.includes(PROFILE_CODES.Executives)
     ) {
       if (!dtoIn.filters?.activityId) {
-        throw new Errors.ListStatistics.UserNotAuthorized({ uuAppErrorMap });
+        throw new Errors.GetStatistics.UserNotAuthorized({ uuAppErrorMap });
       }
 
       let activity;
@@ -177,13 +177,13 @@ class AttendanceAbl {
         activity = await this.activityDao.get(awid, dtoIn.filters.activityId);
       } catch (error) {
         if (error instanceof ObjectStoreError) {
-          throw new Errors.ListStatistics.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+          throw new Errors.GetStatistics.ActivityDaoGetFailed({ uuAppErrorMap }, error);
         }
         throw error;
       }
 
       if (!activity) {
-        throw new Errors.ListStatistics.ActivityDoesNotExist(
+        throw new Errors.GetStatistics.ActivityDoesNotExist(
           { uuAppErrorMap },
           { activityId: dtoIn.filters.activityId },
         );
@@ -191,7 +191,7 @@ class AttendanceAbl {
 
       const userUuIdentity = session.getIdentity().getUuIdentity();
       if (!activity.members.includes(userUuIdentity)) {
-        throw new Errors.ListStatistics.UserNotMember({ uuAppErrorMap });
+        throw new Errors.GetStatistics.UserNotMember({ uuAppErrorMap });
       }
     }
 
@@ -209,25 +209,28 @@ class AttendanceAbl {
         queryFilters.datetime = queryFilters.datetime || {};
         queryFilters.datetime.$lt = new Date(before);
       }
-      queryFilters.archived = archived;
+      if (archived !== undefined) {
+        queryFilters.archived = archived;
+      }
     }
 
-    let sort = null;
-    if (dtoIn.sort) {
-      sort = Object.keys(dtoIn.sort).length === 0 ? null : dtoIn.sort;
-    }
-
-    let itemList;
+    let statistics;
+    let total;
     try {
-      itemList = await this.attendanceDao.listStatistics(awid, queryFilters, sort);
+      statistics = await this.attendanceDao.getStatistics(awid, queryFilters);
+      total = await this.attendanceDao.count({ ...queryFilters, awid });
     } catch (error) {
       if (error instanceof ObjectStoreError) {
-        throw new Errors.ListStatistics.AttendanceDaoListFailed({ uuAppErrorMap }, error);
+        throw new Errors.GetStatistics.AttendanceDaoGetStatisticsFailed({ uuAppErrorMap }, error);
       }
       throw error;
     }
+    statistics.forEach((item) => {
+      item.total = total;
+    });
+
     let dtoOut = {};
-    dtoOut.itemList = itemList;
+    dtoOut.statistics = statistics;
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

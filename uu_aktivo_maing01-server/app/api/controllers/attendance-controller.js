@@ -15,12 +15,12 @@ class AttendanceController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return AttendanceAbl.list(awid, dtoIn, session, authorizationResult);
   }
-  listStatistics(ucEnv) {
+  getStatistics(ucEnv) {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();
     const session = ucEnv.getSession();
     const authorizationResult = ucEnv.getAuthorizationResult();
-    return AttendanceAbl.listStatistics(awid, dtoIn, session, authorizationResult);
+    return AttendanceAbl.getStatistics(awid, dtoIn, session, authorizationResult);
   }
   delete(ucEnv) {
     const awid = ucEnv.getUri().getAwid();

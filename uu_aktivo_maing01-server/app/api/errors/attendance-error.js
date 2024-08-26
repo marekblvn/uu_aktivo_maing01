@@ -109,48 +109,48 @@ const List = {
   },
 };
 
-const ListStatistics = {
-  UC_CODE: `${ERR_PREFIX}listStatistics/`,
+const GetStatistics = {
+  UC_CODE: `${ERR_PREFIX}getStatistics/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${ListStatistics.UC_CODE}invalidDtoIn`;
+      this.code = `${GetStatistics.UC_CODE}invalidDtoIn`;
       this.message = "DtoIn is not valid.";
     }
   },
   UserNotAuthorized: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${ListStatistics.UC_CODE}userNotAuthorized`;
+      this.code = `${GetStatistics.UC_CODE}userNotAuthorized`;
       this.message = "User is not authorized to list all attendances.";
     }
   },
   ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${ListStatistics.UC_CODE}activityDaoGetFailed`;
+      this.code = `${GetStatistics.UC_CODE}activityDaoGetFailed`;
       this.message = "Get activity by activity DAO get failed.";
     }
   },
   ActivityDoesNotExist: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${ListStatistics.UC_CODE}activityDoesNotExist`;
+      this.code = `${GetStatistics.UC_CODE}activityDoesNotExist`;
       this.message = "Activity with provided id does not exist.";
     }
   },
   UserNotMember: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${ListStatistics.UC_CODE}userNotMember`;
+      this.code = `${GetStatistics.UC_CODE}userNotMember`;
       this.message = "User is not a member of this activity.";
     }
   },
-  AttendanceDaoListStatisticsFailed: class extends AktivoMainUseCaseError {
+  AttendanceDaoGetStatisticsFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${ListStatistics.UC_CODE}attendanceDaoListStatisticsFailed`;
-      this.message = "List attendance statistics by attendance DAO listStatistics failed.";
+      this.code = `${GetStatistics.UC_CODE}attendanceDaoGetStatisticsFailed`;
+      this.message = "Get attendance statistics by attendance DAO getStatistics failed.";
     }
   },
 };
@@ -211,6 +211,6 @@ const Delete = {
 module.exports = {
   Create,
   List,
-  ListStatistics,
+  GetStatistics,
   Delete,
 };

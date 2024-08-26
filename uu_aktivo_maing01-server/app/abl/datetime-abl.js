@@ -112,7 +112,7 @@ class DatetimeAbl {
 
     const datetimeCreateObject = {
       awid,
-      activityId: dtoIn.activityId,
+      activityId: activity.id,
       undecided: activity.members,
       confirmed: [],
       denied: [],
@@ -342,7 +342,7 @@ class DatetimeAbl {
     }
 
     try {
-      await this.attendanceDao.updateMany(awid, { datetimeId: dtoIn.id }, { archived: true });
+      await this.attendanceDao.updateMany(awid, { datetimeId: datetime.id }, { archived: true });
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.AttendanceDaoUpdateManyFailed({ uuAppErrorMap }, error);

@@ -34,6 +34,7 @@
     "management": "Management",
     "management/activities": "Activity management",
     "management/invitations": "Invitation management",
+    "management/posts": "Post management",
     "about": "About Application"
   },
   "Placeholder": {

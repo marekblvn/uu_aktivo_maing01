@@ -4,6 +4,7 @@ const postCreateDtoInType = shape({
   activityId: id().isRequired(),
   content: uu5String(1, 256).isRequired(),
   type: oneOf(["normal", "important"]),
+  createdAt: datetime().isRequired(),
 });
 
 const postGetDtoInType = shape({
@@ -14,6 +15,8 @@ const postListDtoInType = shape({
   filters: shape({
     activityId: id(),
     uuIdentity: uuIdentity(),
+    uuIdentityName: uu5String(),
+    type: oneOf(["normal", "important"]),
   }),
   sort: shape({
     createdAt: integer(),

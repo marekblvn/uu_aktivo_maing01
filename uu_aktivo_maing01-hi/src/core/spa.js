@@ -13,6 +13,7 @@ import AppBar from "./app-bar.js";
 const ActivityPage = Utils.Component.lazy(() => import("../routes/activity-page.js"));
 const ActivityManagement = Utils.Component.lazy(() => import("../routes/activity-management.js"));
 const InvitationManagement = Utils.Component.lazy(() => import("../routes/invitation-management.js"));
+const PostManagement = Utils.Component.lazy(() => import("../routes/post-management.js"));
 const MyActivities = Utils.Component.lazy(() => import("../routes/my-activities.js"));
 const Invitations = Utils.Component.lazy(() => import("../routes/invitations.js"));
 const About = Utils.Component.lazy(() => import("../routes/about.js"));
@@ -27,6 +28,7 @@ const ROUTE_MAP = {
   "my-activities": (props) => <MyActivities {...props} />,
   "management/activities": (props) => <ActivityManagement {...props} />,
   "management/invitations": (props) => <InvitationManagement {...props} />,
+  "management/posts": (props) => <PostManagement {...props} />,
   invitations: (props) => <Invitations {...props} />,
   activity: ({ params }) => <ActivityPage id={params.id} />,
   about: (props) => <About {...props} />,

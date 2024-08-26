@@ -9,6 +9,7 @@ class PostMongo extends UuObjectDao {
   async createSchema() {
     await super.createIndex({ awid: 1, _id: 1 }, { unique: true });
     await super.createIndex({ awid: 1, activityId: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, uuIdentity: 1 }, { unique: false });
   }
 
   /**

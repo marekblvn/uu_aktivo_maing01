@@ -127,8 +127,9 @@ const PostBlock = createVisualComponent({
       const firstNotYetLoadedIndex = data ? data.findIndex((item) => item == null) : 0;
 
       const handleCreatePost = async (value) => {
+        const createdAt = new Date();
         try {
-          await handlerMap.create({ activityId, type: "normal", content: value });
+          await handlerMap.create({ activityId, type: "normal", content: value, createdAt });
           await handlerMap.load({ filters: { activityId }, sort: { createdAt: -1 } });
         } catch (error) {
           showError(error);

@@ -54,59 +54,7 @@ const PostListProvider = createVisualComponent({
     let { state, data, errorData, pendingData, handlerMap } = dataList;
     //@@viewOff:private
 
-    // const handleCreatePost = async (value) => {
-    //   try {
-    //     await handlerMap.create({ activityId, type: "normal", content: value });
-    //     await handlerMap.load({ filters: { activityId }, sort: { createdAt: -1 } });
-    //   } catch (error) {
-    //     showError(error);
-    //   }
-    // };
-
-    // function renderLoading() {
-    //   return (
-    //     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-    //       <Pending size="xl" type="horizontal" colorScheme="secondary" />
-    //     </div>
-    //   );
-    // }
-
-    // function renderError(errorData) {
-    //   switch (errorData.operation) {
-    //     case "load":
-    //     case "loadNext":
-    //     default:
-    //       return <Error title={errorData.error?.message} subtitle={errorData.error?.code} error={errorData.error} />;
-    //   }
-    // }
-
-    // function renderReady(data) {
-    //   return (
-    //     <Grid templateRows="10fr auto" rowGap={0} style={{ maxHeight: "655px", borderRadius: "8px" }}>
-    //       <PostList
-    //         data={data}
-    //         onPostCreate={handleCreatePost}
-    //         onLoadNext={() => handlerMap.loadNext({ filters: { activityId }, sort: { createdAt: 1 } })}
-    //       />
-    //     </Grid>
-    //   );
-    // }
-
-    // //@@viewOn:render
-    // switch (state) {
-    //   case "pending":
-    //     renderReady(data);
-    //   case "pendingNoData":
-    //     return renderLoading();
-    //   case "error":
-    //     renderReady(data);
-    //   case "errorNoData":
-    //     return renderError(errorData);
-    //   case "ready":
-    //   case "readyNoData":
-    //     return renderReady(data);
-    // }
-
+    //@@viewOn:render
     return children({ state, data, errorData, pendingData, handlerMap });
     //@@viewOff:render
   },

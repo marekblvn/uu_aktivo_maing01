@@ -93,6 +93,14 @@ const AppBar = createVisualComponent({
               setRoute("management/invitations");
             },
           },
+          {
+            children: <Lsi import={importLsi} path={["Menu", "management/posts"]} />,
+            icon: "uugds-comment-text",
+            colorScheme: "building",
+            onClick: () => {
+              setRoute("management/posts");
+            },
+          },
         ],
         icon: "mdi-wrench-outline",
         colorScheme: "building",

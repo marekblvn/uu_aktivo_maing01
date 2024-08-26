@@ -151,6 +151,9 @@ class PostAbl {
     }
 
     let dtoOut;
+    if (filters?.uuIdentityName) {
+      filters.uuIdentityName = { $regex: filters.uuIdentityName, $options: "i" };
+    }
 
     try {
       dtoOut = await this.postDao.list(awid, filters, dtoIn.pageInfo, dtoIn.sort);

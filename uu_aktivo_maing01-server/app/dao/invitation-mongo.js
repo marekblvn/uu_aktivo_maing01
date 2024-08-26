@@ -95,67 +95,45 @@ class InvitationMongo extends UuObjectDao {
     };
     let aggregationPipeline = [
       {
+        $match: filter,
+      },
+      {
+        $lookup: {
+          from: "activity",
+          localField: "activityId",
+          foreignField: "_id",
+          as: "activity",
+        },
+      },
+      {
+        $unwind: "$activity",
+      },
+      {
         $facet: {
-          itemList: [
+          metadata: [{ $count: "total" }],
+          paginatedResults: [
+            { $skip: skip },
+            { $limit: pageInfo.pageSize },
             {
-              $match: filter,
-            },
-            {
-              $addFields: { convertedId: { $toObjectId: "$activityId" } },
-            },
-            {
-              $lookup: {
-                from: "activity",
-                localField: "convertedId",
-                foreignField: "_id",
-                as: "activityDoc",
-              },
-            },
-            {
-              $unwind: "$activityDoc",
-            },
-            {
-              $addFields: {
-                activityName: "$activityDoc.name",
-                createdAt: "$sys.cts",
-                id: "$_id",
-              },
-            },
-            {
-              $unset: ["activityDoc", "convertedId", "sys", "_id"],
-            },
-            {
-              $skip: skip,
-            },
-            {
-              $limit: pageInfo.pageSize,
-            },
-          ],
-          pageInfo: [
-            {
-              $match: filter,
-            },
-            {
-              $count: "total",
-            },
-            {
-              $addFields: {
-                pageIndex: pageInfo.pageIndex,
-                pageSize: pageInfo.pageSize,
+              $project: {
+                _id: 1,
+                activityId: 1,
+                activityName: "$activity.name",
+                uuIdentity: 1,
+                sys: 1,
               },
             },
           ],
         },
       },
       {
-        $unwind: "$pageInfo",
-      },
-      {
         $project: {
-          itemList: {
-            $ifNull: ["$itemList", []],
+          itemList: "$paginatedResults",
+          pageInfo: {
+            pageIndex: { $literal: pageInfo.pageIndex },
+            pageSize: { $literal: pageInfo.pageSize },
+            total: { $arrayElemAt: ["$metadata.total", 0] },
           },
-          pageInfo: 1,
         },
       },
     ];

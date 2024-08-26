@@ -1,5 +1,6 @@
 "use strict";
 const Path = require("path");
+const { ObjectId } = require("mongodb");
 const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
@@ -79,6 +80,7 @@ class InvitationAbl {
     }
 
     dtoIn.awid = awid;
+    dtoIn.activityId = activity.id;
     let dtoOut;
     try {
       dtoOut = await this.invitationDao.create(dtoIn);
@@ -170,6 +172,10 @@ class InvitationAbl {
           activityId: dtoIn.filters.activityId,
         };
       }
+    }
+
+    if (dtoIn.filters?.activityId) {
+      dtoIn.filters.activityId = ObjectId.createFromHexString(dtoIn.filters.activityId);
     }
 
     let dtoOut;

@@ -1,5 +1,6 @@
 "use strict";
 const Path = require("path");
+const { ObjectId } = require("mongodb");
 const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
@@ -64,6 +65,7 @@ class PostAbl {
       dtoIn.type = "normal";
     }
     dtoIn.awid = awid;
+    dtoIn.activityId = ObjectId.createFromHexString(dtoIn.activityId);
     dtoIn.uuIdentity = userUuIdentity;
     dtoIn.uuIdentityName = session.getIdentity().getName();
     dtoIn.createdAt = new Date();
@@ -151,6 +153,9 @@ class PostAbl {
     }
 
     let dtoOut;
+    if (filters?.activityId) {
+      filters.activityId = ObjectId.createFromHexString(filters.activityId);
+    }
     if (filters?.uuIdentityName) {
       filters.uuIdentityName = { $regex: filters.uuIdentityName, $options: "i" };
     }

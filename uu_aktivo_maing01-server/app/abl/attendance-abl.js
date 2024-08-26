@@ -1,5 +1,6 @@
 "use strict";
 const Path = require("path");
+const { ObjectId } = require("mongodb");
 const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
@@ -65,8 +66,12 @@ class AttendanceAbl {
 
     const attendanceObject = {
       awid,
-      ...datetime,
-      datetimeId: dtoIn.datetimeId,
+      confirmed: datetime.confirmed,
+      denied: datetime.denied,
+      undecided: datetime.undecided,
+      datetime: datetime.datetime,
+      activityId: activity.id,
+      datetimeId: datetime.id,
       archived: false,
     };
 
@@ -129,7 +134,7 @@ class AttendanceAbl {
     if (filters) {
       const { after, before, activityId, archived } = filters;
       if (activityId) {
-        queryFilters.activityId = activityId;
+        queryFilters.activityId = ObjectId.createFromHexString(activityId);
       }
       if (after) {
         queryFilters.datetime = { $gte: new Date(after) };
@@ -138,7 +143,9 @@ class AttendanceAbl {
         queryFilters.datetime = queryFilters.datetime || {};
         queryFilters.datetime.$lt = new Date(before);
       }
-      queryFilters.archived = archived;
+      if (archived !== undefined) {
+        queryFilters.archived = archived;
+      }
     }
 
     let dtoOut;
@@ -200,7 +207,7 @@ class AttendanceAbl {
     if (filters) {
       const { after, before, activityId, archived } = filters;
       if (activityId) {
-        queryFilters.activityId = activityId;
+        queryFilters.activityId = ObjectId.createFromHexString(activityId);
       }
       if (after) {
         queryFilters.datetime = { $gte: new Date(after) };

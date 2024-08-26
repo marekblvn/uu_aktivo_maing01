@@ -1,10 +1,10 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Config from "./config/config.js";
 import Container from "../bricks/container.js";
 import PostListProvider from "../providers/post-list-provider.js";
-import { Block, DateTime, Dialog, Grid, Pending, Tag, Text } from "uu5g05-elements";
+import { Badge, Block, Box, DateTime, Dialog, Grid, Link, Pending, Tag, Text } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { Table } from "uu5tilesg02-elements";
@@ -14,6 +14,35 @@ import { PersonItem, useAlertBus } from "uu_plus4u5g02-elements";
 import UpdatePostForm from "../bricks/update-post-form.js";
 import FormModal from "../bricks/form-modal.js";
 //@@viewOff:imports
+
+const _TextBox = createVisualComponent({
+  uu5Tag: Config.TAG + "_TextBox",
+  render({ content }) {
+    const [collapsed, setCollapsed] = useState(true);
+    const handleToggleCollapsed = (e) => {
+      e.preventDefault();
+      if (content.length > 100) {
+        setCollapsed(!collapsed);
+      }
+    };
+    const renderContent = () => {
+      if (content.length > 100) {
+        if (collapsed) {
+          return content.slice(0, 100) + "...";
+        } else {
+          return content;
+        }
+      } else {
+        return content;
+      }
+    };
+    return (
+      <Box shape="background" significance="subdued" onClick={content.length > 100 ? handleToggleCollapsed : null}>
+        <div style={{ display: "block", textAlign: "justify" }}>{renderContent()}</div>
+      </Box>
+    );
+  },
+});
 
 //@@viewOn:constants
 const FILTER_LIST = [
@@ -46,9 +75,22 @@ const FILTER_LIST = [
       itemList: [
         {
           value: "normal",
-          children: "Normal",
+          children: (
+            <>
+              <Badge colorScheme="building" significance="common" size="l" />
+              &nbsp; Normal
+            </>
+          ),
         },
-        { value: "important", children: "Important" },
+        {
+          value: "important",
+          children: (
+            <>
+              <Badge colorScheme="warning" size="l" />
+              &nbsp; Important
+            </>
+          ),
+        },
       ],
       placeholder: { en: "Select post type", cs: "Vyberte typ příspěvku" },
     },
@@ -65,8 +107,16 @@ const SORTER_LIST = [
 const COLUMN_LIST = [
   {
     value: "activityId",
-    header: <Lsi lsi={{ en: "Activity", cs: "Aktivita" }} />,
-    cell: ({ data }) => data.activityId,
+    header: <Lsi lsi={{ en: "Activity ID", cs: "ID Aktivity" }} />,
+    cell: ({ data }) => (
+      <Link
+        tooltip={{ en: "Go to activity page", cs: "Přejít na stránku aktivity" }}
+        href={`activity?id=${data.activityId}`}
+        target="_blank"
+      >
+        {data.activityId}
+      </Link>
+    ),
   },
   {
     value: "uuIdentity",
@@ -78,11 +128,7 @@ const COLUMN_LIST = [
   {
     value: "content",
     header: <Lsi lsi={{ en: "Post content", cs: "Obsah příspěvku" }} />,
-    cell: ({ data }) => (
-      <Text autoFit style={{ maxHeight: "200px", maxWidth: "200px" }}>
-        {data.content}
-      </Text>
-    ),
+    cell: ({ data }) => <_TextBox content={data.content} />,
   },
   {
     value: "createdAt",
@@ -265,8 +311,6 @@ const _PostManagement = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
-      console.log(data);
-
       const handleChangeFilterList = (e) => {
         const filters = {};
         const sort = {};
@@ -297,6 +341,20 @@ const _PostManagement = createVisualComponent({
         handlerMap.load({ filters, sort });
       };
 
+      const handleRefresh = () => {
+        const filters = {};
+        const sort = {};
+        filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
+        });
+        sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        handlerMap.load({ filters, sort });
+      };
+
       const dataToRender = data
         .filter((item) => item != null)
         .map((item) => ({ ...item.data, handlerMap: item.handlerMap }));
@@ -318,10 +376,15 @@ const _PostManagement = createVisualComponent({
                 <Lsi lsi={{ en: "Post management", cs: "Správa příspěvků" }} />
               </Text>
             }
-            actionList={[{ component: <FilterButton type="bar" /> }, { component: <SorterButton type="dropdown" /> }]}
+            actionList={[
+              { icon: "uugds-refresh", onClick: handleRefresh },
+              { component: <FilterButton type="bar" /> },
+              { component: <SorterButton type="dropdown" /> },
+            ]}
           >
             <FilterBar displayManagerButton={false} />
             <Table columnList={COLUMN_LIST} verticalAlignment="center" getActionList={getActionList} />
+            <AutoLoad data={data} handleLoadNext={handlerMap.loadNext} distance={window.innerHeight} />
           </Block>
         </ControllerProvider>
       );
@@ -334,9 +397,10 @@ const _PostManagement = createVisualComponent({
             switch (state) {
               case "pendingNoData":
                 return renderLoading();
-              case "error":
               case "errorNoData":
                 return renderError(errorData);
+              case "error":
+                showError(errorData.error);
               case "pending":
               case "ready":
               case "readyNoData":

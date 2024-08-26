@@ -133,7 +133,7 @@
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
-      "attendance/listStatistics": {
+      "attendance/getStatistics": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },

@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useEffect, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, useCall, useEffect, useLsi, useScreenSize, useState } from "uu5g05";
 import { Error } from "uu_plus4u5g02-elements";
-import { ActionGroup, Block, CollapsibleBox, Pending } from "uu5g05-elements";
+import { ActionGroup, Block, Button, CollapsibleBox, Grid, Pending, Text, Toggle } from "uu5g05-elements";
 import { DateRange } from "uu5g05-forms";
 import Config from "./config/config.js";
 import Container from "./container.js";
@@ -10,6 +10,7 @@ import AttendanceList from "./attendance-list.js";
 import importLsi from "../lsi/import-lsi.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { FormSerieManager, SerieButton, SerieManagerModal, SorterBar, SorterButton } from "uu5tilesg02-controls";
+import Calls from "../calls.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -21,7 +22,7 @@ const SERIE_LIST = [
     fixed: "start",
   },
   {
-    value: "confirmedCount",
+    value: "confirmed",
     label: { en: "Came", cs: "Přišel(a)" },
     visible: true,
   },
@@ -31,7 +32,7 @@ const SERIE_LIST = [
     visible: false,
   },
   {
-    value: "undecidedCount",
+    value: "undecided",
     label: { en: "Didn't decide", cs: "Nerozhodl(a) se" },
     visible: true,
   },
@@ -41,7 +42,7 @@ const SERIE_LIST = [
     visible: false,
   },
   {
-    value: "deniedCount",
+    value: "denied",
     label: { en: "Didn't come", cs: "Nepřišel(a)" },
     visible: true,
   },
@@ -51,28 +52,32 @@ const SERIE_LIST = [
     visible: false,
   },
   {
-    value: "total",
-    label: { en: "Total datetimes", cs: "Celkem termínů" },
-    visible: "always",
-    fixed: "end",
+    value: "datetimesAsMember",
+    label: { en: "Datetimes as member", cs: "Termínů členem" },
+    visible: true,
   },
 ];
 
 const SORTER_LIST = [
   {
-    key: "confirmedCount",
+    key: "confirmed",
     label: <Lsi lsi={{ en: "Came", cs: "Přišel(a)" }} />,
-    sort: (a, b) => a.confirmedCount - b.confirmedCount,
+    sort: (a, b) => a.confirmed - b.confirmed,
   },
   {
-    key: "undecidedCount",
+    key: "undecided",
     label: <Lsi lsi={{ en: "Didn't decide", cs: "Nerozhodl(a) se" }} />,
-    sort: (a, b) => a.undecidedCount - b.undecidedCount,
+    sort: (a, b) => a.undecided - b.undecided,
   },
   {
-    key: "deniedCount",
+    key: "denied",
     label: <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel(a)" }} />,
-    sort: (a, b) => a.deniedCount - b.deniedCount,
+    sort: (a, b) => a.denied - b.denied,
+  },
+  {
+    key: "datetimesAsMember",
+    label: <Lsi lsi={{ en: "Datetimes as member", cs: "Termínů členem" }} />,
+    sort: (a, b) => a.datetimesAsMember - b.datetimesAsMember,
   },
 ];
 //@@viewOff:constants
@@ -101,22 +106,27 @@ const ActivityAttendanceView = createVisualComponent({
 
   render({ activityId }) {
     //@@viewOn:private
+    const { call: callGetStatistics, state, data, errorData } = useCall(Calls.Attendance.getStatistics);
     const [screenSize] = useScreenSize();
-    const [dateRange, setDateRange] = useState(undefined);
-    const [dateFilter, setDateFilter] = useState({ before: undefined, after: undefined });
+    const [dateFilter, setDateFilter] = useState();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
-    const [collapseDateRange, setCollapseDateRange] = useState(true);
+    const [hideFilters, setHideFilters] = useState(false);
+    const [archivedFilter, setArchivedFilter] = useState(false);
     const [serieList, setSerieList] = useState(SERIE_LIST);
     const [sorterList, setSorterList] = useState();
     //@@viewOff:private
 
-    useEffect(() => {
-      if (dateRange?.filter((i) => i != null).length === 2) {
-        setDateFilter({ after: dateRange[0], before: dateRange[1] });
-      }
-    }, [dateRange]);
-    //@@viewOn:render
+    const handleLoadStatistics = async (e) => {
+      const filters = {
+        activityId,
+        after: dateFilter[0],
+        before: dateFilter[1],
+        archived: archivedFilter,
+      };
+      await callGetStatistics({ filters });
+    };
 
+    //@@viewOn:render
     function renderError(errorData) {
       switch (errorData.operation) {
         case "load":
@@ -134,18 +144,16 @@ const ActivityAttendanceView = createVisualComponent({
     }
 
     function renderReady(data) {
-      if (!data) {
-        data = [];
-      }
-
-      const dataToRender = data
-        .filter((item) => item != null)
-        .map((item) => ({
-          ...item.data,
-          confirmedPercentage: (item.data.confirmedCount / item.data.total) * 100,
-          undecidedPercentage: (item.data.undecidedCount / item.data.total) * 100,
-          deniedPercentage: (item.data.deniedCount / item.data.total) * 100,
+      let dataToRender = [];
+      if (data) {
+        dataToRender = data.statistics?.map((item) => ({
+          ...item,
+          confirmedPercentage: (item.confirmed / item.total) * 100,
+          undecidedPercentage: (item.undecided / item.total) * 100,
+          deniedPercentage: (item.denied / item.total) * 100,
+          datetimesAsMember: item.confirmed + item.denied + item.undecided,
         }));
+      }
 
       return (
         <ControllerProvider
@@ -159,54 +167,99 @@ const ActivityAttendanceView = createVisualComponent({
           onSorterChange={(e) => setSorterList(e.data.sorterList)}
         >
           <Block
+            header={
+              <div style={{ display: "flex", columnGap: "8px", alignItems: "center", color: "rgb(0,0,0,0.45)" }}>
+                <Button icon="mdi-magnify" disabled={dateFilter === undefined} onClick={handleLoadStatistics} />
+                <DateRange
+                  autoFocus
+                  displayWeekNumbers={true}
+                  weekStartDay={1}
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.data.value)}
+                  format="D/M/YY"
+                  style={{
+                    minWidth: ["xl", "l", "m", "s"].includes(screenSize) ? "300px" : "120px",
+                    maxWidth: ["xl", "l", "m"].includes(screenSize) ? "300px" : screenSize === "m" ? "240px" : "120px",
+                  }}
+                />
+              </div>
+            }
             actionList={[
-              {
-                icon: "mdi-calendar",
-                onClick: () => setCollapseDateRange(!collapseDateRange),
-              },
+              { icon: "uugds-filter", onClick: () => setHideFilters(!hideFilters) },
               { component: <SorterButton type="bar" /> },
               { component: <SerieButton /> },
             ]}
           >
-            <CollapsibleBox collapsed={collapseDateRange}>
-              <div
-                style={{
-                  display: "flex",
-                  marginLeft: "16px",
-                  padding: "8px 0px",
-                  marginRight: "16px",
-                  justifyContent: "start",
-                }}
+            <CollapsibleBox collapsed={hideFilters}>
+              <Grid
+                templateRows={{ xs: "100%" }}
+                templateColumns={{ xs: "auto auto" }}
+                columnGap={{ xs: "18px", m: "28px" }}
+                style={{ padding: "8px", marginLeft: "8px", marginRight: "8px" }}
               >
-                <DateRange
-                  displayWeekNumbers={true}
-                  weekStartDay={1}
-                  value={dateRange}
-                  onChange={(e) => setDateRange(e.data.value)}
-                  format="D/M/YY"
-                  style={{
-                    minWidth: ["xl", "l", "m", "s"].includes(screenSize) ? "300px" : "160px",
-                  }}
+                <Toggle
+                  label={{ en: "Archived attendance", cs: "Archivovaná docházka" }}
+                  tooltip={{ cs: "Docházka netýkající se probíhajícího termínu", en: "Attendance of past datetimes" }}
+                  value={archivedFilter}
+                  onChange={(e) => setArchivedFilter(e.data.value)}
                 />
                 <ActionGroup
                   itemList={[
                     {
                       icon: "uugds-close",
-                      onClick: () => setCollapseDateRange(true),
                       colorScheme: "neutral",
+                      significance: "subdued",
+                      onClick: () => setHideFilters(true),
                     },
                   ]}
                 />
-              </div>
+              </Grid>
             </CollapsibleBox>
             <SerieManagerModal>
               <FormSerieManager />
             </SerieManagerModal>
             <SorterBar />
+            {dataToRender.length > 0 && (
+              <Text
+                style={{ display: "flex", justifyContent: "end", alignItems: "center", padding: "8px" }}
+                colorScheme="neutral"
+                significance="subdued"
+                category="story"
+                segment="body"
+                type={["xs", "s"].includes(screenSize) ? "minor" : "common"}
+              >
+                <Lsi
+                  lsi={{
+                    en: `${dataToRender[0].total} datetimes total`,
+                    cs: `Celkem ${dataToRender[0].total} termínů`,
+                  }}
+                />
+              </Text>
+            )}
             <AttendanceList />
           </Block>
         </ControllerProvider>
       );
+    }
+
+    function renderContent(state) {
+      switch (state) {
+        case "pendingNoData":
+          return (
+            <div
+              style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}
+            >
+              <Pending size="xl" colorScheme="secondary" />
+            </div>
+          );
+        case "error":
+        case "errorNoData":
+          return renderError(errorData);
+        case "pending":
+        case "ready":
+        case "readyNoData":
+          return renderReady(data);
+      }
     }
 
     return (
@@ -221,21 +274,7 @@ const ActivityAttendanceView = createVisualComponent({
           height: "100%",
         }}
       >
-        <AttendanceListProvider activityId={activityId} dateFilter={dateFilter}>
-          {({ state, data, errorData, pendingData, handlerMap }) => {
-            switch (state) {
-              case "pending":
-              case "pendingNoData":
-                return <Pending size="max" colorScheme="secondary" />;
-              case "error":
-              case "errorNoData":
-                return renderError(errorData);
-              case "ready":
-              case "readyNoData":
-                return renderReady(data);
-            }
-          }}
-        </AttendanceListProvider>
+        {renderContent(state)}
       </Container>
     );
     //@@viewOff:render

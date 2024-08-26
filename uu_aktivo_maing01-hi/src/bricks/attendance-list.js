@@ -16,19 +16,16 @@ const COLUMN_LIST = [
     cell: ({ data }) => <PersonItem uuIdentity={data.uuIdentity} />,
   },
   {
-    value: "confirmedCount",
+    value: "confirmed",
     header: (
       <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
         <Icon icon="uugdsstencil-communication-thumb-up" colorScheme="positive" />
         <Lsi lsi={{ cs: "Přišel(a)", en: "Came" }} />
       </div>
     ),
-    headerComponent: (
-      <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" sorterKey="confirmedCount" />
-    ),
+    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
     cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.confirmedCount} />,
-    maxWidth: "108px",
+    cell: ({ data }) => <Number value={data.confirmed} />,
   },
   {
     value: "confirmedPercentage",
@@ -44,19 +41,16 @@ const COLUMN_LIST = [
     maxWidth: "80px",
   },
   {
-    value: "undecidedCount",
+    value: "undecided",
     header: (
       <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
         <Icon icon="uugds-help" colorScheme="neutral" />
         <Lsi lsi={{ en: "Didn't decide", cs: "Nerozhodnuto" }} />
       </div>
     ),
-    headerComponent: (
-      <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" sorterKey="undecidedCount" />
-    ),
+    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
     cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.undecidedCount} />,
-    maxWidth: "148px",
+    cell: ({ data }) => <Number value={data.undecided} />,
   },
   {
     value: "undecidedPercentage",
@@ -72,19 +66,16 @@ const COLUMN_LIST = [
     maxWidth: "80px",
   },
   {
-    value: "deniedCount",
+    value: "denied",
     header: (
       <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
         <Icon icon="uugdsstencil-communication-thumb-down" colorScheme="negative" />
         <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel(la)" }} />
       </div>
     ),
-    headerComponent: (
-      <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" sorterKey="deniedCount" />
-    ),
+    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
     cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.deniedCount} />,
-    maxWidth: "140px",
+    cell: ({ data }) => <Number value={data.denied} />,
   },
   {
     value: "deniedPercentage",
@@ -100,11 +91,33 @@ const COLUMN_LIST = [
     maxWidth: "80px",
   },
   {
-    value: "total",
-    header: <Lsi lsi={{ en: "Total datetimes", cs: "Celkem termínů" }} />,
+    value: "datetimesAsMember",
+    header: (
+      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
+        <Icon icon="uugdsstencil-commerce-sum" colorScheme="building" />
+        <Lsi lsi={{ en: "Datetimes as member (%)", cs: "Termínů členem (%)" }} />
+      </div>
+    ),
     headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
     cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.total} />,
+    cell: ({ data }) => (
+      <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+        <div style={{ marginRight: "4px" }}>
+          <Number value={data.datetimesAsMember} />
+        </div>
+        <div>
+          {"("}
+          <Number
+            value={(data.datetimesAsMember / data.total) * 100}
+            unit="percent"
+            roundingMode="halfExpand"
+            maxDecimalDigits={1}
+            roundingPosition={-1}
+          />
+          {")"}
+        </div>
+      </div>
+    ),
   },
 ];
 //@@viewOff:constants

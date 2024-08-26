@@ -118,8 +118,8 @@ const Calls = {
       const commandUri = Calls.getCommandUri("attendance/list");
       return Calls.call("cmdGet", commandUri, dtoIn);
     },
-    listStatistics(dtoIn) {
-      const commandUri = Calls.getCommandUri("attendance/listStatistics");
+    getStatistics(dtoIn) {
+      const commandUri = Calls.getCommandUri("attendance/getStatistics");
       return Calls.call("cmdGet", commandUri, dtoIn);
     },
     delete(dtoIn) {

@@ -41,76 +41,124 @@ const AttendanceTile = createVisualComponent({
     return (
       <Box shape="ground" borderRadius="moderate" style={{ padding: screenSize === "xs" ? "8px" : "16px" }}>
         <Grid
-          templateColumns={{ xs: "repeat(2,auto)" }}
+          templateColumns={{ xs: "auto" }}
           templateRows={{ xs: "100%" }}
           alignItems={{ xs: "center" }}
           justifyContent={{ xs: "space-between" }}
           style={{ padding: screenSize === "xs" ? "8px 12px" : "16px 24px" }}
         >
           <PersonItem uuIdentity={data.uuIdentity} />
-          <Number value={data.total} />
         </Grid>
         <Line colorScheme="building" significance="subdued" />
         <Grid
           rowGap={{ xs: "8px", s: "16px" }}
-          style={{ padding: screenSize === "xs" ? "8px" : "16px", marginTop: "4px" }}
+          style={{
+            padding: screenSize === "xs" ? "8px" : "16px",
+            marginTop: "4px",
+            fontSize: screenSize === "xs" ? "13px" : "16px",
+          }}
         >
-          <Grid templateAreas={{ xs: `l l l l l count count perc perc` }}>
-            <Grid.Item gridArea="l" colSpan={5} rowSpan={1}>
+          <Grid templateAreas={{ xs: `l l l l l l count count count perc perc perc` }} alignItems="center">
+            <Grid.Item gridArea="l" colSpan={6} rowSpan={1}>
               <Text>
                 <Icon icon="uugdsstencil-communication-thumb-up" colorScheme="positive" margin="0 4px" />
                 <Lsi lsi={{ en: "Came", cs: "Přišel(a)" }} />
               </Text>
             </Grid.Item>
-            <Grid.Item gridArea="count" colSpan={2} rowSpan={1}>
+            <Grid.Item gridArea="count" colSpan={3} rowSpan={1}>
               <div style={{ textAlign: "right" }}>
-                <Number value={data.confirmedCount} />
+                <Number value={data.confirmed} />
               </div>
             </Grid.Item>
-            <Grid.Item gridArea="perc" colSpan={2} rowSpan={1}>
+            <Grid.Item gridArea="perc" colSpan={3} rowSpan={1}>
               <div style={{ textAlign: "right" }}>
                 {"("}
-                <Number value={data.confirmedPercentage} unit="percent" roundingMode="halfExpand" />
+                <Number
+                  value={data.confirmedPercentage}
+                  unit="percent"
+                  roundingMode="halfExpand"
+                  roundingPosition={-1}
+                  maxDecimalDigits={1}
+                />
                 {")"}
               </div>
             </Grid.Item>
           </Grid>
-          <Grid templateAreas={{ xs: `l l l l l count count perc perc` }}>
-            <Grid.Item gridArea="l" colSpan={5} rowSpan={1}>
+          <Grid templateAreas={{ xs: `l l l l l l count count count perc perc perc` }} alignItems="center">
+            <Grid.Item gridArea="l" colSpan={6} rowSpan={1}>
               <Text>
                 <Icon icon="uugds-help" colorScheme="neutral" margin="0 4px" />
                 <Lsi lsi={{ en: "Didn't decide", cs: "Nerozhodl(a) se" }} />
               </Text>
             </Grid.Item>
-            <Grid.Item gridArea="count" colSpan={2} rowSpan={1}>
+            <Grid.Item gridArea="count" colSpan={3} rowSpan={1}>
               <div style={{ textAlign: "right" }}>
-                <Number value={data.undecidedCount} />
+                <Number value={data.undecided} />
               </div>
             </Grid.Item>
-            <Grid.Item gridArea="perc" colSpan={2} rowSpan={1}>
+            <Grid.Item gridArea="perc" colSpan={3} rowSpan={1}>
               <div style={{ textAlign: "right" }}>
                 {"("}
-                <Number value={data.undecidedPercentage} unit="percent" roundingMode="halfExpand" />
+                <Number
+                  value={data.undecidedPercentage}
+                  unit="percent"
+                  roundingMode="halfExpand"
+                  roundingPosition={-1}
+                  maxDecimalDigits={1}
+                />
                 {")"}
               </div>
             </Grid.Item>
           </Grid>
-          <Grid templateAreas={{ xs: `l l l l l count count perc perc` }}>
-            <Grid.Item gridArea="l" colSpan={5} rowSpan={1}>
+          <Grid templateAreas={{ xs: `l l l l l l count count count perc perc perc` }} alignItems="center">
+            <Grid.Item gridArea="l" colSpan={6} rowSpan={1}>
               <Text>
                 <Icon icon="uugdsstencil-communication-thumb-down" colorScheme="negative" margin="0 4px" />
                 <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel(a)" }} />
               </Text>
             </Grid.Item>
-            <Grid.Item gridArea="count" colSpan={2} rowSpan={1}>
+            <Grid.Item gridArea="count" colSpan={3} rowSpan={1}>
               <div style={{ textAlign: "right" }}>
-                <Number value={data.deniedCount} />
+                <Number value={data.denied} />
               </div>
             </Grid.Item>
-            <Grid.Item gridArea="perc" colSpan={2} rowSpan={1}>
+            <Grid.Item gridArea="perc" colSpan={3} rowSpan={1}>
               <div style={{ textAlign: "right" }}>
                 {"("}
-                <Number value={data.deniedPercentage} unit="percent" roundingMode="halfExpand" />
+                <Number
+                  value={data.deniedPercentage}
+                  unit="percent"
+                  roundingMode="halfExpand"
+                  roundingPosition={-1}
+                  maxDecimalDigits={1}
+                />
+                {")"}
+              </div>
+            </Grid.Item>
+          </Grid>
+          <Line colorScheme="neutral" significance="subdued" />
+          <Grid templateAreas={{ xs: `l l l l l l count count count perc perc perc` }} alignItems="center">
+            <Grid.Item gridArea="l" colSpan={6} rowSpan={1}>
+              <Text>
+                <Icon icon="uugdsstencil-commerce-sum" margin="0 4px" />
+                <Lsi lsi={{ en: "Datetimes as member", cs: "Termínů členem" }} />
+              </Text>
+            </Grid.Item>
+            <Grid.Item gridArea="count" colSpan={3} rowSpan={1}>
+              <div style={{ textAlign: "right" }}>
+                <Number value={data.denied + data.confirmed + data.undecided} />
+              </div>
+            </Grid.Item>
+            <Grid.Item gridArea="perc" colSpan={3} rowSpan={1}>
+              <div style={{ textAlign: "right" }}>
+                {"("}
+                <Number
+                  value={((data.denied + data.confirmed + data.undecided) / data.total) * 100}
+                  unit="percent"
+                  roundingMode="halfExpand"
+                  roundingPosition={-1}
+                  maxDecimalDigits={1}
+                />
                 {")"}
               </div>
             </Grid.Item>

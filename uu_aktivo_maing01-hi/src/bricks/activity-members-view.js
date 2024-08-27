@@ -306,7 +306,7 @@ const ActivityMembersView = createVisualComponent({
             itemList={[
               {
                 icon: "uugds-refresh",
-                onClick: () => handlerMap.load(),
+                onClick: () => handlerMap.load({ filters: { activityId } }),
               },
             ]}
             size="s"
@@ -364,7 +364,11 @@ const ActivityMembersView = createVisualComponent({
               );
             }}
           </List>
-          <AutoLoad data={data} handleLoadNext={handlerMap.loadNext} distance={window.innerHeight} />
+          <AutoLoad
+            data={data}
+            handleLoadNext={() => handlerMap.loadNext({ filters: { activityId } })}
+            distance={window.innerHeight}
+          />
         </Fragment>
       );
     }

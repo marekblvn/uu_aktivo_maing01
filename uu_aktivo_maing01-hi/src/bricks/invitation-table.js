@@ -1,9 +1,9 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, useCallback, useState } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
-import { Block, DateTime, Link, Text } from "uu5g05-elements";
-import { FilterBar, FilterButton, SorterBar, SorterButton } from "uu5tilesg02-controls";
+import { Block, DateTime, Link, Pending, RichIcon, Text } from "uu5g05-elements";
+import { FilterBar, FilterButton, SorterButton } from "uu5tilesg02-controls";
 import { Table } from "uu5tilesg02-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
 //@@viewOff:imports
@@ -12,70 +12,54 @@ import { PersonItem } from "uu_plus4u5g02-elements";
 const SORTER_LIST = [
   {
     key: "activityName",
-    label: <Lsi lsi={{ en: "Activity name", cs: "Název aktivity" }} />,
+    label: { en: "Activity name", cs: "Název aktivity" },
     sort: (a, b) => a.activityName.localeCompare(b.activityName),
   },
   {
     key: "createdAt",
-    label: <Lsi lsi={{ en: "Created at", cs: "Datum vytvoření" }} />,
-    sort: (a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-      if (dateA < dateB) return -1;
-      else if (dateA > dateB) return 1;
-      return 0;
-    },
+    label: { en: "Created at", cs: "Datum vytvoření" },
   },
 ];
 
 const COLUMN_LIST = [
   {
-    value: "activityName",
-    header: <Lsi lsi={{ en: "Activity name", cs: "Název aktivity" }} />,
-    headerComponent: <Table.HeaderCell filterKey="activityName" />,
+    value: "activityId",
+    header: <Lsi lsi={{ en: "Activity ID", cs: "ID aktivity" }} />,
     cell: ({ data }) => (
-      <Link href={`activity?id=${data.activityId}`} target="_blank">
-        {data.activityName}
+      <Link
+        tooltip={{ en: "Go to activity page", cs: "Přejít na stránku aktivity" }}
+        href={`activity?id=${data.activityId}`}
+        target="_blank"
+      >
+        {data.activityId}
       </Link>
     ),
   },
   {
+    value: "activityName",
+    header: <Lsi lsi={{ en: "Activity name", cs: "Název aktivity" }} />,
+  },
+  {
     value: "uuIdentity",
     header: <Lsi lsi={{ en: "Recipient", cs: "Příjemce" }} />,
-    headerComponent: <Table.HeaderCell filterKey="uuIdentity" />,
     cell: ({ data }) => <PersonItem uuIdentity={data.uuIdentity} subtitle={data.uuIdentity} size="s" />,
   },
   {
     value: "createdAt",
     header: <Lsi lsi={{ en: "Created at", cs: "Datum vytvoření" }} />,
-    headerComponent: <Table.HeaderCell filterKey="createdAt" />,
     cell: ({ data }) => <DateTime value={data.createdAt} />,
   },
 ];
 
 const FILTER_LIST = [
   {
-    key: "activityName",
-    label: { en: "Activity name", cs: "Název aktivity" },
-    filter: (item, value) => {
-      let fragments = value.split(/[\s,.-;:_]/);
-      return fragments.some((frag) => {
-        let itemValue = item.activityName;
-        return itemValue.toLowerCase().indexOf(frag.toLowerCase()) !== -1;
-      });
-    },
-    inputProps: { placeholder: { en: "Enter activity name", cs: "Zadejte název aktivity" } },
+    key: "activityId",
+    label: { en: "Activity ID", cs: "ID aktivity" },
+    inputProps: { placeholder: { en: "Enter activity ID", cs: "Zadejte ID aktivity" } },
   },
   {
     key: "uuIdentity",
     label: { en: "Recipient", cs: "Příjemce" },
-    filter: (item, value) => {
-      let fragments = value.split(/\s+/);
-      return fragments.some((frag) => {
-        let itemValue = item.uuIdentity;
-        return itemValue.toLowerCase().indexOf(frag.toLowerCase()) !== -1;
-      });
-    },
     inputProps: {
       placeholder: { en: "Enter recipient's Plus4U ID", cs: "Zadejte Plus4U ID příjemce" },
     },
@@ -83,13 +67,6 @@ const FILTER_LIST = [
   {
     key: "createdAt",
     label: { en: "Created at", cs: "Datum vytvoření" },
-    filter: (item, value) => {
-      const itemDate = new Date(item.createdAt);
-      let [after, before] = value;
-      after = new Date(after);
-      before = new Date(before);
-      return after <= itemDate && itemDate < before;
-    },
     inputType: "date-range",
   },
 ];
@@ -114,43 +91,46 @@ const InvitationTable = createVisualComponent({
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    data: [],
+    onLoadNext: () => {},
+    onRefresh: () => {},
+    getActionList: () => {},
+    sorterList: [],
+    filterList: [],
+    onSorterListChange: () => {},
+    onFilterListChange: () => {},
+  },
   //@@viewOff:defaultProps
 
-  render({ data, onLoadNext, onRefresh, onDeleteInvitation }) {
+  render({
+    data,
+    pending,
+    onLoadNext,
+    onRefresh,
+    getActionList,
+    sorterList,
+    filterList,
+    onSorterListChange,
+    onFilterListChange,
+  }) {
     //@@viewOn:private
-    const [sorterList, setSorterList] = useState();
-    const [filterList, setFilterList] = useState();
+    const dataToRender = data
+      .filter((item) => item != null)
+      .map((item) => ({ ...item.data, handlerMap: item.handlerMap }));
     //@@viewOff:private
-
-    const getActionList = useCallback(
-      ({ rowIndex, data }) => {
-        return [
-          {
-            icon: "mdi-delete",
-            tooltip: { en: "Delete invitation", cs: "Smazat pozvánku" },
-            onClick: (e) => onDeleteInvitation(data),
-            colorScheme: "negative",
-            significance: "subdued",
-            order: 1,
-          },
-        ];
-      },
-      [data],
-    );
 
     //@@viewOn:render
     return (
       <ControllerProvider
         sorterList={sorterList}
         sorterDefinitionList={SORTER_LIST}
-        onSorterChange={(e) => setSorterList(e.data.sorterList)}
+        onSorterChange={onSorterListChange}
         filterList={filterList}
         filterDefinitionList={FILTER_LIST}
-        onFilterChange={(e) => setFilterList(e.data.filterList)}
-        itemIdentifier="id"
+        onFilterChange={onFilterListChange}
         selectable="none"
-        data={data}
+        data={dataToRender}
       >
         <Block
           card="full"
@@ -160,20 +140,19 @@ const InvitationTable = createVisualComponent({
             </Text>
           }
           actionList={[
-            { component: <SorterButton type="bar" /> },
             { component: <FilterButton type="bar" /> },
+            { component: <SorterButton type="dropdown" /> },
             { divider: true },
             {
-              icon: "mdi-refresh",
-              tooltip: { en: "Refresh", cs: "Obnovit" },
+              component: pending ? (
+                <Pending size="m" />
+              ) : (
+                <RichIcon icon="uugds-reload" colorScheme="dim" significance="subdued" borderRadius="moderate" />
+              ),
               onClick: onRefresh,
-              colorScheme: "dim",
-              significance: "subdued",
-              order: 1,
             },
           ]}
         >
-          <SorterBar displayManagerButton={false} />
           <FilterBar displayManagerButton={false} />
           <Table
             columnList={COLUMN_LIST}

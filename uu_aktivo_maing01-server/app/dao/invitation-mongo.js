@@ -87,16 +87,19 @@ class InvitationMongo extends UuObjectDao {
    * @param {object} pageInfo
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, filterObject = {}, pageInfo = { pageIndex: 0, pageSize: 100 }) {
+  async list(awid, filterObject = {}, pageInfo = { pageIndex: 0, pageSize: 100 }, sort = {}) {
     const skip = pageInfo.pageIndex * pageInfo.pageSize;
     let filter = {
       awid,
       ...filterObject,
     };
-    let aggregationPipeline = [
-      {
-        $match: filter,
-      },
+    let aggregationPipeline = [{ $match: filter }];
+
+    if (Object.keys(sort).length > 0) {
+      aggregationPipeline.push({ $sort: sort });
+    }
+
+    aggregationPipeline.push(
       {
         $lookup: {
           from: "activity",
@@ -116,11 +119,12 @@ class InvitationMongo extends UuObjectDao {
             { $limit: pageInfo.pageSize },
             {
               $project: {
-                _id: 1,
+                id: "$_id",
+                _id: 0,
                 activityId: 1,
                 activityName: "$activity.name",
                 uuIdentity: 1,
-                sys: 1,
+                createdAt: 1,
               },
             },
           ],
@@ -136,7 +140,8 @@ class InvitationMongo extends UuObjectDao {
           },
         },
       },
-    ];
+    );
+
     return await super.aggregate(aggregationPipeline);
   }
 

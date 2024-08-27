@@ -132,6 +132,26 @@ const _MyActivities = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
+      const handleCreateActivity = () => {
+        showModal(async (e) => {
+          e.preventDefault();
+          try {
+            const activity = await handlerMap.create(e.data.value);
+            setModalProps(null);
+            addAlert({
+              priority: "success",
+              header: { en: "New activity created!", cs: "Nová aktivita byla vytvořena!" },
+              message: {
+                en: `Activity '${activity.name}' was successfully created.`,
+                cs: `Aktivita '${activity.name}' byla úspěšně vytvořena.`,
+              },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        });
+      };
       if (!data.length) {
         return (
           <Grid
@@ -166,7 +186,7 @@ const _MyActivities = createVisualComponent({
                   icon: "mdi-plus",
                   colorScheme: "primary",
                   significance: "common",
-                  onClick: () => setOpenModal(true),
+                  onClick: handleCreateActivity,
                 },
               ]}
               style={{ marginTop: "10%", padding: "0 16px" }}
@@ -174,27 +194,6 @@ const _MyActivities = createVisualComponent({
           </Grid>
         );
       }
-
-      const handleCreateActivity = () => {
-        showModal(async (e) => {
-          e.preventDefault();
-          try {
-            const activity = await handlerMap.create(e.data.value);
-            setModalProps(null);
-            addAlert({
-              priority: "success",
-              header: { en: "New activity created!", cs: "Nová aktivita byla vytvořena!" },
-              message: {
-                en: `Activity '${activity.name}' was successfully created.`,
-                cs: `Aktivita '${activity.name}' byla úspěšně vytvořena.`,
-              },
-              durationMs: 2000,
-            });
-          } catch (error) {
-            showError(error);
-          }
-        });
-      };
 
       const handleLeaveActivity = (item) => {
         showDialog(async (e) => {

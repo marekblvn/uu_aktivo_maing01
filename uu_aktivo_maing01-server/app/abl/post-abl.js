@@ -120,7 +120,6 @@ class PostAbl {
       Errors.List.InvalidDtoIn,
     );
 
-    let filters = dtoIn.filters;
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
     if (
@@ -131,7 +130,7 @@ class PostAbl {
         throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
       }
 
-      filters = { activityId: dtoIn.filters.activityId };
+      dtoIn.filters = { activityId: dtoIn.filters.activityId };
 
       let activity;
       try {
@@ -152,16 +151,50 @@ class PostAbl {
       }
     }
 
-    let dtoOut;
-    if (filters?.activityId) {
-      filters.activityId = ObjectId.createFromHexString(filters.activityId);
-    }
-    if (filters?.uuIdentityName) {
-      filters.uuIdentityName = { $regex: filters.uuIdentityName, $options: "i" };
+    const filters = {};
+    if (dtoIn.filters) {
+      const { activityId, uuIdentity, uuIdentityName, createdAt, type } = dtoIn.filters;
+
+      if (activityId) {
+        filters.activityId = ObjectId.createFromHexString(activityId);
+      }
+
+      if (uuIdentity) {
+        filters.uuIdentity = uuIdentity;
+      }
+
+      if (uuIdentityName) {
+        filters.uuIdentityName = { $regex: uuIdentityName, $options: "i" };
+      }
+
+      if (type) {
+        filters.type = type;
+      }
+
+      if (createdAt && createdAt.filter((item) => item != null).length > 0) {
+        filters.createdAt = {};
+        if (createdAt[0]) {
+          filters.createdAt.$gte = new Date(createdAt[0]);
+        }
+
+        if (createdAt[1]) {
+          filters.createdAt.$lt = new Date(createdAt[1]);
+        }
+      }
     }
 
+    const sort = {};
+    if (dtoIn.sort) {
+      const { createdAt } = dtoIn.sort;
+
+      if (createdAt) {
+        sort.createdAt = createdAt;
+      }
+    }
+
+    let dtoOut;
     try {
-      dtoOut = await this.postDao.list(awid, filters, dtoIn.pageInfo, dtoIn.sort);
+      dtoOut = await this.postDao.list(awid, filters, dtoIn.pageInfo, sort);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.List.PostDaoListFailed({ uuAppErrorMap }, error);

@@ -39,11 +39,23 @@ const activityGetDtoInType = shape({
 });
 
 const activityListDtoInType = shape({
-  filters: shape({
-    recurrent: boolean(),
-    owner: uuIdentity(),
-    members: array(uuIdentity(), 1, 100),
-  }),
+  filters: shape(
+    {
+      name: uu5String(1, 48),
+      recurrent: boolean(),
+      owner: uuIdentity(),
+      members: array(uuIdentity(), 1, 100),
+      hasDatetime: boolean(),
+    },
+    true,
+  ),
+  sort: shape(
+    {
+      name: integer(-1, 1),
+      createdAt: integer(-1, 1),
+    },
+    true,
+  ),
   pageInfo: shape({
     pageIndex: integer(),
     pageSize: integer(),

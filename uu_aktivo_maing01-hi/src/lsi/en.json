@@ -102,6 +102,11 @@
       "info": "The invitation will be deleted.",
       "confirm": "Delete"
     },
+    "adminDeleteInvitation": {
+      "header": "Are you sure you want to delete this invitation?",
+      "info": "The invitation will be deleted without notifying the sender and the recipient.",
+      "confirm": "Delete"
+    },
     "deleteDatetime": {
       "header": "Are you sure you want to delete the datetime?",
       "info": "The datetime will be permanently deleted and it's recurrence will be stopped (if it is recurrent). Please note that by deleting the datetime, you will lose all participation data in the current datetime!",
@@ -110,6 +115,16 @@
     "deleteActivity": {
       "header": "Are you absolutely sure you want to delete this activity?",
       "info": "This activity and all information contained in it will be lost permanently. Please note that this decision cannot be reversed.",
+      "confirm": "Delete"
+    },
+    "adminDeleteActivity": {
+      "header": "Are you sure you want to delete the activity '%s'?",
+      "info": "Activity and all data associated with it will be deleted without informing the members or the owner.",
+      "confirm": "Delete"
+    },
+    "adminDeleteDatetime": {
+      "header": "Are you sure you want to delete the datetime of activity '%s'?",
+      "info": "The datetime and all information it holds will be deleted without informing the members of the activity.",
       "confirm": "Delete"
     }
   },

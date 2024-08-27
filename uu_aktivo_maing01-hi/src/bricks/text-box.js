@@ -60,7 +60,7 @@ const TextBox = createVisualComponent({
         significance="subdued"
         onClick={shouldBeCollapsible ? () => setCollapsed(!collapsed) : null}
       >
-        <div style={{ display: "block", textAlign: "justify" }}>{renderContent()}</div>
+        <div style={{ display: "block", textAlign: "left" }}>{renderContent()}</div>
       </Box>
     );
     //@@viewOff:render

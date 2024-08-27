@@ -134,6 +134,7 @@ const PostBlock = createVisualComponent({
         } catch (error) {
           showError(error);
         }
+        setInitialScroll(576);
       };
 
       const handlePostDelete = (item) => {

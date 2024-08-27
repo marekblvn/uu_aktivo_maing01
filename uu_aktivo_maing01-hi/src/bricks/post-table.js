@@ -1,8 +1,8 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, Utils } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
-import { Badge, Block, DateTime, Link, Tag, Text } from "uu5g05-elements";
+import { Badge, Block, DateTime, Link, Pending, RichIcon, Tag, Text } from "uu5g05-elements";
 import { FilterBar, FilterButton, SorterButton } from "uu5tilesg02-controls";
 import { Table } from "uu5tilesg02-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
@@ -31,6 +31,11 @@ const FILTER_LIST = [
     inputProps: {
       placeholder: { en: "Enter author's Plus4U ID", cs: "Zadejte Plus4U ID autora" },
     },
+  },
+  {
+    key: "createdAt",
+    label: { en: "Creation date", cs: "Datum vytvoření" },
+    inputType: "date-range",
   },
   {
     key: "type",
@@ -98,11 +103,15 @@ const COLUMN_LIST = [
   {
     value: "createdAt",
     header: <Lsi lsi={{ en: "Creation date", cs: "Datum vytvoření" }} />,
+    headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
+    cellComponent: <Table.Cell horizontalAlignment="center" />,
     cell: ({ data }) => <DateTime value={data.createdAt} timeFormat="long" dateFormat="medium" />,
   },
   {
     value: "type",
     header: <Lsi lsi={{ en: "Type", cs: "Typ" }} />,
+    headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
+    cellComponent: <Table.Cell horizontalAlignment="center" />,
     cell: ({ data }) => (
       <Tag
         size="m"
@@ -112,6 +121,7 @@ const COLUMN_LIST = [
         {data.type}
       </Tag>
     ),
+    maxWidth: "120px",
   },
 ];
 //@@viewOff:constants
@@ -148,6 +158,7 @@ const PostTable = createVisualComponent({
 
   render({
     data,
+    pending,
     onSorterListChange,
     sorterList,
     onFilterListChange,
@@ -168,6 +179,7 @@ const PostTable = createVisualComponent({
     //@@viewOn:render
     return (
       <ControllerProvider
+        itemIdentifier="id"
         data={dataToRender}
         filterDefinitionList={FILTER_LIST}
         filterList={filterList}
@@ -175,6 +187,7 @@ const PostTable = createVisualComponent({
         sorterDefinitionList={SORTER_LIST}
         sorterList={sorterList}
         onSorterChange={onSorterListChange}
+        selectable="none"
       >
         <Block
           card="full"
@@ -184,13 +197,27 @@ const PostTable = createVisualComponent({
             </Text>
           }
           actionList={[
-            { icon: "uugds-refresh", onClick: onRefresh },
             { component: <FilterButton type="bar" /> },
             { component: <SorterButton type="dropdown" /> },
+            { divider: true },
+            {
+              component: pending ? (
+                <Pending size="m" />
+              ) : (
+                <RichIcon icon="uugds-reload" colorScheme="dim" significance="subdued" borderRadius="moderate" />
+              ),
+              onClick: onRefresh,
+            },
           ]}
         >
           <FilterBar displayManagerButton={false} />
-          <Table verticalAlignment="center" columnList={COLUMN_LIST} getActionList={getActionList} />
+          <Table
+            verticalAlignment="center"
+            columnList={COLUMN_LIST}
+            getActionList={getActionList}
+            stickyHeader={true}
+            displayCellSelection="none"
+          />
           <AutoLoad data={data} handleLoadNext={onLoadNext} distance={window.innerHeight} />
         </Block>
       </ControllerProvider>

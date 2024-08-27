@@ -68,6 +68,12 @@ const formatEn = (frequency) => {
   return [monthsString, daysString].filter((str) => !!str).join(" and ");
 };
 
+export const frequencyToLsi = (frequency) => {
+  const idx = getIndexByValues(frequency);
+  const lsi = FREQUENCY_LSI[idx];
+  return lsi;
+};
+
 export const getFrequencyOption = (frequency) => {
   const index = getIndexByValues(frequency);
   return FREQUENCY_OPTIONS[index];

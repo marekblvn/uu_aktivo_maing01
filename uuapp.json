@@ -10,9 +10,14 @@
     "development": {
       "uuAppBoxRegistryBaseUri": "----- VALUE REQUIRED -----",
       "uuCloudUniverseBaseUri": "----- VALUE REQUIRED -----",
-      "uuCloudLogStoreBaseUri": "----- VALUE REQUIRED -----"
+      "uuCloudLogStoreBaseUri": "----- VALUE REQUIRED -----",
+      "appBoxRegistryBaseUri": "----- VALUE REQUIRED -----",
+      "scriptRepositoryBaseUri": "----- VALUE REQUIRED -----"
     }
   },
+  "uu_aktivo_maing01-hi": {},
   "uu_aktivo_maing01-server": {},
-  "uu_aktivo_maing01-hi": {}
+  "uu_aktivo_maing01-uuscriptlib": {
+    "scriptList": []
+  }
 }

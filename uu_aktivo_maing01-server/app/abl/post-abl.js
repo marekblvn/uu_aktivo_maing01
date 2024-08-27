@@ -1,5 +1,6 @@
 "use strict";
 const Path = require("path");
+const { ObjectId } = require("mongodb");
 const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
@@ -64,8 +65,10 @@ class PostAbl {
       dtoIn.type = "normal";
     }
     dtoIn.awid = awid;
+    dtoIn.activityId = ObjectId.createFromHexString(dtoIn.activityId);
     dtoIn.uuIdentity = userUuIdentity;
     dtoIn.uuIdentityName = session.getIdentity().getName();
+    dtoIn.createdAt = new Date();
 
     let dtoOut;
     try {
@@ -123,9 +126,11 @@ class PostAbl {
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
       !authorizedProfiles.includes(PROFILE_CODES.Executives)
     ) {
-      if (!dtoIn.activityId) {
+      if (!dtoIn.filters || !dtoIn.filters?.activityId) {
         throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
       }
+
+      dtoIn.filters = { activityId: dtoIn.filters.activityId };
 
       let activity;
       try {
@@ -146,26 +151,57 @@ class PostAbl {
       }
     }
 
-    let dtoOut;
-    if (dtoIn.activityId) {
-      try {
-        dtoOut = await this.postDao.listByActivityId(awid, dtoIn.activityId, dtoIn.pageInfo);
-      } catch (error) {
-        if (error instanceof ObjectStoreError) {
-          throw new Errors.List.PostDaoListByActivityIdFailed({ uuAppErrorMap }, error);
-        }
-        throw error;
+    const filters = {};
+    if (dtoIn.filters) {
+      const { activityId, uuIdentity, uuIdentityName, createdAt, type } = dtoIn.filters;
+
+      if (activityId) {
+        filters.activityId = ObjectId.createFromHexString(activityId);
       }
-    } else {
-      try {
-        dtoOut = await this.postDao.list(awid, dtoIn.pageInfo);
-      } catch (error) {
-        if (error instanceof ObjectStoreError) {
-          throw new Errors.List.PostDaoListFailed({ uuAppErrorMap }, error);
+
+      if (uuIdentity) {
+        filters.uuIdentity = uuIdentity;
+      }
+
+      if (uuIdentityName) {
+        filters.uuIdentityName = { $regex: uuIdentityName, $options: "i" };
+      }
+
+      if (type) {
+        filters.type = type;
+      }
+
+      if (createdAt && createdAt.filter((item) => item != null).length > 0) {
+        filters.createdAt = {};
+        if (createdAt[0]) {
+          filters.createdAt.$gte = new Date(createdAt[0]);
         }
-        throw error;
+
+        if (createdAt[1]) {
+          filters.createdAt.$lt = new Date(createdAt[1]);
+        }
       }
     }
+
+    const sort = {};
+    if (dtoIn.sort) {
+      const { createdAt } = dtoIn.sort;
+
+      if (createdAt) {
+        sort.createdAt = createdAt;
+      }
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.postDao.list(awid, filters, dtoIn.pageInfo, sort);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.List.PostDaoListFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

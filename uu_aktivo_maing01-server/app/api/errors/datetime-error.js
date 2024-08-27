@@ -128,18 +128,25 @@ const CreateNext = {
       this.message = "Activity with provided id does not exist.";
     }
   },
-  DatetimeDaoDeleteFailed: class extends AktivoMainUseCaseError {
+  ActivityNotRecurrent: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${CreateNext.UC_CODE}datetimeDaoDeleteFailed`;
-      this.message = "Delete datetime by datetime DAO delete failed.";
+      this.code = `${CreateNext.UC_CODE}activityNotRecurrent`;
+      this.message = "Activity is not recurrent. Next datetime cannot be created.";
     }
   },
-  DatetimeDaoCreateFailed: class extends AktivoMainUseCaseError {
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${CreateNext.UC_CODE}datetimeDaoCreateFailed`;
-      this.message = "Create datetime by datetime DAO create failed.";
+      this.code = `${CreateNext.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to create next datetime.";
+    }
+  },
+  DatetimeDaoUpdateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}datetimeDaoUpdateFailed`;
+      this.message = "Update datetime by datetime DAO update failed.";
     }
   },
 };
@@ -278,6 +285,13 @@ const Delete = {
       super(...arguments);
       this.code = `${Delete.UC_CODE}userNotAuthorized`;
       this.message = "User is not authorized to create datetime in this activity.";
+    }
+  },
+  AttendanceDaoUpdateManyFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Delete.UC_CODE}AttendanceDaoUpdateManyFailed`;
+      this.message = "Update attendances by attendance DAO updateMany failed.";
     }
   },
   DatetimeDaoDeleteFailed: class extends AktivoMainUseCaseError {

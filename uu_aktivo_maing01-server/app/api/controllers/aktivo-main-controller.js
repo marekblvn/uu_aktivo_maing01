@@ -13,6 +13,10 @@ class AktivoMainController {
   loadBasicData(ucEnv) {
     return AktivoMainAbl.loadBasicData(ucEnv.getUri(), ucEnv.getSession());
   }
+
+  getAuthorizedProfiles(ucEnv) {
+    return AktivoMainAbl.getAuthorizedProfiles(ucEnv.getAuthorizationResult());
+  }
 }
 
 module.exports = new AktivoMainController();

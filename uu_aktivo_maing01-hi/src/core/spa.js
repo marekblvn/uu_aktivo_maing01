@@ -1,12 +1,21 @@
 //@@viewOn:imports
-import { createVisualComponent, Utils } from "uu5g05";
+import { createVisualComponent, useState, Utils } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Plus4U5 from "uu_plus4u5g02";
 import Plus4U5App from "uu_plus4u5g02-app";
+import { AuthorizationContextProvider } from "../contexts/authorization-context.js";
+import SideMenuDrawer from "./side-menu-drawer.js";
 
 import Config from "./config/config.js";
 import Home from "../routes/home.js";
+import AppBar from "./app-bar.js";
 
+const ActivityPage = Utils.Component.lazy(() => import("../routes/activity-page.js"));
+const ActivityManagement = Utils.Component.lazy(() => import("../routes/activity-management.js"));
+const InvitationManagement = Utils.Component.lazy(() => import("../routes/invitation-management.js"));
+const PostManagement = Utils.Component.lazy(() => import("../routes/post-management.js"));
+const MyActivities = Utils.Component.lazy(() => import("../routes/my-activities.js"));
+const Invitations = Utils.Component.lazy(() => import("../routes/invitations.js"));
 const About = Utils.Component.lazy(() => import("../routes/about.js"));
 const InitAppWorkspace = Utils.Component.lazy(() => import("../routes/init-app-workspace.js"));
 const ControlPanel = Utils.Component.lazy(() => import("../routes/control-panel.js"));
@@ -14,8 +23,14 @@ const ControlPanel = Utils.Component.lazy(() => import("../routes/control-panel.
 
 //@@viewOn:constants
 const ROUTE_MAP = {
-  "": { redirect: "home" },
+  "": { rewrite: "home" },
   home: (props) => <Home {...props} />,
+  "my-activities": (props) => <MyActivities {...props} />,
+  "management/activities": (props) => <ActivityManagement {...props} />,
+  "management/invitations": (props) => <InvitationManagement {...props} />,
+  "management/posts": (props) => <PostManagement {...props} />,
+  invitations: (props) => <Invitations {...props} />,
+  activity: ({ params }) => <ActivityPage id={params.id} />,
   about: (props) => <About {...props} />,
   "sys/uuAppWorkspace/initUve": (props) => <InitAppWorkspace {...props} />,
   controlPanel: (props) => <ControlPanel {...props} />,
@@ -48,13 +63,29 @@ const Spa = createVisualComponent({
 
   render() {
     //@@viewOn:private
+    const [menuOpen, setMenuOpen] = useState(false);
     //@@viewOff:private
 
     //@@viewOn:render
     return (
       <Plus4U5.SpaProvider initialLanguageList={["en", "cs"]}>
         <Uu5Elements.ModalBus>
-          <Plus4U5App.Spa routeMap={ROUTE_MAP} />
+          <AuthorizationContextProvider>
+            <Plus4U5App.Top.View
+              topBgColor="rgb(33, 150, 243)"
+              textBackground="full"
+              unitName={
+                <AppBar
+                  handleCloseSideMenu={() => setMenuOpen(false)}
+                  handleOpenSideMenu={() => setMenuOpen(true)}
+                  sideMenuOpen={menuOpen}
+                />
+              }
+            />
+            <SideMenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
+              <Plus4U5App.Spa routeMap={ROUTE_MAP} displayTop={false} />
+            </SideMenuDrawer>
+          </AuthorizationContextProvider>
         </Uu5Elements.ModalBus>
       </Plus4U5.SpaProvider>
     );

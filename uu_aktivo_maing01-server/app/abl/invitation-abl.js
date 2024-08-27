@@ -1,5 +1,6 @@
 "use strict";
 const Path = require("path");
+const { ObjectId } = require("mongodb");
 const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
@@ -44,6 +45,10 @@ class InvitationAbl {
       throw new Errors.Create.ActivityDoesNotExist({ uuAppErrorMap });
     }
 
+    if (activity.members.length >= 100) {
+      throw new Errors.Create.ActivityMemberLimitReached({ uuAppErrorMap });
+    }
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
 
@@ -75,6 +80,7 @@ class InvitationAbl {
     }
 
     dtoIn.awid = awid;
+    dtoIn.activityId = activity.id;
     let dtoOut;
     try {
       dtoOut = await this.invitationDao.create(dtoIn);
@@ -161,21 +167,59 @@ class InvitationAbl {
         if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
           throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
         }
+      }
+    }
 
-        dtoIn.filters = {
-          activityId: dtoIn.filters.activityId,
-        };
+    const filters = {};
+    if (dtoIn.filters) {
+      const { activityId, uuIdentity, createdAt } = dtoIn.filters;
+
+      if (activityId) {
+        filters.activityId = ObjectId.createFromHexString(activityId);
+      }
+
+      if (uuIdentity) {
+        filters.uuIdentity = uuIdentity;
+      }
+
+      if (createdAt && createdAt.filter((item) => item != null).length > 0) {
+        filters.createdAt = {};
+        if (createdAt[0]) {
+          filters.createdAt.$gte = new Date(createdAt[0]);
+        }
+        if (createdAt[1]) {
+          filters.createdAt.$lt = new Date(createdAt[1]);
+        }
+      }
+    }
+
+    const sort = {};
+    if (dtoIn.sort) {
+      const { createdAt } = dtoIn.sort;
+
+      if (createdAt) {
+        sort.createdAt = createdAt;
       }
     }
 
     let dtoOut;
+    const pageInfo = {
+      pageIndex: parseInt(dtoIn.pageInfo?.pageIndex) || 0,
+      pageSize: parseInt(dtoIn.pageInfo?.pageSize) || 100,
+    };
     try {
-      dtoOut = await this.invitationDao.list(awid, dtoIn.filters, dtoIn.pageInfo);
+      [dtoOut] = await this.invitationDao.list(awid, filters, pageInfo, sort);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.List.InvitationDaoListFailed({ uuAppErrorMap }, error);
       }
       throw error;
+    }
+    if (!dtoOut) {
+      dtoOut = {};
+      dtoOut.itemList = [];
+      dtoOut.pageInfo = pageInfo;
+      dtoOut.pageInfo.total = 0;
     }
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
@@ -223,19 +267,29 @@ class InvitationAbl {
       throw new Errors.Accept.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: invitation.activityId });
     }
 
+    if (activity.members.length >= 100) {
+      throw new Errors.Accept.ActivityMemberLimitReached({ uuAppErrorMap });
+    }
+
     if (activity.members.includes(invitation.uuIdentity)) {
       throw new Errors.Accept.UserAlreadyMember({ uuAppErrorMap });
     }
 
-    let dtoOut;
     const updateObject = { id: invitation.activityId, awid, $push: { members: invitation.uuIdentity } };
     try {
-      dtoOut = await this.activityDao.update(updateObject);
+      await this.activityDao.update(updateObject);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Accept.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
       }
       throw error;
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.invitationDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      throw new Errors.Accept.InvitationDaoDeleteFailed({ uuAppErrorMap }, error);
     }
 
     if (activity.datetimeId !== null) {
@@ -264,6 +318,7 @@ class InvitationAbl {
       }
     }
 
+    dtoOut = dtoOut || {};
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

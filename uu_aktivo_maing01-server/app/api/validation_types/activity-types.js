@@ -1,20 +1,20 @@
 /* eslint-disable */
 
 const activityCreateDtoInType = shape({
-  name: uu5String(1, 256).isRequired(),
-  description: uu5String(512),
-  location: uu5String(256),
-  idealParticipants: integer(0, 1000),
-  minParticipants: integer(0, 1000),
+  name: uu5String(1, 48).isRequired(),
+  description: uu5String(256),
+  location: uu5String(60),
+  idealParticipants: integer(0, 100),
+  minParticipants: integer(0, 100),
 });
 
 const activityUpdateDtoInType = shape({
   id: id().isRequired(),
-  name: uu5String(1, 256),
-  description: uu5String(512),
-  location: uu5String(256),
-  idealParticipants: integer(0, 1000),
-  minParticipants: integer(0, 1000),
+  name: uu5String(1, 48),
+  description: uu5String(256),
+  location: uu5String(60),
+  idealParticipants: integer(0, 100),
+  minParticipants: integer(0, 100),
 });
 
 const activityUpdateFrequencyDtoInType = shape({
@@ -39,12 +39,23 @@ const activityGetDtoInType = shape({
 });
 
 const activityListDtoInType = shape({
-  filters: shape({
-    state: oneOf(["active", "suspended"]),
-    recurrent: boolean(),
-    owner: uuIdentity(),
-    members: array(uuIdentity(), 1, 1000),
-  }),
+  filters: shape(
+    {
+      name: uu5String(1, 48),
+      recurrent: boolean(),
+      owner: uuIdentity(),
+      members: array(uuIdentity(), 1, 100),
+      hasDatetime: boolean(),
+    },
+    true,
+  ),
+  sort: shape(
+    {
+      name: integer(-1, 1),
+      createdAt: integer(-1, 1),
+    },
+    true,
+  ),
   pageInfo: shape({
     pageIndex: integer(),
     pageSize: integer(),

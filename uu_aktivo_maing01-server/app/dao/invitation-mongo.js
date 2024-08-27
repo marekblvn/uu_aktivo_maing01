@@ -81,17 +81,68 @@ class InvitationMongo extends UuObjectDao {
 
   /**
    * Returns a object consisting of itemList - list of matched uuObjects and pageInfo - object with pageIndex, pageSize and total.
+   * Items in itemList have additional activityName and createdAt attributes provided in aggregation.
    * @param {string} awid
    * @param {object} filterObject - Object consisting of filters to use for finding uuObjects: activityId, uuIdentity.
    * @param {object} pageInfo
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, filterObject, pageInfo = {}) {
+  async list(awid, filterObject = {}, pageInfo = { pageIndex: 0, pageSize: 100 }, sort = {}) {
+    const skip = pageInfo.pageIndex * pageInfo.pageSize;
     let filter = {
       awid,
       ...filterObject,
     };
-    return await super.find(filter, pageInfo);
+    let aggregationPipeline = [{ $match: filter }];
+
+    if (Object.keys(sort).length > 0) {
+      aggregationPipeline.push({ $sort: sort });
+    }
+
+    aggregationPipeline.push(
+      {
+        $lookup: {
+          from: "activity",
+          localField: "activityId",
+          foreignField: "_id",
+          as: "activity",
+        },
+      },
+      {
+        $unwind: "$activity",
+      },
+      {
+        $facet: {
+          metadata: [{ $count: "total" }],
+          paginatedResults: [
+            { $skip: skip },
+            { $limit: pageInfo.pageSize },
+            {
+              $project: {
+                id: "$_id",
+                _id: 0,
+                activityId: 1,
+                activityName: "$activity.name",
+                uuIdentity: 1,
+                createdAt: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          itemList: "$paginatedResults",
+          pageInfo: {
+            pageIndex: { $literal: pageInfo.pageIndex },
+            pageSize: { $literal: pageInfo.pageSize },
+            total: { $arrayElemAt: ["$metadata.total", 0] },
+          },
+        },
+      },
+    );
+
+    return await super.aggregate(aggregationPipeline);
   }
 
   /**

@@ -16,6 +16,11 @@
         "httpMethod": "GET",
         "type": "CMD"
       },
+      "sys/uuAppWorkspace/getAuthorizedProfiles": {
+        "realization": "api/controllers/AktivoMainController.getAuthorizedProfiles",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
       "defaultUve": {
         "realization": "index.html",
         "httpMethod": "GET",
@@ -146,6 +151,11 @@
         "httpMethod": "GET",
         "type": "CMD"
       },
+      "attendance/getStatistics": {
+        "realization": "api/controllers/AttendanceController.getStatistics",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
       "attendance/delete": {
         "realization": "api/controllers/AttendanceController.delete",
         "httpMethod": "POST",
@@ -163,6 +173,16 @@
       },
       "datetime/updateParticipation": {
         "realization": "api/controllers/DatetimeController.updateParticipation",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "datetime/delete": {
+        "realization": "api/controllers/DatetimeController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "datetime/createNext": {
+        "realization": "api/controllers/DatetimeController.createNext",
         "httpMethod": "POST",
         "type": "CMD"
       }

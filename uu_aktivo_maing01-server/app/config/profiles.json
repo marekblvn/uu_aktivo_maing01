@@ -26,6 +26,10 @@
         "sysStateList": ["created", "assigned", "active", "restricted", "readOnly", "closed", "suspended"],
         "profileList": ["Public"]
       },
+      "sys/uuAppWorkspace/getAuthorizedProfiles": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers", "Public"]
+      },
       "defaultUve": {
         "profileList": ["Public"]
       },
@@ -129,6 +133,10 @@
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
+      "attendance/getStatistics": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
       "attendance/delete": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
@@ -142,6 +150,14 @@
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/updateParticipation": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "datetime/delete": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "datetime/createNext": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       }

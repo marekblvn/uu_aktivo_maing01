@@ -119,33 +119,56 @@ class ActivityAbl {
     );
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
-    let daoFilter = {};
+    const filter = {};
     if (
       authorizedProfiles.includes(PROFILE_CODES.Authorities) ||
       authorizedProfiles.includes(PROFILE_CODES.Executives)
     ) {
-      if (dtoIn.filters?.recurrent !== undefined) {
-        daoFilter.recurrent = dtoIn.filters.recurrent;
-      }
-      if (dtoIn.filters?.owner) {
-        daoFilter.owner = dtoIn.filters.owner;
-      }
-      if (dtoIn.filters?.members?.length) {
-        daoFilter.members = {
-          $all: dtoIn.filters.members,
-        };
+      if (dtoIn.filters) {
+        const { name, recurrent, owner, members, hasDatetime } = dtoIn.filters;
+        if (name) {
+          filter.name = { $regex: name, $options: "i" };
+        }
+        if (recurrent !== undefined) {
+          filter.recurrent = recurrent;
+        }
+        if (owner) {
+          filter.owner = owner;
+        }
+        if (members) {
+          filter.members = {
+            $all: members,
+          };
+        }
+        if (hasDatetime !== undefined) {
+          if (hasDatetime === true) {
+            filter.datetimeId = { $ne: null };
+          } else {
+            filter.datetimeId = null;
+          }
+        }
       }
     } else {
-      daoFilter = {
-        members: {
-          $in: [session.getIdentity().getUuIdentity()],
-        },
-      };
+      filter.members = { $in: [session.getIdentity().getUuIdentity()] };
     }
+
+    const sort = {};
+    if (dtoIn.sort) {
+      const { createdAt, name } = dtoIn.sort;
+
+      if (createdAt) {
+        sort["sys.cts"] = createdAt;
+      }
+
+      if (name) {
+        sort.name = name;
+      }
+    }
+
     const pageInfo = dtoIn.pageInfo || { pageIndex: 0, pageSize: 10 };
     let dtoOut;
     try {
-      dtoOut = await this.activityDao.list(awid, daoFilter, pageInfo);
+      dtoOut = await this.activityDao.list(awid, filter, pageInfo, sort);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.List.ActivityDaoListFailed({ uuAppErrorMap }, error);
@@ -521,6 +544,10 @@ class ActivityAbl {
       throw new Errors.TransferOwnership.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
     }
 
+    if (activity.datetimeId !== null) {
+      throw new Errors.TransferOwnership.ActivityHasDatetime({ uuAppErrorMap });
+    }
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
@@ -690,7 +717,6 @@ class ActivityAbl {
       throw new Errors.Leave.UserIsOwner({ uuAppErrorMap });
     }
 
-    let dtoOut;
     const updateObject = {
       id: dtoIn.id,
       awid,
@@ -701,7 +727,7 @@ class ActivityAbl {
     };
 
     try {
-      dtoOut = await this.activityDao.update(updateObject);
+      await this.activityDao.update(updateObject);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Leave.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
@@ -743,6 +769,8 @@ class ActivityAbl {
         throw error;
       }
     }
+
+    let dtoOut = {};
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
@@ -782,7 +810,7 @@ class ActivityAbl {
     }
 
     try {
-      await this.attendanceDao.deleteByActivityId(awid, dtoIn.id);
+      await this.attendanceDao.deleteByActivityId(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.AttendanceDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
@@ -791,7 +819,7 @@ class ActivityAbl {
     }
 
     try {
-      await this.postDao.deleteByActivityId(awid, dtoIn.id);
+      await this.postDao.deleteByActivityId(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.PostDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
@@ -800,7 +828,7 @@ class ActivityAbl {
     }
 
     try {
-      await this.invitationDao.deleteByActivityId(awid, dtoIn.id);
+      await this.invitationDao.deleteByActivityId(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.InvitationDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
@@ -809,7 +837,7 @@ class ActivityAbl {
     }
 
     try {
-      await this.datetimeDao.deleteByActivityId(awid, dtoIn.id);
+      await this.datetimeDao.deleteByActivityId(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.DatetimeDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
@@ -819,7 +847,7 @@ class ActivityAbl {
 
     let dtoOut;
     try {
-      dtoOut = await this.activityDao.delete(awid, dtoIn.id);
+      dtoOut = await this.activityDao.delete(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.ActivityDaoDeleteFailed({ uuAppErrorMap }, error);

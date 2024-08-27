@@ -9,6 +9,7 @@ class PostMongo extends UuObjectDao {
   async createSchema() {
     await super.createIndex({ awid: 1, _id: 1 }, { unique: true });
     await super.createIndex({ awid: 1, activityId: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, uuIdentity: 1 }, { unique: false });
   }
 
   /**
@@ -65,28 +66,15 @@ class PostMongo extends UuObjectDao {
    * Returns an object consisting of itemList - list of matched uuObjects based on awid, and pageInfo - object with pageIndex, pageSize and total.
    * @param {string} awid
    * @param {object} pageInfo
+   * @param {object} sort
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, pageInfo = {}) {
+  async list(awid, filterObject = {}, pageInfo = {}, sort = {}) {
     let filter = {
       awid,
+      ...filterObject,
     };
-    return await super.find(filter, pageInfo);
-  }
-
-  /**
-   * Returns an object consisting of itemList - list of matched uuObjects based on awid and activityId, and pageInfo - object with pageIndex, pageSize and total.
-   * @param {string} awid
-   * @param {string} activityId
-   * @param {object} pageInfo
-   * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
-   */
-  async listByActivityId(awid, activityId, pageInfo = {}) {
-    let filter = {
-      awid,
-      activityId,
-    };
-    return await super.find(filter, pageInfo);
+    return await super.find(filter, pageInfo, sort);
   }
 
   /**

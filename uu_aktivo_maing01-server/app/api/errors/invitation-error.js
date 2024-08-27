@@ -33,6 +33,13 @@ const Create = {
       this.message = "User is not authorized to create invitation to this activity.";
     }
   },
+  ActivityMemberLimitReached: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Create.UC_CODE}activityMemberLimitReached`;
+      this.message = "Activity's member limit has been reached. No more users can be invited.";
+    }
+  },
   TargetUserAlreadyMember: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -178,6 +185,13 @@ const Accept = {
       this.message = "Activity with the provided id does not exist.";
     }
   },
+  ActivityMemberLimitReached: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Accept.UC_CODE}activityMemberLimitReached`;
+      this.message = "Activity's member limit has been reached. No more users can join.";
+    }
+  },
   UserAlreadyMember: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
@@ -190,6 +204,13 @@ const Accept = {
       super(...arguments);
       this.code = `${Accept.UC_CODE}activityDaoUpdateFailed`;
       this.message = "Update activity by activity DAO update failed.";
+    }
+  },
+  InvitationDaoDeleteFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Accept.UC_CODE}invitationDaoDeleteFailed`;
+      this.message = "Delete invitation by invitation DAO delete failed.";
     }
   },
   DatetimeDaoGetFailed: class extends AktivoMainUseCaseError {

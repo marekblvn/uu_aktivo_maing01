@@ -15,7 +15,13 @@ class AttendanceController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return AttendanceAbl.list(awid, dtoIn, session, authorizationResult);
   }
-
+  getStatistics(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return AttendanceAbl.getStatistics(awid, dtoIn, session, authorizationResult);
+  }
   delete(ucEnv) {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();

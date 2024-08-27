@@ -1,5 +1,6 @@
 "use strict";
 const Path = require("path");
+const { ObjectId } = require("mongodb");
 const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
@@ -65,9 +66,16 @@ class AttendanceAbl {
 
     const attendanceObject = {
       awid,
-      ...datetime,
-      notification: undefined,
+      confirmed: datetime.confirmed,
+      denied: datetime.denied,
+      undecided: datetime.undecided,
+      datetime: datetime.datetime,
+      activityId: activity.id,
+      datetimeId: datetime.id,
+      archived: false,
     };
+
+    delete attendanceObject.notification;
 
     let dtoOut;
     try {
@@ -124,16 +132,19 @@ class AttendanceAbl {
     const { filters } = dtoIn || {};
     const queryFilters = {};
     if (filters) {
-      const { after, before, activityId } = filters;
+      const { after, before, activityId, archived } = filters;
       if (activityId) {
-        queryFilters.activityId = activityId;
+        queryFilters.activityId = ObjectId.createFromHexString(activityId);
       }
       if (after) {
-        queryFilters.datetime = { $gte: after };
+        queryFilters.datetime = { $gte: new Date(after) };
       }
       if (before) {
         queryFilters.datetime = queryFilters.datetime || {};
-        queryFilters.datetime.$lt = before;
+        queryFilters.datetime.$lt = new Date(before);
+      }
+      if (archived !== undefined) {
+        queryFilters.archived = archived;
       }
     }
 
@@ -146,6 +157,87 @@ class AttendanceAbl {
       }
       throw error;
     }
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async getStatistics(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("attendanceGetStatisticsDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.GetStatistics),
+      Errors.GetStatistics.InvalidDtoIn,
+    );
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      if (!dtoIn.filters?.activityId) {
+        throw new Errors.GetStatistics.UserNotAuthorized({ uuAppErrorMap });
+      }
+
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, dtoIn.filters.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.GetStatistics.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.GetStatistics.ActivityDoesNotExist(
+          { uuAppErrorMap },
+          { activityId: dtoIn.filters.activityId },
+        );
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.GetStatistics.UserNotMember({ uuAppErrorMap });
+      }
+    }
+
+    const { filters } = dtoIn;
+    const queryFilters = {};
+    if (filters) {
+      const { after, before, activityId, archived } = filters;
+      if (activityId) {
+        queryFilters.activityId = ObjectId.createFromHexString(activityId);
+      }
+      if (after) {
+        queryFilters.datetime = { $gte: new Date(after) };
+      }
+      if (before) {
+        queryFilters.datetime = queryFilters.datetime || {};
+        queryFilters.datetime.$lt = new Date(before);
+      }
+      if (archived !== undefined) {
+        queryFilters.archived = archived;
+      }
+    }
+
+    let statistics;
+    let total;
+    try {
+      statistics = await this.attendanceDao.getStatistics(awid, queryFilters);
+      total = await this.attendanceDao.count({ ...queryFilters, awid });
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.GetStatistics.AttendanceDaoGetStatisticsFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+    statistics.forEach((item) => {
+      item.total = total;
+    });
+
+    let dtoOut = {};
+    dtoOut.statistics = statistics;
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

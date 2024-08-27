@@ -19,6 +19,7 @@ class DatetimeAbl {
     this.datetimeDao = DaoFactory.getDao("datetime");
     this.datetimeDao.createSchema();
     this.activityDao = DaoFactory.getDao("activity");
+    this.attendanceDao = DaoFactory.getDao("attendance");
   }
 
   async create(awid, dtoIn, session, authorizationResult) {
@@ -93,26 +94,25 @@ class DatetimeAbl {
       if (!dtoIn.frequency || (dtoIn.frequency.months === 0 && dtoIn.frequency.days === 0)) {
         throw new Errors.Create.FrequencyIsRequired({ uuAppErrorMap });
       }
-    }
+      const nextDatetime = new Date(datetimeAsDate);
+      nextDatetime.setMonth(nextDatetime.getMonth() + dtoIn.frequency.months);
+      nextDatetime.setDate(nextDatetime.getDate() + dtoIn.frequency.days);
+      const nextNotificationDate = new Date(nextDatetime);
+      nextNotificationDate.setDate(nextNotificationDate.getDate() - dtoIn.notificationOffset.days);
+      nextNotificationDate.setHours(
+        nextNotificationDate.getHours() - dtoIn.notificationOffset.hours,
+        nextNotificationDate.getMinutes() - dtoIn.notificationOffset.minutes,
+      );
 
-    const nextDatetime = new Date(datetimeAsDate);
-    nextDatetime.setMonth(nextDatetime.getMonth() + dtoIn.frequency.months);
-    nextDatetime.setDate(nextDatetime.getDate() + dtoIn.frequency.days);
-    const nextNotificationDate = new Date(nextDatetime);
-    nextNotificationDate.setDate(nextNotificationDate.getDate() - dtoIn.notificationOffset.days);
-    nextNotificationDate.setHours(
-      nextNotificationDate.getHours() - dtoIn.notificationOffset.hours,
-      nextNotificationDate.getMinutes() - dtoIn.notificationOffset.minutes,
-    );
-
-    // next notification must NOT be sent BEFORE the current datetime, only after the next datetime is calculated, which happens then the current datetime passes
-    if (nextNotificationDate <= datetimeAsDate) {
-      throw new Errors.Create.InvalidFrequencyAndNotificationOffset({ uuAppErrorMap });
+      // next notification must NOT be sent BEFORE the current datetime, only after the next datetime is calculated, which happens then the current datetime passes
+      if (nextNotificationDate <= datetimeAsDate) {
+        throw new Errors.Create.InvalidFrequencyAndNotificationOffset({ uuAppErrorMap });
+      }
     }
 
     const datetimeCreateObject = {
       awid,
-      activityId: dtoIn.activityId,
+      activityId: activity.id,
       undecided: activity.members,
       confirmed: [],
       denied: [],
@@ -291,6 +291,182 @@ class DatetimeAbl {
     }
 
     dtoOut.uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async delete(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeDeleteDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Delete),
+      Errors.Delete.InvalidDtoIn,
+    );
+
+    let datetime;
+    try {
+      datetime = await this.datetimeDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.DatetimeDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!datetime) {
+      throw new Errors.Delete.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      let activity;
+      try {
+        activity = await this.activityDao.get(awid, datetime.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Delete.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+      }
+      if (!activity) {
+        throw new Errors.Delete.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: datetime.activityId });
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+
+      if (activity.owner !== userUuIdentity) {
+        throw new Errors.Delete.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    try {
+      await this.attendanceDao.updateMany(awid, { datetimeId: datetime.id }, { archived: true });
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.AttendanceDaoUpdateManyFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await this.datetimeDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.DatetimeDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    const activityUpdateObject = {
+      id: datetime.activityId,
+      awid,
+      datetimeId: null,
+      frequency: {},
+      notificationOffset: {},
+      recurrent: false,
+    };
+
+    try {
+      await this.activityDao.update(activityUpdateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Delete.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut = dtoOut || {};
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+  async createNext(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeCreateNextDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.CreateNext),
+      Errors.CreateNext.InvalidDtoIn,
+    );
+
+    let datetime;
+    try {
+      datetime = await this.datetimeDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.DatetimeDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!datetime) {
+      throw new Errors.CreateNext.DatetimeDoesNotExist({ uuAppErrorMap }, { datetimeId: dtoIn.id });
+    }
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, datetime.activityId);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.CreateNext.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: datetime.activityId });
+    }
+
+    if (activity.recurrent === false) {
+      throw new Errors.CreateNext.ActivityNotRecurrent({ uuAppErrorMap });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (activity.owner !== userUuIdentity) {
+        throw new Errors.CreateNext.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    const nextDatetime = new Date(datetime.datetime);
+    nextDatetime.setMonth(nextDatetime.getMonth() + activity.frequency.months);
+    nextDatetime.setDate(nextDatetime.getDate() + activity.frequency.days);
+
+    const nextNotification = new Date(nextDatetime);
+    nextNotification.setDate(nextNotification.getDate() - activity.notificationOffset.days);
+    nextNotification.setHours(
+      nextNotification.getHours() - activity.notificationOffset.hours,
+      nextNotification.getMinutes() - activity.notificationOffset.minutes,
+    );
+
+    const nextDatetimeObject = {
+      awid,
+      id: datetime.id,
+      activityId: datetime.activityId,
+      datetime: nextDatetime,
+      notification: nextNotification,
+      undecided: activity.members,
+      confirmed: [],
+      denied: [],
+    };
+
+    let dtoOut;
+    try {
+      dtoOut = await this.datetimeDao.update(nextDatetimeObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
 }

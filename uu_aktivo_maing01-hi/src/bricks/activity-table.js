@@ -176,9 +176,9 @@ const Css = {
 //@@viewOn:helpers
 //@@viewOff:helpers
 
-const ActivityList = createVisualComponent({
+const ActivityTable = createVisualComponent({
   //@@viewOn:statics
-  uu5Tag: Config.TAG + "ActivityList",
+  uu5Tag: Config.TAG + "ActivityTable",
   //@@viewOff:statics
 
   //@@viewOn:propTypes
@@ -263,6 +263,6 @@ const ActivityList = createVisualComponent({
 });
 
 //@@viewOn:exports
-export { ActivityList };
-export default ActivityList;
+export { ActivityTable };
+export default ActivityTable;
 //@@viewOff:exports

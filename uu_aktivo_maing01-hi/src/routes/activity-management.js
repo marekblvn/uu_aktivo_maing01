@@ -357,7 +357,7 @@ const _ActivityManagement = createVisualComponent({
               case "errorNoData":
                 return renderError(errorData);
               case "error":
-                showError(error);
+                showError(errorData.error);
               case "pending":
               case "itemPending":
               case "ready":

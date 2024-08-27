@@ -2,7 +2,7 @@
 import { AutoLoad, createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
-import { Block, DateTime, Link, Text } from "uu5g05-elements";
+import { Block, DateTime, Link, Pending, RichIcon, Text } from "uu5g05-elements";
 import { FilterBar, FilterButton, SorterButton } from "uu5tilesg02-controls";
 import { Table } from "uu5tilesg02-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
@@ -105,6 +105,7 @@ const InvitationTable = createVisualComponent({
 
   render({
     data,
+    pending,
     onLoadNext,
     onRefresh,
     getActionList,
@@ -143,7 +144,11 @@ const InvitationTable = createVisualComponent({
             { component: <SorterButton type="dropdown" /> },
             { divider: true },
             {
-              icon: "uugds-refresh",
+              component: pending ? (
+                <Pending size="m" />
+              ) : (
+                <RichIcon icon="uugds-reload" colorScheme="dim" significance="subdued" borderRadius="moderate" />
+              ),
               onClick: onRefresh,
             },
           ]}

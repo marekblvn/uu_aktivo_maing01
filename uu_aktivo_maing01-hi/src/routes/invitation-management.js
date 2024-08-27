@@ -23,7 +23,7 @@ const Css = {
 //@@viewOn:helpers
 //@@viewOff:helpers
 
-let InvitationManagement = createVisualComponent({
+const _InvitationManagement = createVisualComponent({
   //@@viewOn:statics
   uu5Tag: Config.TAG + "InvitationManagement",
   //@@viewOff:statics
@@ -97,7 +97,6 @@ let InvitationManagement = createVisualComponent({
           tooltip: { en: "Delete invitation", cs: "Smazat pozvánku" },
           onClick: () => handleDeleteInvitation(data),
           colorScheme: "negative",
-          significance: "subdued",
         },
       ];
     }, []);
@@ -135,7 +134,7 @@ let InvitationManagement = createVisualComponent({
       }
     }
 
-    function renderReady(data, handlerMap) {
+    function renderReady(data, pending, handlerMap) {
       const handleChangeFilterList = async (e) => {
         const filters = {};
         const sort = {};
@@ -197,6 +196,7 @@ let InvitationManagement = createVisualComponent({
       return (
         <InvitationTable
           data={data}
+          pending={pending}
           onRefresh={handleRefresh}
           onDeleteInvitation={handleDeleteInvitation}
           onLoadNext={handleLoadNext}
@@ -227,9 +227,11 @@ let InvitationManagement = createVisualComponent({
               case "error":
                 showError(errorData.error);
               case "pending":
+              case "itemPending":
               case "ready":
               case "readyNoData":
-                return renderReady(data, handlerMap);
+                const pending = state === "pending" || state === "itemPending";
+                return renderReady(data, pending, handlerMap);
             }
           }}
         </InvitationListProvider>
@@ -240,7 +242,7 @@ let InvitationManagement = createVisualComponent({
   },
 });
 
-InvitationManagement = withRoute(InvitationManagement, { authenticated: true });
+const InvitationManagement = withRoute(_InvitationManagement, { authenticated: true });
 
 //@@viewOn:exports
 export { InvitationManagement };

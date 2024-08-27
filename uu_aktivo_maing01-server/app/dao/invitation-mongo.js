@@ -119,7 +119,8 @@ class InvitationMongo extends UuObjectDao {
             { $limit: pageInfo.pageSize },
             {
               $project: {
-                _id: 1,
+                id: "$_id",
+                _id: 0,
                 activityId: 1,
                 activityName: "$activity.name",
                 uuIdentity: 1,

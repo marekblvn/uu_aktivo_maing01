@@ -121,6 +121,11 @@
       "header": "Opravdu chcete smazat aktivitu '%s'?",
       "info": "Aktivita a všechna data s ní spojená budou smazána bez vědomí členů nebo vlastníka.",
       "confirm": "Smazat"
+    },
+    "adminDeleteDatetime": {
+      "header": "Opravdu chcete smazat termín aktivity '%s'?",
+      "info": "Termín bude smazán bez upozornění členů aktivity a všechny informace o probíhajícím termínu budou ztraceny.",
+      "confirm": "Smazat"
     }
   },
   "Forms": {

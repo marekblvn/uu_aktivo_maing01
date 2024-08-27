@@ -12,15 +12,22 @@ const postGetDtoInType = shape({
 });
 
 const postListDtoInType = shape({
-  filters: shape({
-    activityId: id(),
-    uuIdentity: uuIdentity(),
-    uuIdentityName: uu5String(),
-    type: oneOf(["normal", "important"]),
-  }),
-  sort: shape({
-    createdAt: integer(),
-  }),
+  filters: shape(
+    {
+      activityId: id(),
+      uuIdentity: uuIdentity(),
+      uuIdentityName: uu5String(),
+      type: oneOf(["normal", "important"]),
+      createdAt: array(oneOf([date(), constant(null)]), 1, 2),
+    },
+    true,
+  ),
+  sort: shape(
+    {
+      createdAt: integer(-1, 1),
+    },
+    true,
+  ),
   pageInfo: shape({
     pageIndex: integer(),
     pageSize: integer(),

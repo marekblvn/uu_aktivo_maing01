@@ -1,19 +1,17 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Config from "./config/config.js";
 import Container from "../bricks/container.js";
 import PostListProvider from "../providers/post-list-provider.js";
-import { Badge, Block, Box, DateTime, Dialog, Grid, Link, Pending, Tag, Text } from "uu5g05-elements";
+import { Dialog, Grid, Pending } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
-import { ControllerProvider } from "uu5tilesg02";
-import { Table } from "uu5tilesg02-elements";
-import { FilterBar, FilterButton, SorterButton } from "uu5tilesg02-controls";
 import { ResetButton, SubmitButton, CancelButton } from "uu5g05-forms";
-import { PersonItem, useAlertBus } from "uu_plus4u5g02-elements";
+import { Unauthorized, useAlertBus } from "uu_plus4u5g02-elements";
 import UpdatePostForm from "../bricks/update-post-form.js";
 import FormModal from "../bricks/form-modal.js";
 import PostTable from "../bricks/post-table.js";
+import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -43,6 +41,7 @@ const _PostManagement = createVisualComponent({
 
   render(props) {
     //@@viewOn:private
+    const { isAuthority, isExecutive } = useAuthorization();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const [screenSize] = useScreenSize();
@@ -154,6 +153,18 @@ const _PostManagement = createVisualComponent({
     }, []);
 
     //@@viewOn:render
+    if (!isAuthority && !isExecutive) {
+      return (
+        <Unauthorized
+          title={{
+            en: "You don't have the necessary permissions to see this page",
+            cs: "Nemáte dostatečná oprávnění pro zobrazení této stránky",
+          }}
+          subtitle={{ en: "Super secret stuff is going on here...", cs: "Dějí se zde super tajné věci..." }}
+        />
+      );
+    }
+
     function renderLoading() {
       return (
         <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -178,8 +189,8 @@ const _PostManagement = createVisualComponent({
       }
     }
 
-    function renderReady(data, handlerMap) {
-      const handleChangeFilterList = (e) => {
+    function renderReady(data, pending, handlerMap) {
+      const handleChangeFilterList = async (e) => {
         const filters = {};
         const sort = {};
         setFilterList(e.data.filterList);
@@ -191,10 +202,10 @@ const _PostManagement = createVisualComponent({
           const { key, ascending } = item;
           sort[key] = ascending ? 1 : -1;
         });
-        handlerMap.load({ filters, sort });
+        await handlerMap.load({ filters, sort });
       };
 
-      const handleChangeSorterList = (e) => {
+      const handleChangeSorterList = async (e) => {
         const filters = {};
         const sort = {};
         setSorterList(e.data.sorterList);
@@ -206,10 +217,10 @@ const _PostManagement = createVisualComponent({
           const { key, value } = item;
           filters[key] = value;
         });
-        handlerMap.load({ filters, sort });
+        await handlerMap.load({ filters, sort });
       };
 
-      const handleRefresh = () => {
+      const handleRefresh = async () => {
         const filters = {};
         const sort = {};
         filterList.forEach((item) => {
@@ -220,10 +231,10 @@ const _PostManagement = createVisualComponent({
           const { key, ascending } = item;
           sort[key] = ascending ? 1 : -1;
         });
-        handlerMap.load({ filters, sort });
+        await handlerMap.load({ filters, sort });
       };
 
-      const handleLoadNext = () => {
+      const handleLoadNext = async () => {
         const filters = {};
         const sort = {};
         filterList.forEach((item) => {
@@ -234,12 +245,13 @@ const _PostManagement = createVisualComponent({
           const { key, ascending } = item;
           sort[key] = ascending ? 1 : -1;
         });
-        handlerMap.loadNext({ filters, sort });
+        await handlerMap.loadNext({ filters, sort });
       };
 
       return (
         <PostTable
           data={data}
+          pending={pending}
           sorterList={sorterList}
           onSorterListChange={handleChangeSorterList}
           filterList={filterList}
@@ -263,9 +275,11 @@ const _PostManagement = createVisualComponent({
               case "error":
                 showError(errorData.error);
               case "pending":
+              case "itemPending":
               case "ready":
               case "readyNoData":
-                return renderReady(data, handlerMap);
+                const pending = state === "pending" || state === "itemPending";
+                return renderReady(data, pending, handlerMap);
             }
           }}
         </PostListProvider>

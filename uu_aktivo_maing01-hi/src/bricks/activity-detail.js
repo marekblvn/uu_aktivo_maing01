@@ -3,21 +3,19 @@ import {
   createVisualComponent,
   Lsi,
   useEffect,
-  useLsi,
   useRoute,
   useRouteLeave,
   useScreenSize,
   useSlide,
   useState,
 } from "uu5g05";
-import { Grid, PlaceholderBox, Tabs, Text } from "uu5g05-elements";
+import { Grid, Tabs, Text } from "uu5g05-elements";
 import Config from "./config/config.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import ActivityInformationView from "./activity-information-view.js";
 import ActivityMembersView from "./activity-members-view.js";
 import ActivitySettingsView from "./activity-settings-view.js";
-import importLsi from "../lsi/import-lsi.js";
 import ActivityAttendanceView from "./activity-attendance-view.js";
 //@@viewOff:imports
 
@@ -49,7 +47,7 @@ const ActivityDetail = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ data, handlerMap }) {
+  render({ data, handlerMap, tab }) {
     //@@viewOn:private
     const { id, name } = data;
 
@@ -59,9 +57,8 @@ const ActivityDetail = createVisualComponent({
     const { isAdministrator, isOwner } = useActivityAuthorization();
 
     const [screenSize] = useScreenSize();
-    const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "notFound"] });
 
-    const [activeTab, setActiveTab] = useState("info");
+    const [activeTab, setActiveTab] = useState(tab);
     const { ref, style } = useSlide({
       onEnd(e) {
         const { direction, pointerType } = e.data;
@@ -92,13 +89,17 @@ const ActivityDetail = createVisualComponent({
 
     const canAccessSettings = isAuthority || isExecutive || isOwner || isAdministrator;
 
+    if (!canAccessSettings && tab === "settings") {
+      setRoute("activity", { id, tab: "information" }, { replace: true });
+    }
+
     const tabDirections = {
-      info: {
-        left: "info",
+      information: {
+        left: "information",
         right: "members",
       },
       members: {
-        left: "info",
+        left: "information",
         right: "attendance",
       },
       attendance: {
@@ -114,13 +115,13 @@ const ActivityDetail = createVisualComponent({
     const tabItemList = [
       {
         label:
-          ["xs", "s"].includes(screenSize) && activeTab !== "info" ? undefined : (
+          ["xs", "s"].includes(screenSize) && activeTab !== "information" ? undefined : (
             <Text category="interface" segment="highlight" type="common">
               <Lsi lsi={{ en: "Information", cs: "Informace" }} />
             </Text>
           ),
-        icon: activeTab === "info" ? "mdi-information" : "mdi-information-outline",
-        code: "info",
+        icon: activeTab === "information" ? "mdi-information" : "mdi-information-outline",
+        code: "information",
       },
       {
         label:
@@ -158,6 +159,7 @@ const ActivityDetail = createVisualComponent({
     //@@viewOff:private
 
     function handleChangeTab({ activeCode }) {
+      setRoute("activity", { id: id, tab: activeCode }, { replace: true });
       setActiveTab(activeCode);
     }
 
@@ -223,8 +225,6 @@ const ActivityDetail = createVisualComponent({
 
     function renderContent() {
       switch (activeTab) {
-        case "info":
-          return <ActivityInformationView {...data} onReload={handleReload} />;
         case "members":
           return (
             <ActivityMembersView
@@ -250,15 +250,16 @@ const ActivityDetail = createVisualComponent({
           );
         case "attendance":
           return <ActivityAttendanceView activityId={id} />;
+        case "info":
         default:
-          return <PlaceholderBox code="items" header={placeholderLsi.header} info={placeholderLsi.info} />;
+          return <ActivityInformationView {...data} onReload={handleReload} />;
       }
     }
 
     const { userSelect, ...restStyles } = style;
 
     return (
-      <Grid templateRows={{ xs: "auto auto" }} rowGap="8px" ref={ref} style={restStyles}>
+      <Grid templateRows={{ xs: "auto auto" }} rowGap="8px" elementRef={ref} style={restStyles}>
         <Grid justifyContent="center">
           <Text
             category="story"

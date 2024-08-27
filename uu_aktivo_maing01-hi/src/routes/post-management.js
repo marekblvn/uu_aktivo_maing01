@@ -166,11 +166,7 @@ const _PostManagement = createVisualComponent({
     }
 
     function renderLoading() {
-      return (
-        <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <Pending size="xl" colorScheme="primary" />
-        </div>
-      );
+      return <Pending size="max" colorScheme="primary" />;
     }
 
     function renderError(errorData) {

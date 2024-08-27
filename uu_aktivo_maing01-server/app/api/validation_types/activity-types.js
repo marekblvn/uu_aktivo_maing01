@@ -45,6 +45,7 @@ const activityListDtoInType = shape({
       recurrent: boolean(),
       owner: uuIdentity(),
       members: array(uuIdentity(), 1, 100),
+      hasDatetime: boolean(),
     },
     true,
   ),

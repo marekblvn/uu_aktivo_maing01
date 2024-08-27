@@ -125,7 +125,7 @@ class ActivityAbl {
       authorizedProfiles.includes(PROFILE_CODES.Executives)
     ) {
       if (dtoIn.filters) {
-        const { name, recurrent, owner, members } = dtoIn.filters;
+        const { name, recurrent, owner, members, hasDatetime } = dtoIn.filters;
         if (name) {
           filter.name = { $regex: name, $options: "i" };
         }
@@ -139,6 +139,13 @@ class ActivityAbl {
           filter.members = {
             $all: members,
           };
+        }
+        if (hasDatetime !== undefined) {
+          if (hasDatetime === true) {
+            filter.datetimeId = { $ne: null };
+          } else {
+            filter.datetimeId = null;
+          }
         }
       }
     } else {

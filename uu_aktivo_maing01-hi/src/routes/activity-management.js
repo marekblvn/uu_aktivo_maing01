@@ -11,7 +11,10 @@ import ActivityTable from "../bricks/activity-table.js";
 import importLsi from "../lsi/import-lsi.js";
 import { CancelButton, ResetButton, SubmitButton } from "uu5g05-forms";
 import UpdateActivityForm from "../bricks/update-activity-form.js";
+import UpdateFrequencyForm from "../bricks/update-frequency-form.js";
+import UpdateNotificationOffsetForm from "../bricks/update-notification-offset-form.js";
 import FormModal from "../bricks/form-modal.js";
+import DatetimeManagementModal from "../bricks/datetime-management-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -26,7 +29,7 @@ const Css = {
 //@@viewOn:helpers
 //@@viewOff:helpers
 
-let ActivityManagement = createVisualComponent({
+const _ActivityManagement = createVisualComponent({
   //@@viewOn:statics
   uu5Tag: Config.TAG + "ActivityManagement",
   //@@viewOff:statics
@@ -49,6 +52,7 @@ let ActivityManagement = createVisualComponent({
     const [filterList, setFilterList] = useState([]);
     const [dialogProps, setDialogProps] = useState(null);
     const [modalProps, setModalProps] = useState(null);
+    const [datetimeModalProps, setDatetimeModalProps] = useState(null);
     //@@viewOff:private
 
     const showDeleteActivityDialog = useCallback(
@@ -76,11 +80,11 @@ let ActivityManagement = createVisualComponent({
       [setDialogProps],
     );
 
-    const showUpdateActivityModal = useCallback(
-      (activity, onSubmit) => {
+    const showUpdateModal = useCallback(
+      (useCase, children, onSubmit) => {
         setModalProps({
           onSubmit: onSubmit,
-          header: <Lsi import={importLsi} path={["Forms", "updateActivity", "header"]} />,
+          header: <Lsi import={importLsi} path={["Forms", useCase, "header"]} />,
           footer: (
             <Grid
               templateColumns={{ xs: "auto repeat(2,1fr)", s: "repeat(3,auto)" }}
@@ -89,14 +93,23 @@ let ActivityManagement = createVisualComponent({
               <ResetButton icon="uugds-refresh" significance="subdued" />
               <CancelButton onClick={() => setModalProps(null)} />
               <SubmitButton>
-                <Lsi import={importLsi} path={["Forms", "updateActivity", "submit"]} />
+                <Lsi import={importLsi} path={["Forms", useCase, "submit"]} />
               </SubmitButton>
             </Grid>
           ),
-          children: <UpdateActivityForm initialValues={activity} />,
+          children,
         });
       },
       [setModalProps],
+    );
+
+    const handleOpenDatetimeModal = useCallback(
+      (activity) => {
+        setDatetimeModalProps({
+          activity,
+        });
+      },
+      [setDatetimeModalProps],
     );
 
     const handleDeleteActivity = useCallback(
@@ -120,7 +133,7 @@ let ActivityManagement = createVisualComponent({
     );
 
     const handleUpdateActivity = useCallback((activity) =>
-      showUpdateActivityModal(activity, async (e) => {
+      showUpdateModal("updateActivity", <UpdateActivityForm initialValues={activity} />, async (e) => {
         e.preventDefault();
         try {
           await activity.handlerMap.update({ id: activity.id, ...e.data.value });
@@ -137,13 +150,79 @@ let ActivityManagement = createVisualComponent({
       }),
     );
 
+    const handleUpdateFrequency = useCallback(
+      async (activity) =>
+        showUpdateModal(
+          "updateFrequency",
+          <UpdateFrequencyForm initialValues={activity.frequency} notificationOffset={activity.notificationOffset} />,
+          async (e) => {
+            e.preventDefault();
+            try {
+              const updatedActivity = await activity.handlerMap.updateFrequency({ id: activity.id, ...e.data.value });
+              setModalProps(null);
+              addAlert({
+                priority: "info",
+                header: { en: "Frequency updated", cs: "Frekvence změněna" },
+                message: {
+                  en: "Changes you made were successfully saved.",
+                  cs: "Provedené změny byly úspěšně uloženy.",
+                },
+                durationMs: 2000,
+              });
+              setDatetimeModalProps({ activity: { ...updatedActivity, handlerMap: activity.handlerMap } });
+            } catch (error) {
+              showError(error);
+            }
+          },
+        ),
+      [],
+    );
+
+    const handleUpdateNotificationOffset = useCallback(
+      async (activity) =>
+        showUpdateModal(
+          "updateNotificationOffset",
+          <UpdateNotificationOffsetForm initialValues={activity.notificationOffset} frequency={activity.frequency} />,
+          async (e) => {
+            e.preventDefault();
+            try {
+              const updatedActivity = await activity.handlerMap.updateNotificationOffset({
+                id: activity.id,
+                notificationOffset: e.data.value,
+              });
+              setModalProps(null);
+              addAlert({
+                priority: "info",
+                header: { en: "Notification offset updated", cs: "Posun upozornění změněn" },
+                message: {
+                  en: "Changes you made were successfully saved.",
+                  cs: "Provedené změny byly úspěšně uloženy.",
+                },
+                durationMs: 2000,
+              });
+              setDatetimeModalProps({ activity: { ...updatedActivity, handlerMap: activity.handlerMap } });
+            } catch (error) {
+              showError(error);
+            }
+          },
+        ),
+      [],
+    );
+
     const getActionList = useCallback(({ rowIndex, data }) => {
       return [
         {
-          icon: "uugds-pencil",
-          tooltip: { en: "Edit activity settings", cs: "Změnit nastavení aktivity" },
-          onClick: () => handleUpdateActivity(data),
+          icon: "uugds-calendar",
+          tooltip: { en: "Open datetime detail", cs: "Otevřít detail termínu" },
+          onClick: () => handleOpenDatetimeModal(data),
+          disabled: data.datetimeId === null,
         },
+        {
+          icon: "uugds-pencil",
+          onClick: () => handleUpdateActivity(data),
+          tooltip: { en: "Edit activity settings", cs: "Upravit nastavení aktivity" },
+        },
+        { divider: true },
         {
           icon: "uugds-delete",
           tooltip: { en: "Delete activity", cs: "Smazat aktivitu" },
@@ -246,17 +325,19 @@ let ActivityManagement = createVisualComponent({
       };
 
       return (
-        <ActivityTable
-          data={data}
-          pending={pending}
-          getActionList={getActionList}
-          filterList={filterList}
-          onFilterListChange={handleChangeFilterList}
-          sorterList={sorterList}
-          onSorterListChange={handleChangeSorterList}
-          onRefresh={handleRefresh}
-          onLoadNext={handleLoadNext}
-        />
+        <>
+          <ActivityTable
+            data={data}
+            pending={pending}
+            getActionList={getActionList}
+            filterList={filterList}
+            onFilterListChange={handleChangeFilterList}
+            sorterList={sorterList}
+            onSorterListChange={handleChangeSorterList}
+            onRefresh={handleRefresh}
+            onLoadNext={handleLoadNext}
+          />
+        </>
       );
     }
 
@@ -288,13 +369,20 @@ let ActivityManagement = createVisualComponent({
         </ActivityListProvider>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
         <FormModal {...modalProps} open={!!modalProps} onClose={() => setModalProps(null)} />
+        <DatetimeManagementModal
+          {...datetimeModalProps}
+          open={!!datetimeModalProps}
+          onClose={() => setDatetimeModalProps(null)}
+          onUpdateFrequency={handleUpdateFrequency}
+          onUpdateNotificationOffset={handleUpdateNotificationOffset}
+        />
       </Container>
     );
     //@@viewOff:render
   },
 });
 
-ActivityManagement = withRoute(ActivityManagement, { authenticated: true });
+const ActivityManagement = withRoute(_ActivityManagement, { authenticated: true });
 
 //@@viewOn:exports
 export { ActivityManagement };

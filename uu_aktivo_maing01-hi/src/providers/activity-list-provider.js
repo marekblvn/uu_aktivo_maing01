@@ -45,6 +45,8 @@ const ActivityListProvider = createVisualComponent({
         leave: Calls.Activity.leave,
         delete: Calls.Activity.delete,
         update: Calls.Activity.update,
+        updateFrequency: Calls.Activity.updateFrequency,
+        updateNotificationOffset: Calls.Activity.updateNotificationOffset,
       },
     });
     let { state, data, errorData, pendingData, handlerMap } = dataList;

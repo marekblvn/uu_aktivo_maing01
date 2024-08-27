@@ -5,7 +5,7 @@ import { ControllerProvider } from "uu5tilesg02";
 import { Table } from "uu5tilesg02-elements";
 import { FilterButton, FilterBar, SorterButton } from "uu5tilesg02-controls";
 import { PersonItem } from "uu_plus4u5g02-elements";
-import { Block, Button, Icon, Link, Pending, RichIcon, Text, TouchLink } from "uu5g05-elements";
+import { Block, Button, Icon, Link, Pending, RichIcon, Tag, Text, TouchLink } from "uu5g05-elements";
 import { TextSelect } from "uu5g05-forms";
 import TextBox from "./text-box.js";
 //@@viewOff:imports
@@ -87,17 +87,21 @@ const COLUMN_LIST = [
     value: "datetimeId",
     header: <Lsi lsi={{ en: "Datetime", cs: "Termín" }} />,
     headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
-    cellComponent: <Table.Cell horizontalAlignment="center" />,
     cell: ({ data }) => (
-      <RichIcon
-        disabled={data.datetimeId === null}
-        icon="uugds-calendar"
-        colorScheme={data.datetimeId === null ? "cancelled" : "steel"}
-        significance="subdued"
-        borderRadius="moderate"
-        tooltip={{ en: "Go to datetime detail", cs: "Přejít na detail termínu" }}
-      />
+      <Tag
+        colorScheme={data.datetimeId === null ? "cancelled" : "active"}
+        significance="highlighted"
+        size="xs"
+        tooltip={
+          data.datetimeId === null
+            ? { en: "Does not have datetime", cs: "Nemá termín" }
+            : { en: "Has a datetime", cs: "Má termín" }
+        }
+      >
+        &nbsp;
+      </Tag>
     ),
+    cellComponent: <Table.Cell horizontalAlignment="center" />,
     maxWidth: "100px",
   },
   {
@@ -106,7 +110,7 @@ const COLUMN_LIST = [
     headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
     maxWidth: "100px",
     cellComponent: <Table.Cell horizontalAlignment="center" />,
-    cell: ({ data }) => <Icon icon={data.recurrent ? "mdi-check" : "mdi-close"} />,
+    cell: ({ data }) => <Icon icon={data.recurrent ? "uugds-check" : "uugds-close"} />,
   },
 ];
 
@@ -133,14 +137,26 @@ const FILTER_LIST = [
     },
   },
   {
+    key: "hasDatetime",
+    label: { en: "Has datetime", cs: "Má termín" },
+    inputType: "switch-select",
+    inputProps: {
+      value: null,
+      itemList: [
+        { value: "true", children: { en: "Yes", cs: "Ano" }, icon: "uugds-check" },
+        { value: "false", children: { en: "No", cs: "Ne" }, icon: "uugds-close" },
+      ],
+    },
+  },
+  {
     key: "recurrent",
     label: { en: "Recurrent", cs: "Opakující se" },
     inputType: "switch-select",
     inputProps: {
       value: null,
       itemList: [
-        { value: "true", children: { en: "Yes", cs: "Ano" }, icon: "mdi-check" },
-        { value: "false", children: { en: "No", cs: "Ne" }, icon: "mdi-close" },
+        { value: "true", children: { en: "Yes", cs: "Ano" }, icon: "uugds-check" },
+        { value: "false", children: { en: "No", cs: "Ne" }, icon: "uugds-close" },
       ],
     },
   },

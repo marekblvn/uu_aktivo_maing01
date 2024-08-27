@@ -60,18 +60,18 @@ const formatCs = (frequency) => {
   return [monthsString, daysString].filter((str) => !!str).join(" a ");
 };
 
-export const frequencyToLsi = (frequency) => {
-  const en = formatEn(frequency);
-  const cs = formatCs(frequency);
-  return { en, cs };
-};
-
 const formatEn = (frequency) => {
   if (!frequency || Object.keys(frequency).length === 0) return "";
   const { months = 0, days = 0 } = frequency;
   const monthsString = months === 0 ? "" : months === 1 ? "1 month" : `${months} months`;
   const daysString = days === 0 ? "" : days === 1 ? "1 day" : `${days} days`;
   return [monthsString, daysString].filter((str) => !!str).join(" and ");
+};
+
+export const frequencyToLsi = (frequency) => {
+  const idx = getIndexByValues(frequency);
+  const lsi = FREQUENCY_LSI[idx];
+  return lsi;
 };
 
 export const getFrequencyOption = (frequency) => {

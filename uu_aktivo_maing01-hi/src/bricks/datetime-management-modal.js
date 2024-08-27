@@ -1,31 +1,12 @@
 //@@viewOn:imports
-import {
-  createVisualComponent,
-  Lsi,
-  useCallback,
-  useLsi,
-  useLsiValues,
-  useRef,
-  useScreenSize,
-  useState,
-  Utils,
-} from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Error, useAlertBus } from "uu_plus4u5g02-elements";
-import {
-  DateTime,
-  Dialog,
-  Grid,
-  Line,
-  ListLayout,
-  Modal,
-  Pending,
-  PlaceholderBox,
-  ScrollableBox,
-} from "uu5g05-elements";
+import { Button, DateTime, Dialog, Grid, Icon, ListLayout, Modal, Pending, PlaceholderBox } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
 import DatetimeProvider from "../providers/datetime-provider.js";
-import ParticipationList from "./participation-list.js";
+import { notificationOffsetToLsi } from "../../utils/notification-offset-utils.js";
+import { frequencyToLsi } from "../../utils/frequency-utils.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -55,13 +36,39 @@ const DatetimeManagementModal = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ open, onClose, datetimeId, activity, onDeleteDatetime }) {
+  render({ open, onClose, activity, onUpdateFrequency, onUpdateNotificationOffset }) {
     //@@viewOn:private
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noDatetime"] });
+    const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
+    const [screenSize] = useScreenSize();
     const [dialogProps, setDialogProps] = useState(null);
-    const deleteDatetimeRef = useRef();
     //@@viewOff:private
+
+    const showDeleteDatetimeDialog = useCallback(
+      (onConfirm) => {
+        setDialogProps({
+          header: (
+            <Lsi import={importLsi} path={["Dialog", "adminDeleteDatetime", "header"]} params={[activity.name]} />
+          ),
+          info: <Lsi import={importLsi} path={["Dialog", "adminDeleteDatetime", "info"]} />,
+          icon: "mdi-delete",
+          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+          actionList: [
+            {
+              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+              onClick: () => setDialogProps(null),
+            },
+            {
+              children: <Lsi import={importLsi} path={["Dialog", "adminDeleteDatetime", "confirm"]} />,
+              onClick: onConfirm,
+              colorScheme: "negative",
+            },
+          ],
+        });
+      },
+      [setDialogProps],
+    );
 
     //@@viewOn:render
     function renderLoading() {
@@ -93,13 +100,37 @@ const DatetimeManagementModal = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
-      if (!data) return null;
+      const handleDeleteDatetime = async (e) =>
+        showDeleteDatetimeDialog(async (e) => {
+          e.preventDefault();
+          try {
+            await handlerMap.delete({ id: data.id });
+            setDialogProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Datetime deleted", cs: "Termín smazán" },
+              message: {
+                en: `Datetime of activity '${activity.name}' was successfully deleted.`,
+                cs: `Termín aktivity '${activity.name}' byl úspěšně smazán.`,
+              },
+              durationMs: 2000,
+            });
+            onClose();
+          } catch (error) {
+            showError(error);
+          }
+        });
 
       const itemList = [
         {
           label: { en: "Activity", cs: "Aktivita" },
           children: activity.name,
         },
+        {
+          label: { en: "Recurrent", cs: "Opakující se" },
+          children: <Icon icon={activity.recurrent ? "uugds-check" : "uugds-close"} />,
+        },
+        { divider: true },
         {
           label: { en: "Datetime date", cs: "Datum termínu" },
           children: <DateTime value={data.datetime} />,
@@ -108,39 +139,51 @@ const DatetimeManagementModal = createVisualComponent({
           label: { en: "Notification date", cs: "Datum upozornění" },
           children: <DateTime value={data.notification} />,
         },
+        { divider: true },
+        {
+          label: { en: "Notification offset", cs: "Posun upozornění" },
+          children: <Lsi lsi={notificationOffsetToLsi(activity.notificationOffset)} />,
+          actionList: [
+            {
+              icon: "uugds-pencil",
+              onClick: () => onUpdateNotificationOffset(activity),
+            },
+          ],
+        },
       ];
 
       if (activity.recurrent) {
-        const nextDatetime = new Date(data.datetime);
-        nextDatetime.setMonth(
-          nextDatetime.getMonth() + activity.frequency.months,
-          nextDatetime.getDate() + activity.frequency.days,
-        );
-        const nextNotificationDate = new Date(nextDatetime);
-        nextNotificationDate.setDate(nextNotificationDate.getDate() - activity.notificationOffset.days);
-        nextNotificationDate.setHours(
-          nextNotificationDate.getHours() - activity.notificationOffset.hours,
-          nextNotificationDate.getMinutes() - activity.notificationOffset.minutes,
-        );
-        itemList.push(
-          { divider: true },
-          {
-            label: { en: "Next datetime date", cs: "Datum příštího termínu" },
-            children: <DateTime value={nextDatetime} />,
-          },
-          {
-            label: { en: "Next datetime notification date", cs: "Datum upozornění příštího termínu" },
-            children: <DateTime value={nextNotificationDate} />,
-          },
-        );
+        itemList.push({
+          label: { en: "Frequency", cs: "Frekvence" },
+          children: <Lsi lsi={frequencyToLsi(activity.frequency)} />,
+          actionList: [
+            {
+              icon: "uugds-pencil",
+              onClick: () => onUpdateFrequency(activity),
+            },
+          ],
+        });
       }
+
+      const collapsibleItems = [
+        {
+          label: { en: "Delete datetime", cs: "Smazat termín" },
+          children: (
+            <Button
+              colorScheme="negative"
+              significance="distinct"
+              style={{ margin: "8px 0" }}
+              onClick={handleDeleteDatetime}
+            >
+              <Lsi lsi={{ en: "Delete datetime", cs: "Smazat termín" }} />
+            </Button>
+          ),
+        },
+      ];
 
       return (
         <Grid templateColumns={{ xs: "100%" }} alignItems="start">
-          <ListLayout itemList={itemList} />
-          <ScrollableBox maxHeight={300} minHeight={300}>
-            <ParticipationList confirmed={data.confirmed} undecided={data.undecided} denied={data.denied} />
-          </ScrollableBox>
+          <ListLayout itemList={itemList} collapsibleItemList={collapsibleItems} />
         </Grid>
       );
     }
@@ -149,18 +192,10 @@ const DatetimeManagementModal = createVisualComponent({
       <Modal
         open={open}
         onClose={onClose}
-        header={<Lsi lsi={{ en: `Datetime: ${activity.name}`, cs: `Termín: ${activity.name}` }} />}
+        header={<Lsi lsi={{ en: "Datetime detail", cs: "Detail termínu" }} />}
         width="800px"
-        actionList={[
-          {
-            icon: "mdi-delete",
-            colorScheme: "negative",
-            significance: "subdued",
-            onClick: () => onDeleteDatetime(deleteDatetimeRef.current, datetimeId),
-          },
-        ]}
       >
-        <DatetimeProvider datetimeId={datetimeId}>
+        <DatetimeProvider datetimeId={activity.datetimeId}>
           {({ state, data, errorData, pendingData, handlerMap }) => {
             switch (state) {
               case "pendingNoData":
@@ -169,10 +204,9 @@ const DatetimeManagementModal = createVisualComponent({
                 return renderError(errorData);
               case "readyNoData":
                 return renderEmpty();
+              case "error":
               case "pending":
               case "ready":
-              case "error":
-                deleteDatetimeRef.current = handlerMap.delete;
                 return renderReady(data, handlerMap);
             }
           }}

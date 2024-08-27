@@ -1,15 +1,5 @@
 //@@viewOn:imports
-import {
-  AutoLoad,
-  createVisualComponent,
-  Lsi,
-  useCallback,
-  useLsi,
-  useRef,
-  useScreenSize,
-  useSession,
-  useState,
-} from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
@@ -53,9 +43,6 @@ const _MyActivities = createVisualComponent({
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
-    const loadRef = useRef();
-    const createActivityRef = useRef();
-    const loadNextRef = useRef();
     const [dialogProps, setDialogProps] = useState(null);
     const [modalProps, setModalProps] = useState(null);
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noActivityList"] });
@@ -278,19 +265,14 @@ const _MyActivities = createVisualComponent({
       >
         <ActivityListProvider filters={{ members: [identity.uuIdentity] }} pageSize={10}>
           {({ state, data, errorData, pendingData, handlerMap }) => {
-            loadRef.current = handlerMap.load;
-            loadNextRef.current = handlerMap.loadNext;
-            createActivityRef.current = handlerMap.create;
-
             switch (state) {
-              case "pending":
-                return renderReady(data, handlerMap);
               case "pendingNoData":
                 return renderLoading();
-              case "error":
-                return renderReady(data, handlerMap);
               case "errorNoData":
                 return renderError(errorData);
+              case "error":
+                showError(errorData.error);
+              case "pending":
               case "ready":
               case "readyNoData":
                 return renderReady(data, handlerMap);

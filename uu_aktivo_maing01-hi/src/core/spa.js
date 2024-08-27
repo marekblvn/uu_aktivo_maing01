@@ -30,7 +30,7 @@ const ROUTE_MAP = {
   "management/invitations": (props) => <InvitationManagement {...props} />,
   "management/posts": (props) => <PostManagement {...props} />,
   invitations: (props) => <Invitations {...props} />,
-  activity: ({ params }) => <ActivityPage id={params.id} />,
+  activity: ({ params }) => <ActivityPage id={params.id} tab={params.tab} />,
   about: (props) => <About {...props} />,
   "sys/uuAppWorkspace/initUve": (props) => <InitAppWorkspace {...props} />,
   controlPanel: (props) => <ControlPanel {...props} />,

@@ -810,7 +810,7 @@ class ActivityAbl {
     }
 
     try {
-      await this.attendanceDao.deleteByActivityId(awid, dtoIn.id);
+      await this.attendanceDao.deleteByActivityId(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.AttendanceDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
@@ -819,7 +819,7 @@ class ActivityAbl {
     }
 
     try {
-      await this.postDao.deleteByActivityId(awid, dtoIn.id);
+      await this.postDao.deleteByActivityId(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.PostDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
@@ -828,7 +828,7 @@ class ActivityAbl {
     }
 
     try {
-      await this.invitationDao.deleteByActivityId(awid, dtoIn.id);
+      await this.invitationDao.deleteByActivityId(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.InvitationDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
@@ -837,7 +837,7 @@ class ActivityAbl {
     }
 
     try {
-      await this.datetimeDao.deleteByActivityId(awid, dtoIn.id);
+      await this.datetimeDao.deleteByActivityId(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.DatetimeDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
@@ -847,7 +847,7 @@ class ActivityAbl {
 
     let dtoOut;
     try {
-      dtoOut = await this.activityDao.delete(awid, dtoIn.id);
+      dtoOut = await this.activityDao.delete(awid, activity.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.Delete.ActivityDaoDeleteFailed({ uuAppErrorMap }, error);

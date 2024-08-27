@@ -10,10 +10,20 @@ const invitationGetDtoInType = shape({
 });
 
 const invitationListDtoInType = shape({
-  filters: shape({
-    activityId: id(),
-    uuIdentity: uuIdentity(),
-  }),
+  filters: shape(
+    {
+      activityId: id(),
+      uuIdentity: uuIdentity(),
+      createdAt: array(oneOf([date(), constant(null)]), 1, 2),
+    },
+    true,
+  ),
+  sort: shape(
+    {
+      createdAt: integer(-1, 1),
+    },
+    true,
+  ),
   pageInfo: shape({
     pageIndex: integer(),
     pageSize: integer(),

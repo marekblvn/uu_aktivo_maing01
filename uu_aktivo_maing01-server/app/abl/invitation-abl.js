@@ -167,24 +167,48 @@ class InvitationAbl {
         if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
           throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
         }
-
-        dtoIn.filters = {
-          activityId: dtoIn.filters.activityId,
-        };
       }
     }
 
-    if (dtoIn.filters?.activityId) {
-      dtoIn.filters.activityId = ObjectId.createFromHexString(dtoIn.filters.activityId);
+    const filters = {};
+    if (dtoIn.filters) {
+      const { activityId, uuIdentity, createdAt } = dtoIn.filters;
+
+      if (activityId) {
+        filters.activityId = ObjectId.createFromHexString(activityId);
+      }
+
+      if (uuIdentity) {
+        filters.uuIdentity = uuIdentity;
+      }
+
+      if (createdAt && createdAt.filter((item) => item != null).length > 0) {
+        filters.createdAt = {};
+        if (createdAt[0]) {
+          filters.createdAt.$gte = new Date(createdAt[0]);
+        }
+        if (createdAt[1]) {
+          filters.createdAt.$lt = new Date(createdAt[1]);
+        }
+      }
+    }
+
+    const sort = {};
+    if (dtoIn.sort) {
+      const { createdAt } = dtoIn.sort;
+
+      if (createdAt) {
+        sort.createdAt = createdAt;
+      }
     }
 
     let dtoOut;
     const pageInfo = {
       pageIndex: parseInt(dtoIn.pageInfo?.pageIndex) || 0,
-      pageSize: parseInt(dtoIn.pageInfo?.pageSize || 100),
+      pageSize: parseInt(dtoIn.pageInfo?.pageSize) || 100,
     };
     try {
-      [dtoOut] = await this.invitationDao.list(awid, dtoIn.filters, pageInfo);
+      [dtoOut] = await this.invitationDao.list(awid, filters, pageInfo, sort);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.List.InvitationDaoListFailed({ uuAppErrorMap }, error);

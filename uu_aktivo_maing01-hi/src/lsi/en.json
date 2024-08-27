@@ -102,6 +102,11 @@
       "info": "The invitation will be deleted.",
       "confirm": "Delete"
     },
+    "adminDeleteInvitation": {
+      "header": "Are you sure you want to delete this invitation?",
+      "info": "The invitation will be deleted without notifying the sender and the recipient.",
+      "confirm": "Delete"
+    },
     "deleteDatetime": {
       "header": "Are you sure you want to delete the datetime?",
       "info": "The datetime will be permanently deleted and it's recurrence will be stopped (if it is recurrent). Please note that by deleting the datetime, you will lose all participation data in the current datetime!",

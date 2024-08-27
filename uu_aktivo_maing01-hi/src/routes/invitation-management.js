@@ -39,30 +39,67 @@ let InvitationManagement = createVisualComponent({
   render(props) {
     //@@viewOn:private
     const { isAuthority, isExecutive } = useAuthorization();
-    const [screenSize] = useScreenSize();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
+    const [screenSize] = useScreenSize();
+    const [sorterList, setSorterList] = useState([]);
+    const [filterList, setFilterList] = useState([]);
     const [dialogProps, setDialogProps] = useState(null);
     //@@viewOff:private
 
-    const showDeleteInvitationDialog = useCallback((onConfirm) => {
-      setDialogProps({
-        header: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "header"]} />,
-        icon: "mdi-email-remove",
-        info: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "info"]} />,
-        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-        actionList: [
-          {
-            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: (e) => setDialogProps(null),
-          },
-          {
-            children: <Lsi import={importLsi} path={["Dialog", "deleteInvitation", "confirm"]} />,
-            onClick: onConfirm,
-            colorScheme: "negative",
-          },
-        ],
-      });
+    const showDeleteInvitationDialog = useCallback(
+      (onConfirm) => {
+        setDialogProps({
+          header: <Lsi import={importLsi} path={["Dialog", "adminDeleteInvitation", "header"]} />,
+          icon: "mdi-email-remove",
+          info: <Lsi import={importLsi} path={["Dialog", "adminDeleteInvitation", "info"]} />,
+          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+          actionList: [
+            {
+              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+              onClick: (e) => setDialogProps(null),
+            },
+            {
+              children: <Lsi import={importLsi} path={["Dialog", "adminDeleteInvitation", "confirm"]} />,
+              onClick: onConfirm,
+              colorScheme: "negative",
+            },
+          ],
+        });
+      },
+      [setDialogProps],
+    );
+
+    const handleDeleteInvitation = useCallback(
+      (invitation) =>
+        showDeleteInvitationDialog(async (e) => {
+          e.preventDefault();
+          try {
+            await invitation.handlerMap.delete({ id: invitation.id });
+            setDialogProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Invitation deleted", cs: "Pozvánka smazána" },
+              message: { en: "The invitation was successfully deleted.", cs: "Pozvánka byla úspěšně smazána." },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        }),
+      [],
+    );
+
+    const getActionList = useCallback(({ rowIndex, data }) => {
+      return [
+        {
+          icon: "uugds-delete",
+          tooltip: { en: "Delete invitation", cs: "Smazat pozvánku" },
+          onClick: () => handleDeleteInvitation(data),
+          colorScheme: "negative",
+          significance: "subdued",
+        },
+      ];
     }, []);
 
     //@@viewOn:render
@@ -99,30 +136,62 @@ let InvitationManagement = createVisualComponent({
     }
 
     function renderReady(data, handlerMap) {
-      if (!data || !data.length) return null;
-
-      const handleDeleteInvitation = (invitation) =>
-        showDeleteInvitationDialog(async (e) => {
-          e.preventDefault();
-          try {
-            await invitation.handlerMap.delete({ id: invitation.id });
-            setDialogProps(null);
-            addAlert({
-              priority: "info",
-              header: { en: "Invitation deleted", cs: "Pozvánka smazána" },
-              message: {
-                en: `Invitation to '${invitation.activityName}' was successfully deleted.`,
-                cs: `Pozvánka do '${invitation.activityName}' byla úspěšně smazána.`,
-              },
-              durationMs: 2000,
-            });
-          } catch (error) {
-            showError(error);
-          }
+      const handleChangeFilterList = async (e) => {
+        const filters = {};
+        const sort = {};
+        setFilterList(e.data.filterList);
+        e.data.filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
         });
+        sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        await handlerMap.load({ filters, sort });
+      };
+
+      const handleChangeSorterList = async (e) => {
+        const filters = {};
+        const sort = {};
+        setSorterList(e.data.sorterList);
+        e.data.sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
+        });
+        await handlerMap.load({ filters, sort });
+      };
 
       const handleRefresh = async () => {
-        return await handlerMap.load();
+        const filters = {};
+        const sort = {};
+        filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
+        });
+        sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        await handlerMap.load({ filters, sort });
+      };
+
+      const handleLoadNext = async () => {
+        const filters = {};
+        const sort = {};
+        filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
+        });
+        sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        await handlerMap.loadNext({ filters, sort });
       };
 
       return (
@@ -130,7 +199,12 @@ let InvitationManagement = createVisualComponent({
           data={data}
           onRefresh={handleRefresh}
           onDeleteInvitation={handleDeleteInvitation}
-          onLoadNext={handlerMap.loadNext}
+          onLoadNext={handleLoadNext}
+          filterList={filterList}
+          onFilterListChange={handleChangeFilterList}
+          sorterList={sorterList}
+          onSorterListChange={handleChangeSorterList}
+          getActionList={getActionList}
         />
       );
     }
@@ -150,15 +224,12 @@ let InvitationManagement = createVisualComponent({
                 return renderLoading();
               case "errorNoData":
                 return renderError(errorData);
-              case "pending":
               case "error":
+                showError(errorData.error);
+              case "pending":
               case "ready":
               case "readyNoData":
-                const dataToRender = data.map((item) => {
-                  if (item == null) return item;
-                  return { ...item.data, handlerMap: item.handlerMap };
-                });
-                return renderReady(dataToRender, handlerMap);
+                return renderReady(data, handlerMap);
             }
           }}
         </InvitationListProvider>

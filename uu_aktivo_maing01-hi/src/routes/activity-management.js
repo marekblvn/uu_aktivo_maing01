@@ -276,6 +276,7 @@ let ActivityManagement = createVisualComponent({
               case "errorNoData":
                 return renderError(errorData);
               case "error":
+                showError(error);
               case "pending":
               case "itemPending":
               case "ready":

@@ -116,6 +116,11 @@
       "header": "Opravdu chcete smazat tuto aktivitu?",
       "info": "Tato aktivita a všechny informace v ní obsažené budou trvale ztraceny. Vezměte prosím na vědomí, že toto rozhodnutí nelze vzít zpět.",
       "confirm": "Smazat"
+    },
+    "adminDeleteActivity": {
+      "header": "Opravdu chcete smazat aktivitu '%s'?",
+      "info": "Aktivita a všechna data s ní spojená budou smazána bez vědomí členů nebo vlastníka.",
+      "confirm": "Smazat"
     }
   },
   "Forms": {

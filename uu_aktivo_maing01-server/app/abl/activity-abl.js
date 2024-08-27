@@ -119,33 +119,49 @@ class ActivityAbl {
     );
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
-    let daoFilter = {};
+    const filter = {};
     if (
       authorizedProfiles.includes(PROFILE_CODES.Authorities) ||
       authorizedProfiles.includes(PROFILE_CODES.Executives)
     ) {
-      if (dtoIn.filters?.recurrent !== undefined) {
-        daoFilter.recurrent = dtoIn.filters.recurrent;
-      }
-      if (dtoIn.filters?.owner) {
-        daoFilter.owner = dtoIn.filters.owner;
-      }
-      if (dtoIn.filters?.members?.length) {
-        daoFilter.members = {
-          $all: dtoIn.filters.members,
-        };
+      if (dtoIn.filters) {
+        const { name, recurrent, owner, members } = dtoIn.filters;
+        if (name) {
+          filter.name = { $regex: name, $options: "i" };
+        }
+        if (recurrent !== undefined) {
+          filter.recurrent = recurrent;
+        }
+        if (owner) {
+          filter.owner = owner;
+        }
+        if (members) {
+          filter.members = {
+            $all: members,
+          };
+        }
       }
     } else {
-      daoFilter = {
-        members: {
-          $in: [session.getIdentity().getUuIdentity()],
-        },
-      };
+      filter.members = { $in: [session.getIdentity().getUuIdentity()] };
     }
+
+    const sort = {};
+    if (dtoIn.sort) {
+      const { createdAt, name } = dtoIn.sort;
+
+      if (createdAt) {
+        sort["sys.cts"] = createdAt;
+      }
+
+      if (name) {
+        sort.name = name;
+      }
+    }
+
     const pageInfo = dtoIn.pageInfo || { pageIndex: 0, pageSize: 10 };
     let dtoOut;
     try {
-      dtoOut = await this.activityDao.list(awid, daoFilter, pageInfo);
+      dtoOut = await this.activityDao.list(awid, filter, pageInfo, sort);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.List.ActivityDaoListFailed({ uuAppErrorMap }, error);

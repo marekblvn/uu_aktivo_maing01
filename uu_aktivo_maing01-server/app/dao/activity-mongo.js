@@ -9,6 +9,7 @@ class ActivityMongo extends UuObjectDao {
     await super.createIndex({ awid: 1, _id: 1 }, { unique: true });
     await super.createIndex({ awid: 1, members: 1 }, { unique: false });
     await super.createIndex({ awid: 1, name: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, owner: 1 }, { unique: false });
   }
 
   /**
@@ -68,12 +69,12 @@ class ActivityMongo extends UuObjectDao {
    * @param {object} pageInfo
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, filterObject, pageInfo = {}) {
+  async list(awid, filterObject = {}, pageInfo = {}, sort = {}) {
     let filter = {
       awid,
       ...filterObject,
     };
-    return await super.find(filter, pageInfo);
+    return await super.find(filter, pageInfo, sort);
   }
 
   /**

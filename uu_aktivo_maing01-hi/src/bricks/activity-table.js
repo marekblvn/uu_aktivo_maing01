@@ -1,13 +1,13 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, useCallback, useState } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi, Utils } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { Table } from "uu5tilesg02-elements";
-import { FilterButton, FilterBar, SorterButton, SorterBar } from "uu5tilesg02-controls";
+import { FilterButton, FilterBar, SorterButton } from "uu5tilesg02-controls";
 import { PersonItem } from "uu_plus4u5g02-elements";
-import { Block, Icon, Link, RichIcon, Text } from "uu5g05-elements";
-import { FREQUENCY_LSI, getIndexByValues } from "../../utils/frequency-utils.js";
-import { notificationOffsetToLsi } from "../../utils/notification-offset-utils.js";
+import { Block, Button, Icon, Link, Pending, RichIcon, Text, TouchLink } from "uu5g05-elements";
+import { TextSelect } from "uu5g05-forms";
+import TextBox from "./text-box.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -15,27 +15,36 @@ const SORTER_LIST = [
   {
     key: "name",
     label: <Lsi lsi={{ en: "Name", cs: "Název" }} />,
-    sort: (a, b) => a.name.localeCompare(b.name),
   },
   {
-    key: "location",
-    label: <Lsi lsi={{ en: "Location", cs: "Lokace" }} />,
-    sort: (a, b) => a.location.localeCompare(b.location),
-  },
-  {
-    key: "members",
-    label: <Lsi lsi={{ en: "No. of members", cs: "Poč. členů" }} />,
-    sort: (a, b) => a.members.length - b.members.length,
+    key: "createdAt",
+    label: <Lsi lsi={{ en: "Creation date", cs: "Datum vytvoření" }} />,
   },
 ];
 
 const COLUMN_LIST = [
   {
+    value: "id",
+    header: "ID",
+    headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
+    cellComponent: <Table.Cell horizontalAlignment="center" />,
+    cell: ({ data }) => (
+      <Button
+        icon="uugds-copy"
+        onClick={() => Utils.Clipboard.write(data.id)}
+        tooltip={{ en: "Copy activity ID to clipboard", cs: "Zkopírovat ID aktivity" }}
+        colorScheme="dim"
+        significance="subdued"
+      />
+    ),
+    maxWidth: "68px",
+  },
+  {
     value: "name",
     header: <Lsi lsi={{ en: "Name", cs: "Název" }} />,
-    headerComponent: <Table.HeaderCell filterKey="name" />,
+    headerComponent: <Table.HeaderCell />,
     cell: ({ data }) => (
-      <Link href={`activity?id=${data.id}`} target="_blank">
+      <Link href={`activity?id=${data.id}&tab=information`} target="_blank">
         {data.name}
       </Link>
     ),
@@ -43,30 +52,36 @@ const COLUMN_LIST = [
   {
     value: "owner",
     header: <Lsi lsi={{ en: "Owner", cs: "Vlastník" }} />,
-    headerComponent: <Table.HeaderCell filterKey="owner" />,
-    cell: ({ data }) => <PersonItem uuIdentity={data.owner} size="s" />,
+    headerComponent: <Table.HeaderCell />,
+    cell: ({ data }) => <PersonItem uuIdentity={data.owner} subtitle={data.owner} />,
   },
   {
     value: "members",
-    header: <Lsi lsi={{ en: "No. of members", cs: "Poč. členů" }} />,
+    header: <Lsi lsi={{ en: "Members", cs: "Členové" }} />,
     headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
-    maxWidth: "100px",
     cellComponent: <Table.Cell horizontalAlignment="center" />,
-    cell: ({ data }) => data.members.length,
+    minHeight: "200px",
+    cell: ({ data }) => (
+      <TouchLink
+        href={`activity?id=${data.id}&tab=members`}
+        target="_blank"
+        icon="uugds-account-multi"
+        size="s"
+        colorScheme="dim"
+        significance="subdued"
+      />
+    ),
+    maxWidth: "100px",
   },
   {
     value: "location",
     header: <Lsi lsi={{ en: "Location", cs: "Lokace" }} />,
-    headerComponent: <Table.HeaderCell filterKey="location" />,
+    headerComponent: <Table.HeaderCell />,
   },
   {
     value: "description",
     header: <Lsi lsi={{ en: "Description", cs: "Popis" }} />,
-    cell: ({ data }) => (
-      <Text autoFit style={{ maxHeight: "100px" }}>
-        {data.description}
-      </Text>
-    ),
+    cell: ({ data }) => <TextBox content={data.description} previewLength={80} />,
   },
   {
     value: "datetimeId",
@@ -76,12 +91,11 @@ const COLUMN_LIST = [
     cell: ({ data }) => (
       <RichIcon
         disabled={data.datetimeId === null}
-        icon="mdi-calendar-cursor"
+        icon="uugds-calendar"
         colorScheme={data.datetimeId === null ? "cancelled" : "steel"}
         significance="subdued"
         borderRadius="moderate"
         tooltip={{ en: "Go to datetime detail", cs: "Přejít na detail termínu" }}
-        onClick={() => data.onClickDatetime(data.datetimeId, data)}
       />
     ),
     maxWidth: "100px",
@@ -89,24 +103,10 @@ const COLUMN_LIST = [
   {
     value: "recurrent",
     header: <Lsi lsi={{ en: "Recurrent", cs: "Opakující se" }} />,
-    headerComponent: <Table.HeaderCell filterKey="recurrent" horizontalAlignment="center" />,
+    headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
     maxWidth: "100px",
     cellComponent: <Table.Cell horizontalAlignment="center" />,
     cell: ({ data }) => <Icon icon={data.recurrent ? "mdi-check" : "mdi-close"} />,
-  },
-  {
-    value: "frequency",
-    header: <Lsi lsi={{ en: "Frequency", cs: "Frekvence" }} />,
-    headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
-    cellComponent: <Table.Cell horizontalAlignment="center" />,
-    cell: ({ data }) => <Lsi lsi={FREQUENCY_LSI[getIndexByValues(data.frequency)]} />,
-  },
-  {
-    value: "notificationOffset",
-    header: <Lsi lsi={{ en: "Notification offset", cs: "Posun upozornění" }} />,
-    headerComponent: <Table.HeaderCell horizontalAlignment="center" />,
-    cellComponent: <Table.Cell horizontalAlignment="center" />,
-    cell: ({ data }) => <Lsi lsi={notificationOffsetToLsi(data.notificationOffset)} />,
   },
 ];
 
@@ -114,38 +114,23 @@ const FILTER_LIST = [
   {
     key: "name",
     label: { en: "Name", cs: "Název" },
-    filter: (item, value) => {
-      let fragments = value.split(/[\s,.-;:_]/);
-      return fragments.some((frag) => {
-        let itemValue = item.name;
-        return itemValue.toLowerCase().indexOf(frag.toLowerCase()) !== -1;
-      });
-    },
     inputProps: { placeholder: { en: "Enter name", cs: "Zadejte název" } },
   },
   {
     key: "owner",
     label: { en: "Owner", cs: "Vlastník" },
-    filter: (item, value) => {
-      let fragments = value.split(/\s+/);
-      return fragments.some((frag) => {
-        let itemValue = item.owner;
-        return itemValue.toLowerCase().indexOf(frag.toLowerCase()) !== -1;
-      });
-    },
     inputProps: { placeholder: { en: "Enter owner's Plus4U ID", cs: "Zadejte Plus4U ID vlastníka" } },
   },
   {
-    key: "location",
-    label: { en: "Location", cs: "Lokace" },
-    filter: (item, value) => {
-      let fragments = value.split(/[\s,.-;:_]/);
-      return fragments.some((frag) => {
-        let itemValue = item.location;
-        return itemValue.toLowerCase().indexOf(frag.toLowerCase()) !== -1;
-      });
+    key: "members",
+    label: { en: "Members", cs: "Členové" },
+    inputType: TextSelect.Input,
+    inputProps: {
+      insertable: true,
+      multiple: true,
+      itemList: [],
+      value: [],
     },
-    inputProps: { placeholder: { en: "Enter location", cs: "Zadejte lokaci" } },
   },
   {
     key: "recurrent",
@@ -157,11 +142,6 @@ const FILTER_LIST = [
         { value: "true", children: { en: "Yes", cs: "Ano" }, icon: "mdi-check" },
         { value: "false", children: { en: "No", cs: "Ne" }, icon: "mdi-close" },
       ],
-    },
-    filter: (item, value) => {
-      if (value === null) return true;
-      const boolValue = value === "true";
-      return item.recurrent === boolValue;
     },
   },
 ];
@@ -189,40 +169,35 @@ const ActivityTable = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ data, onLoadNext, onRefresh, onDeleteActivity }) {
+  render({
+    data,
+    pending,
+    getActionList,
+    filterList,
+    sorterList,
+    onFilterListChange,
+    onSorterListChange,
+    onRefresh,
+    onLoadNext,
+  }) {
     //@@viewOn:private
-    const [sorterList, setSorterList] = useState();
-    const [filterList, setFilterList] = useState();
+    const dataToRender = data
+      .filter((item) => item != null)
+      .map((item) => ({ ...item.data, handlerMap: item.handlerMap }));
     //@@viewOff:private
-
-    const getActionList = useCallback(
-      ({ rowIndex, data }) => {
-        return [
-          {
-            icon: "mdi-delete",
-            tooltip: { en: "Delete activity", cs: "Smazat aktivitu" },
-            onClick: () => onDeleteActivity(data),
-            colorScheme: "negative",
-            significance: "subdued",
-            order: 1,
-          },
-        ];
-      },
-      [data],
-    );
 
     //@@viewOn:render
     return (
       <ControllerProvider
+        data={dataToRender}
+        itemIdentifier="id"
         sorterList={sorterList}
         sorterDefinitionList={SORTER_LIST}
-        data={data}
-        onSorterChange={(e) => setSorterList(e.data.sorterList)}
-        itemIdentifier="id"
-        selectable="none"
-        filterDefinitionList={FILTER_LIST}
+        onSorterChange={onSorterListChange}
         filterList={filterList}
-        onFilterChange={(e) => setFilterList(e.data.filterList)}
+        onFilterChange={onFilterListChange}
+        filterDefinitionList={FILTER_LIST}
+        selectable="none"
       >
         <Block
           card="full"
@@ -232,20 +207,19 @@ const ActivityTable = createVisualComponent({
             </Text>
           }
           actionList={[
-            { component: <SorterButton type="bar" /> },
             { component: <FilterButton type="bar" /> },
+            { component: <SorterButton type="dropdown" /> },
             { divider: true },
             {
-              icon: "mdi-refresh",
-              tooltip: { en: "Refresh", cs: "Obnovit" },
+              component: pending ? (
+                <Pending size="m" />
+              ) : (
+                <RichIcon icon="uugds-reload" colorScheme="dim" significance="subdued" borderRadius="moderate" />
+              ),
               onClick: onRefresh,
-              colorScheme: "dim",
-              significance: "subdued",
-              order: 1,
             },
           ]}
         >
-          <SorterBar displayManagerButton={false} />
           <FilterBar displayManagerButton={false} />
           <Table
             columnList={COLUMN_LIST}

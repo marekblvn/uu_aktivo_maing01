@@ -342,10 +342,10 @@ class DatetimeAbl {
     }
 
     try {
-      await this.attendanceDao.updateMany(awid, { datetimeId: datetime.id }, { archived: true });
+      await this.attendanceDao.deleteByActivityId(awid, datetime.activityId);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
-        throw new Errors.Delete.AttendanceDaoUpdateManyFailed({ uuAppErrorMap }, error);
+        throw new Errors.Delete.AttendanceDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
       }
       throw error;
     }
@@ -445,9 +445,17 @@ class DatetimeAbl {
       nextNotification.getMinutes() - activity.notificationOffset.minutes,
     );
 
+    try {
+      await this.datetimeDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.DatetimeDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
     const nextDatetimeObject = {
       awid,
-      id: datetime.id,
       activityId: datetime.activityId,
       datetime: nextDatetime,
       notification: nextNotification,
@@ -458,10 +466,25 @@ class DatetimeAbl {
 
     let dtoOut;
     try {
-      dtoOut = await this.datetimeDao.update(nextDatetimeObject);
+      dtoOut = await this.datetimeDao.create(nextDatetimeObject);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
-        throw new Errors.CreateNext.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
+        throw new Errors.CreateNext.DatetimeDaoCreateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    const updateActivityObject = {
+      awid,
+      id: datetime.activityId,
+      datetimeId: dtoOut.id,
+    };
+
+    try {
+      await this.activityDao.update(updateActivityObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
       }
       throw error;
     }

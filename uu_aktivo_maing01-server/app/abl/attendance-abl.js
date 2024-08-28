@@ -71,11 +71,7 @@ class AttendanceAbl {
       undecided: datetime.undecided,
       datetime: datetime.datetime,
       activityId: activity.id,
-      datetimeId: datetime.id,
-      archived: false,
     };
-
-    delete attendanceObject.notification;
 
     let dtoOut;
     try {
@@ -132,7 +128,7 @@ class AttendanceAbl {
     const { filters } = dtoIn || {};
     const queryFilters = {};
     if (filters) {
-      const { after, before, activityId, archived } = filters;
+      const { after, before, activityId } = filters;
       if (activityId) {
         queryFilters.activityId = ObjectId.createFromHexString(activityId);
       }
@@ -142,9 +138,6 @@ class AttendanceAbl {
       if (before) {
         queryFilters.datetime = queryFilters.datetime || {};
         queryFilters.datetime.$lt = new Date(before);
-      }
-      if (archived !== undefined) {
-        queryFilters.archived = archived;
       }
     }
 
@@ -205,7 +198,7 @@ class AttendanceAbl {
     const { filters } = dtoIn;
     const queryFilters = {};
     if (filters) {
-      const { after, before, activityId, archived } = filters;
+      const { after, before, activityId } = filters;
       if (activityId) {
         queryFilters.activityId = ObjectId.createFromHexString(activityId);
       }
@@ -215,9 +208,6 @@ class AttendanceAbl {
       if (before) {
         queryFilters.datetime = queryFilters.datetime || {};
         queryFilters.datetime.$lt = new Date(before);
-      }
-      if (archived !== undefined) {
-        queryFilters.archived = archived;
       }
     }
 

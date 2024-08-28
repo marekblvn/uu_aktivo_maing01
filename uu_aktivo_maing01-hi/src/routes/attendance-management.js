@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useLsi } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import { Dialog, Pending } from "uu5g05-elements";
 import { useAlertBus, Error } from "uu_plus4u5g02-elements";
 import { withRoute } from "uu_plus4u5g02-app";
@@ -8,9 +8,28 @@ import { useAuthorization } from "../contexts/authorization-context.js";
 import Container from "../bricks/container.js";
 import AttendanceListProvider from "../providers/attendance-list-provider.js";
 import importLsi from "../lsi/import-lsi.js";
+import AttendanceTable from "../bricks/attendance-table.js";
+import { ControllerProvider } from "uu5tilesg02";
 //@@viewOff:imports
 
 //@@viewOn:constants
+const SORTER_LIST = [
+  {
+    key: "datetime",
+    label: { en: "Datetime date", cs: "Datum termínu" },
+  },
+];
+
+const FILTER_LIST = [
+  {
+    key: "activityId",
+    label: { en: "Activity ID", cs: "ID aktivity" },
+  },
+  {
+    key: "datetime",
+    label: { en: "Datetime date", cs: "Datum termínu" },
+  },
+];
 //@@viewOff:constants
 
 //@@viewOn:css
@@ -40,8 +59,88 @@ const _AttendanceManagement = createVisualComponent({
     const { isAuthority, isExecutive } = useAuthorization();
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
     const { showError, addAlert } = useAlertBus();
-
+    const [screenSize] = useScreenSize();
+    const [sorterList, setSorterList] = useState([]);
+    const [filterList, setFilterList] = useState([]);
+    const [dialogProps, setDialogProps] = useState(null);
     //@@viewOff:private
+
+    const showDeleteAttendanceDialog = useCallback(
+      (onConfirm) => {
+        setDialogProps({
+          header: <Lsi import={importLsi} path={["Dialog", "adminDeleteAttendance", "header"]} />,
+          icon: "mdi-delete",
+          info: <Lsi import={importLsi} path={["Dialog", "adminDeleteAttendance", "info"]} />,
+          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+          actionList: [
+            {
+              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+              onClick: () => setDialogProps(null),
+            },
+            {
+              children: <Lsi import={importLsi} path={["Dialog", "adminDeleteAttendance", "confirm"]} />,
+              onClick: onConfirm,
+              colorScheme: "negative",
+            },
+          ],
+        });
+      },
+      [setDialogProps],
+    );
+
+    const handleDeleteAttendance = useCallback(
+      (attendance) =>
+        showDeleteAttendanceDialog(async (e) => {
+          e.preventDefault();
+          try {
+            await attendance.handlerMap.delete({ id: attendance.id });
+            setDialogProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Attendance deleted", cs: "Docházka smazána" },
+              message: { en: "The attendance was successfully deleted.", cs: "Docházka byla úspěšně smazána." },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        }),
+      [],
+    );
+
+    const handleDeleteBulkAttendance = useCallback(
+      (attendanceIdList, handlerFn) =>
+        showDeleteAttendanceDialog(async (e) => {
+          e.preventDefault();
+          try {
+            await handlerFn({ idList: attendanceIdList });
+            setDialogProps(null);
+            addAlert({
+              priority: "info",
+              header: { en: "Attendances deleted", cs: "Docházky smazány" },
+              message: {
+                en: "The selected attendances were successfully deleted.",
+                cs: "Vybrané docházky byly úspěšně smazány.",
+              },
+              durationMs: 2000,
+            });
+          } catch (error) {
+            showError(error);
+          }
+        }),
+      [],
+    );
+
+    const getActionList = useCallback(({ rowIndex, data }) => {
+      return [
+        {
+          icon: "uugds-delete",
+          tooltip: { en: "Delete attendance", cs: "Smazat docházku" },
+          onClick: () => handleDeleteAttendance(data),
+          colorScheme: "negative",
+        },
+      ];
+    }, []);
 
     //@@viewOn:render
     if (!isAuthority && !isExecutive) {
@@ -77,7 +176,90 @@ const _AttendanceManagement = createVisualComponent({
     }
 
     function renderReady(data, state, handlerMap) {
-      return <div>ready</div>;
+      const pending = state === "pending" || state === "itemPending";
+      const dataToRender = data
+        .filter((item) => item != null)
+        .map((item) => ({ ...item.data, handlerMap: item.handlerMap }));
+
+      const handleChangeFilterList = async (e) => {
+        const filters = {};
+        const sort = {};
+        setFilterList(e.data.filterList);
+        e.data.filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
+        });
+        sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        await handlerMap.load({ filters, sort });
+      };
+
+      const handleChangeSorterList = async (e) => {
+        const filters = {};
+        const sort = {};
+        setSorterList(e.data.sorterList);
+        e.data.sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
+        });
+        await handlerMap.load({ filters, sort });
+      };
+
+      const handleRefresh = async () => {
+        const filters = {};
+        const sort = {};
+        sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
+        });
+        await handlerMap.load({ filters, sort });
+      };
+
+      const handleLoadNext = async () => {
+        const filters = {};
+        const sort = {};
+        sorterList.forEach((item) => {
+          const { key, ascending } = item;
+          sort[key] = ascending ? 1 : -1;
+        });
+        filterList.forEach((item) => {
+          const { key, value } = item;
+          filters[key] = value;
+        });
+        await handlerMap.loadNext({ filters, sort });
+      };
+
+      return (
+        <ControllerProvider
+          data={dataToRender}
+          sorterDefinitionList={SORTER_LIST}
+          sorterList={sorterList}
+          onSorterChange={handleChangeSorterList}
+          filterDefinitionList={FILTER_LIST}
+          filterList={filterList}
+          onFilterChange={handleChangeFilterList}
+          selectable="multiple"
+        >
+          <AttendanceTable
+            data={data}
+            pending={pending}
+            getActionList={getActionList}
+            onDeleteBulkAttendance={() => {}}
+            onRefresh={handleRefresh}
+            onLoadNext={handleLoadNext}
+          />
+        </ControllerProvider>
+      );
     }
 
     return (
@@ -104,7 +286,7 @@ const _AttendanceManagement = createVisualComponent({
             }
           }}
         </AttendanceListProvider>
-        <Dialog />
+        <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
       </Container>
     );
     //@@viewOff:render

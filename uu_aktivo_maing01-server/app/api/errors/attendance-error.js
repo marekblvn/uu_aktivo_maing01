@@ -56,6 +56,52 @@ const Create = {
   },
 };
 
+const Get = {
+  UC_CODE: `${ERR_PREFIX}get/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity associated with this attendance does not exist.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to access attendance of this activity.";
+    }
+  },
+  AttendanceDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}attendanceDaoGetFailed`;
+      this.message = "Get attendance by attendance DAO get failed.";
+    }
+  },
+  AttendanceDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${Get.UC_CODE}attendanceDoesNotExist`;
+      this.message = "Attendance with provided id does not exist.";
+    }
+  },
+};
+
 const List = {
   UC_CODE: `${ERR_PREFIX}list/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
@@ -210,6 +256,7 @@ const Delete = {
 
 module.exports = {
   Create,
+  Get,
   List,
   GetStatistics,
   Delete,

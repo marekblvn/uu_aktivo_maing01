@@ -127,6 +127,11 @@
       "header": "Are you sure you want to delete the datetime of activity '%s'?",
       "info": "The datetime and all information it holds will be deleted without informing the members of the activity.",
       "confirm": "Delete"
+    },
+    "adminDeleteAttendance": {
+      "header": "Are you sure you want to continue?",
+      "info": "Selected attendance will be deleted without notifying the members of the activity.",
+      "confirm": "Delete"
     }
   },
   "Forms": {

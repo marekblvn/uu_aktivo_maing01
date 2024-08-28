@@ -127,6 +127,11 @@
       "header": "Opravdu chcete smazat termín aktivity '%s'?",
       "info": "Termín bude smazán bez upozornění členů aktivity a všechny informace o probíhajícím termínu budou ztraceny.",
       "confirm": "Smazat"
+    },
+    "adminDeleteAttendance": {
+      "header": "Opravdu chcete pokračovat?",
+      "info": "Vybraná docházka bude smazána bez upozornění členů aktivity.",
+      "confirm": "Smazat"
     }
   },
   "Forms": {

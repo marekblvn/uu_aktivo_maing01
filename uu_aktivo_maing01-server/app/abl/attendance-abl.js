@@ -125,25 +125,38 @@ class AttendanceAbl {
       }
     }
 
-    const { filters } = dtoIn || {};
-    const queryFilters = {};
-    if (filters) {
-      const { after, before, activityId } = filters;
+    const filters = {};
+    if (dtoIn.filters) {
+      const { activityId, datetime } = dtoIn.filters;
+
       if (activityId) {
-        queryFilters.activityId = ObjectId.createFromHexString(activityId);
+        filters.activityId = ObjectId.createFromHexString(activityId);
       }
-      if (after) {
-        queryFilters.datetime = { $gte: new Date(after) };
-      }
-      if (before) {
-        queryFilters.datetime = queryFilters.datetime || {};
-        queryFilters.datetime.$lt = new Date(before);
+
+      if (datetime && datetime.filter((item) => item != null).length > 0) {
+        filters.datetime = {};
+        if (datetime[0]) {
+          filters.datetime.$gte = new Date(datetime[0]);
+        }
+        if (datetime[1]) {
+          filters.datetime.$lt = new Date(datetime[1]);
+        }
       }
     }
 
+    const sort = {};
+    if (dtoIn.sort) {
+      const { datetime } = dtoIn.sort;
+      if (datetime) {
+        sort.datetime = datetime;
+      }
+    }
+
+    console.log(sort);
+
     let dtoOut;
     try {
-      dtoOut = await this.attendanceDao.list(awid, queryFilters, dtoIn.pageInfo);
+      dtoOut = await this.attendanceDao.list(awid, filters, dtoIn.pageInfo, sort);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.List.AttendanceDaoListFailed({ uuAppErrorMap }, error);

@@ -5,11 +5,19 @@ const attendanceCreateDtoInType = shape({
 });
 
 const attendanceListDtoInType = shape({
-  filters: shape({
-    activityId: id(),
-    before: date(),
-    after: date(),
-  }),
+  filters: shape(
+    {
+      activityId: id(),
+      datetime: array(oneOf([date(), constant(null)]), 1, 2),
+    },
+    true,
+  ),
+  sort: shape(
+    {
+      datetime: integer(-1, 1),
+    },
+    true,
+  ),
   pageInfo: shape({
     pageIndex: integer(),
     pageSize: integer(),

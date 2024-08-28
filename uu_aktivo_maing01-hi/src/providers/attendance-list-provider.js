@@ -29,24 +29,22 @@ const AttendanceListProvider = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ children, activityId, dateFilter, sort }) {
+  render({ children, filters, pageSize, sort }) {
     //@@viewOn:private
-    const filter = { activityId, ...dateFilter };
-    Object.keys(filter).forEach((key) => filter[key] === undefined && delete filter[key]);
-    const dataObject = useDataList(
-      {
-        itemIdentifier: "uuIdentity",
-        skipInitialLoad: true,
-        initialDtoIn: {
-          filters: filter,
-          sort,
-        },
-        handlerMap: {
-          load: Calls.Attendance.listStatistics,
-        },
+    const dataObject = useDataList({
+      pageSize,
+      itemIdentifier: "id",
+      initialDtoIn: {
+        filters,
+        sort,
       },
-      [dateFilter, sort],
-    );
+      handlerMap: {
+        load: Calls.Attendance.list,
+      },
+      itemHandlerMap: {
+        delete: Calls.Attendance.delete,
+      },
+    });
     let { state, data, errorData, pendingData, handlerMap } = dataObject;
     //@@viewOff:private
 

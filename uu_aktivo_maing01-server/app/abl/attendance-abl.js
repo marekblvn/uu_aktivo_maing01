@@ -87,6 +87,58 @@ class AttendanceAbl {
     return dtoOut;
   }
 
+  async get(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("attendanceGetDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Get),
+      Errors.Get.InvalidDtoIn,
+    );
+
+    let dtoOut;
+    try {
+      dtoOut = await this.attendanceDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Get.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!dtoOut) {
+      throw new Errors.Get.AttendanceDoesNotExist({ uuAppErrorMap }, { attendanceId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      let activity;
+      try {
+        await this.activityDao.get(awid, dtoOut.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Get.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.Get.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoOut.activityId });
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (!activity.members.includes(userUuIdentity)) {
+        throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
   async list(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("attendanceListDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(

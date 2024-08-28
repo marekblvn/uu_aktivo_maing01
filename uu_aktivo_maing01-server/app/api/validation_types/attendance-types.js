@@ -4,6 +4,10 @@ const attendanceCreateDtoInType = shape({
   datetimeId: id().isRequired(),
 });
 
+const attendanceGetDtoInType = shape({
+  id: id().isRequired(),
+});
+
 const attendanceListDtoInType = shape({
   filters: shape(
     {

@@ -8,6 +8,13 @@ class AttendanceController {
     const dtoIn = ucEnv.getDtoIn();
     return AttendanceAbl.create(awid, dtoIn);
   }
+  get(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return AttendanceAbl.get(awid, dtoIn, session, authorizationResult);
+  }
   list(ucEnv) {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();

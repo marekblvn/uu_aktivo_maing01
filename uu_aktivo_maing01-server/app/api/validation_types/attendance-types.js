@@ -9,7 +9,6 @@ const attendanceListDtoInType = shape({
     activityId: id(),
     before: date(),
     after: date(),
-    archived: boolean(),
   }),
   pageInfo: shape({
     pageIndex: integer(),
@@ -22,7 +21,6 @@ const attendanceGetStatisticsDtoInType = shape({
     activityId: id().isRequired(),
     before: date(),
     after: date(),
-    archived: boolean(),
   }).isRequired(),
 });
 

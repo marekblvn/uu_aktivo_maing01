@@ -40,9 +40,11 @@ const AttendanceListProvider = createVisualComponent({
       },
       handlerMap: {
         load: Calls.Attendance.list,
+        deleteBulk: Calls.Attendance.deleteBulk,
       },
       itemHandlerMap: {
         delete: Calls.Attendance.delete,
+        get: Calls.Attendance.get,
       },
     });
     let { state, data, errorData, pendingData, handlerMap } = dataObject;

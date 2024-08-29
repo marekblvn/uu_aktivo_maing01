@@ -3,6 +3,7 @@ import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useStat
 import { Dialog, Pending } from "uu5g05-elements";
 import { useAlertBus, Error } from "uu_plus4u5g02-elements";
 import { withRoute } from "uu_plus4u5g02-app";
+import { Text } from "uu5g05-forms";
 import Config from "./config/config.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import Container from "../bricks/container.js";
@@ -24,10 +25,18 @@ const FILTER_LIST = [
   {
     key: "activityId",
     label: { en: "Activity ID", cs: "ID aktivity" },
+    inputType: Text.Input,
+    inputProps: {
+      placeholder: { en: "Enter activity ID", cs: "Zadejte ID aktivity" },
+    },
   },
   {
     key: "datetime",
     label: { en: "Datetime date", cs: "Datum termínu" },
+    inputType: "date-range",
+    inputProps: {
+      placeholder: { en: "Select a date range", cs: "Vyberte datové rozmezí" },
+    },
   },
 ];
 //@@viewOff:constants
@@ -109,7 +118,7 @@ const _AttendanceManagement = createVisualComponent({
     );
 
     const handleDeleteBulkAttendance = useCallback(
-      (attendanceIdList, handlerFn) =>
+      (attendanceIdList, handlerFn, onSuccess) =>
         showDeleteAttendanceDialog(async (e) => {
           e.preventDefault();
           try {
@@ -127,6 +136,7 @@ const _AttendanceManagement = createVisualComponent({
           } catch (error) {
             showError(error);
           }
+          onSuccess();
         }),
       [],
     );
@@ -239,6 +249,24 @@ const _AttendanceManagement = createVisualComponent({
         await handlerMap.loadNext({ filters, sort });
       };
 
+      const handleDeleteBulk = (data, onSuccess) => {
+        const attendanceIdList = data.map((item) => item.id);
+        handleDeleteBulkAttendance(attendanceIdList, handlerMap.deleteBulk, () => {
+          onSuccess();
+          const filters = {};
+          const sort = {};
+          sorterList.forEach((item) => {
+            const { key, ascending } = item;
+            sort[key] = ascending ? 1 : -1;
+          });
+          filterList.forEach((item) => {
+            const { key, value } = item;
+            filters[key] = value;
+          });
+          handlerMap.load({ filters, sort });
+        });
+      };
+
       return (
         <ControllerProvider
           data={dataToRender}
@@ -254,7 +282,7 @@ const _AttendanceManagement = createVisualComponent({
             data={data}
             pending={pending}
             getActionList={getActionList}
-            onDeleteBulkAttendance={() => {}}
+            onDeleteBulk={handleDeleteBulk}
             onRefresh={handleRefresh}
             onLoadNext={handleLoadNext}
           />

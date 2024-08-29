@@ -54,7 +54,7 @@ const COLUMN_LIST = [
   {
     value: "cts",
     header: <Lsi lsi={{ en: "Saved at", cs: "Vytvořeno v" }} />,
-    cell: ({ data }) => <DateTime value={data.sys.cts} timeFormat="medium" dateFormat="medium" />,
+    cell: ({ data }) => <DateTime value={data.sys.cts || ""} timeFormat="medium" dateFormat="medium" />,
   },
 ];
 //@@viewOff:constants
@@ -82,14 +82,15 @@ const AttendanceTable = createVisualComponent({
     data: [],
     pending: false,
     getActionList: () => [],
+    onDeleteBulk: () => {},
     onLoadNext: () => {},
     onRefresh: () => {},
   },
   //@@viewOff:defaultProps
 
-  render({ data, pending, getActionList, onLoadNext, onRefresh }) {
+  render({ data, pending, getActionList, onDeleteBulk, onLoadNext, onRefresh }) {
     //@@viewOn:private
-    const { selectedData } = useController();
+    const { selectedData, clearSelected } = useController();
     //@@viewOff:private
 
     //@@viewOn:render
@@ -121,11 +122,11 @@ const AttendanceTable = createVisualComponent({
             {
               icon: "uugds-delete",
               colorScheme: "negative",
-              onClick: () => {},
+              onClick: () => onDeleteBulk(selectedData, () => clearSelected()),
             },
           ]}
         />
-        <Table columnList={COLUMN_LIST} getActionList={getActionList} verticalAlignment="center" />
+        {<Table columnList={COLUMN_LIST} getActionList={getActionList} verticalAlignment="center" />}
         <AutoLoad data={data} handleLoadNext={onLoadNext} distance={window.innerHeight} />
       </Block>
     );

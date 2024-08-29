@@ -6,7 +6,7 @@ import { Table } from "uu5tilesg02-elements";
 import { FilterButton, FilterBar, SorterButton } from "uu5tilesg02-controls";
 import { PersonItem } from "uu_plus4u5g02-elements";
 import { Block, Button, Icon, Link, Pending, RichIcon, Tag, Text, TouchLink } from "uu5g05-elements";
-import { TextSelect } from "uu5g05-forms";
+import { TextSelect, Text as FText } from "uu5g05-forms";
 import TextBox from "./text-box.js";
 //@@viewOff:imports
 
@@ -116,6 +116,15 @@ const COLUMN_LIST = [
 
 const FILTER_LIST = [
   {
+    key: "id",
+    label: { en: "Activity ID", cs: "ID aktivity" },
+    inputType: FText.Input,
+    inputProps: {
+      placeholder: { en: "Enter Activity ID", cs: "Zadejte ID aktivity" },
+      pattern: "^[a-fA-F0-9]{24}$",
+    },
+  },
+  {
     key: "name",
     label: { en: "Name", cs: "Název" },
     inputProps: { placeholder: { en: "Enter name", cs: "Zadejte název" } },
@@ -123,7 +132,11 @@ const FILTER_LIST = [
   {
     key: "owner",
     label: { en: "Owner", cs: "Vlastník" },
-    inputProps: { placeholder: { en: "Enter owner's Plus4U ID", cs: "Zadejte Plus4U ID vlastníka" } },
+    inputType: FText.Input,
+    inputProps: {
+      placeholder: { en: "Enter owner's Plus4U ID", cs: "Zadejte Plus4U ID vlastníka" },
+      pattern: "^\\d{1,4}(-\\d{1,4}){1,3}$",
+    },
   },
   {
     key: "members",
@@ -134,6 +147,7 @@ const FILTER_LIST = [
       multiple: true,
       itemList: [],
       value: [],
+      placeholder: { en: "Enter Plus4U IDs of members", cs: "Zadejte Plus4U ID členů" },
     },
   },
   {

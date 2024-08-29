@@ -46,7 +46,7 @@ const CreateInvitationForm = createVisualComponent({
             name="uuIdentity"
             label={{ en: "User's Plus4U ID", cs: "Plus4U ID uživatele" }}
             required
-            pattern="^\d{1,5}-\d{1,5}-\d{1,5}$"
+            pattern="^\d{1,4}(-\d{1,4}){1,3}$"
             onValidate={async (e) => {
               if (members.includes(e.data.value)) {
                 return {

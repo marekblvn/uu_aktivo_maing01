@@ -114,6 +114,10 @@ const Calls = {
       const commandUri = Calls.getCommandUri("attendance/create");
       return Calls.call("cmdPost", commandUri, dtoIn);
     },
+    get(dtoIn) {
+      const commandUri = Calls.getCommandUri("attendance/get");
+      return Calls.call("cmdGet", commandUri, dtoIn);
+    },
     list(dtoIn) {
       const commandUri = Calls.getCommandUri("attendance/list");
       return Calls.call("cmdGet", commandUri, dtoIn);

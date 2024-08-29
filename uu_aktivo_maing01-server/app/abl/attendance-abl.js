@@ -415,9 +415,8 @@ class AttendanceAbl {
 
     const idsAsObjectId = idList.map((id) => ObjectId.createFromHexString(id));
 
-    let dtoOut;
     try {
-      dtoOut = await this.attendanceDao.deleteByIdList(awid, idsAsObjectId);
+      await this.attendanceDao.deleteByIdList(awid, idsAsObjectId);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.DeleteBulk.AttendanceDaoDeleteByIdListFailed({ uuAppErrorMap }, error);
@@ -425,7 +424,7 @@ class AttendanceAbl {
       throw error;
     }
 
-    dtoOut = dtoOut || {};
+    const dtoOut = {};
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

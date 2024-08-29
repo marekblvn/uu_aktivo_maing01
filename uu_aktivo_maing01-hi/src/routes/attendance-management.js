@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import { Dialog, Pending } from "uu5g05-elements";
-import { useAlertBus, Error } from "uu_plus4u5g02-elements";
+import { useAlertBus, Error, Unauthorized } from "uu_plus4u5g02-elements";
 import { withRoute } from "uu_plus4u5g02-app";
 import { Text } from "uu5g05-forms";
 import Config from "./config/config.js";
@@ -11,6 +11,7 @@ import AttendanceListProvider from "../providers/attendance-list-provider.js";
 import importLsi from "../lsi/import-lsi.js";
 import AttendanceTable from "../bricks/attendance-table.js";
 import { ControllerProvider } from "uu5tilesg02";
+import AttendanceDetailModal from "../bricks/attendance-detail-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -73,6 +74,7 @@ const _AttendanceManagement = createVisualComponent({
     const [sorterList, setSorterList] = useState([]);
     const [filterList, setFilterList] = useState([]);
     const [dialogProps, setDialogProps] = useState(null);
+    const [modalProps, setModalProps] = useState(null);
     //@@viewOff:private
 
     const showDeleteAttendanceDialog = useCallback(
@@ -98,6 +100,16 @@ const _AttendanceManagement = createVisualComponent({
       [setDialogProps],
     );
 
+    const showAttendanceDetailModal = useCallback(
+      (attendance) => {
+        setModalProps({
+          data: attendance,
+          onDelete: () => handleDeleteAttendance(attendance),
+        });
+      },
+      [setModalProps],
+    );
+
     const handleDeleteAttendance = useCallback(
       (attendance) =>
         showDeleteAttendanceDialog(async (e) => {
@@ -105,6 +117,7 @@ const _AttendanceManagement = createVisualComponent({
           try {
             await attendance.handlerMap.delete({ id: attendance.id });
             setDialogProps(null);
+            setModalProps(null);
             addAlert({
               priority: "info",
               header: { en: "Attendance deleted", cs: "Docházka smazána" },
@@ -144,6 +157,12 @@ const _AttendanceManagement = createVisualComponent({
 
     const getActionList = useCallback(({ rowIndex, data }) => {
       return [
+        {
+          icon: "uugds-open-in-modal",
+          tooltip: { en: "Open detail", cs: "Otevřít detail" },
+          onClick: () => showAttendanceDetailModal(data),
+        },
+        { divider: true },
         {
           icon: "uugds-delete",
           tooltip: { en: "Delete attendance", cs: "Smazat docházku" },
@@ -316,6 +335,7 @@ const _AttendanceManagement = createVisualComponent({
           }}
         </AttendanceListProvider>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
+        <AttendanceDetailModal {...modalProps} open={!!modalProps} onClose={() => setModalProps(null)} />
       </Container>
     );
     //@@viewOff:render

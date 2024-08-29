@@ -118,6 +118,11 @@
       "info": "This activity and all information contained in it will be lost permanently. Please note that this decision cannot be reversed.",
       "confirm": "Delete"
     },
+    "deleteAttendance": {
+      "header": "Are you sure you want to continue?",
+      "info": "Selected attendance will be deleted without notifying the members of the activity.",
+      "confirm": "Delete"
+    },
     "adminDeleteActivity": {
       "header": "Are you sure you want to delete the activity '%s'?",
       "info": "Activity and all data associated with it will be deleted without informing the members or the owner.",

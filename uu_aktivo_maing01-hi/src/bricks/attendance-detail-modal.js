@@ -41,7 +41,7 @@ const AttendanceDetailModal = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ open, onClose, data, onDelete }) {
+  render({ open, onClose, data }) {
     //@@viewOn:private
     const { datetime, confirmed, denied, undecided } = data;
     const { isAuthority, isExecutive } = useAuthorization();
@@ -54,14 +54,6 @@ const AttendanceDetailModal = createVisualComponent({
         header={<DateTime value={data.datetime} timeFormat="medium" dateFormat="long" />}
         open={open}
         onClose={onClose}
-        actionList={[
-          {
-            icon: "uugds-delete",
-            colorScheme: "negative",
-            onClick: onDelete,
-          },
-          { divider: true },
-        ]}
       >
         <Block style={{ padding: "0 14px 8px" }}>
           <Grid templateColumns={{ xs: "100%" }} templateRows={{ xs: "repeat(3,auto)" }} style={{ marginTop: "8px" }}>

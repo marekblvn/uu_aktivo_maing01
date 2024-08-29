@@ -1,7 +1,7 @@
 //@@viewOn:imports
 import { createVisualComponent, Lsi } from "uu5g05";
 import Config from "./config/config.js";
-import { Block, DateTime, Grid, Icon, Line, LinkPanel, Modal, Text } from "uu5g05-elements";
+import { Block, DateTime, Grid, Icon, Line, LinkPanel, Modal } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
 import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports

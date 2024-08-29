@@ -126,7 +126,7 @@ const AttendanceTable = createVisualComponent({
             },
           ]}
         />
-        {<Table columnList={COLUMN_LIST} getActionList={getActionList} verticalAlignment="center" />}
+        <Table columnList={COLUMN_LIST} getActionList={getActionList} verticalAlignment="center" />
         <AutoLoad data={data} handleLoadNext={onLoadNext} distance={window.innerHeight} />
       </Block>
     );

@@ -28,6 +28,7 @@ const FILTER_LIST = [
     inputType: Text.Input,
     inputProps: {
       placeholder: { en: "Enter activity ID", cs: "Zadejte ID aktivity" },
+      pattern: "^[a-fA-F0-9]{24}$",
     },
   },
   {

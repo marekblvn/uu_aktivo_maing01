@@ -254,10 +254,64 @@ const Delete = {
   },
 };
 
+const DeleteBulk = {
+  UC_CODE: `${ERR_PREFIX}deleteBulk/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${DeleteBulk.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  AttendanceDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${DeleteBulk.UC_CODE}attendanceDaoGetFailed`;
+      this.message = "Get attendance by attendance DAO get failed.";
+    }
+  },
+  AttendanceDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${DeleteBulk.UC_CODE}attendanceDoesNotExist`;
+      this.message = "Attendance with provided id does not exist.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${DeleteBulk.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${DeleteBulk.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with provided id does not exist.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${DeleteBulk.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to delete attendance in this activity.";
+    }
+  },
+  AttendanceDaoDeleteByIdListFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${DeleteBulk.UC_CODE}attendanceDaoDeleteByIdListFailed`;
+      this.message = "Delete attendances by attendance DAO deleteByIdList failed.";
+    }
+  },
+};
+
 module.exports = {
   Create,
   Get,
   List,
   GetStatistics,
   Delete,
+  DeleteBulk,
 };

@@ -173,6 +173,14 @@ class AttendanceMongo extends UuObjectDao {
     };
     return await super.deleteMany(filter);
   }
+
+  async deleteByIdList(awid, idList) {
+    let filter = {
+      awid,
+      _id: { $in: idList },
+    };
+    return await super.deleteMany(filter);
+  }
 }
 
 module.exports = AttendanceMongo;

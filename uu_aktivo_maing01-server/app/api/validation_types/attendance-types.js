@@ -39,3 +39,7 @@ const attendanceGetStatisticsDtoInType = shape({
 const attendanceDeleteDtoInType = shape({
   id: id().isRequired(),
 });
+
+const attendanceDeleteBulkDtoInType = shape({
+  idList: array(id(), 1, 100).isRequired(),
+});

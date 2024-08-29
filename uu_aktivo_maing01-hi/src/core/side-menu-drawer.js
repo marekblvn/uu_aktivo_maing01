@@ -97,6 +97,14 @@ const SideMenuDrawer = createVisualComponent({
               setRoute("management/posts");
             },
           },
+          {
+            children: <Lsi import={importLsi} path={["Menu", "management/attendance"]} />,
+            icon: "uugdsstencil-chart-bar-chart-square",
+            colorScheme: "building",
+            onClick: () => {
+              setRoute("management/attendance");
+            },
+          },
         ],
         icon: "mdi-wrench-outline",
         colorScheme: "building",

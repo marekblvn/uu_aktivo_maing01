@@ -146,6 +146,11 @@
         "httpMethod": "POST",
         "type": "CMD"
       },
+      "attendance/get": {
+        "realization": "api/controllers/AttendanceController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
       "attendance/list": {
         "realization": "api/controllers/AttendanceController.list",
         "httpMethod": "GET",
@@ -158,6 +163,11 @@
       },
       "attendance/delete": {
         "realization": "api/controllers/AttendanceController.delete",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
+      "attendance/deleteBulk": {
+        "realization": "api/controllers/AttendanceController.deleteBulk",
         "httpMethod": "POST",
         "type": "CMD"
       },

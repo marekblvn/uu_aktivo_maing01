@@ -96,12 +96,12 @@ class AttendanceMongo extends UuObjectDao {
    * @param {object} pageInfo
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, filterObject = {}, pageInfo = {}) {
+  async list(awid, filterObject = {}, pageInfo = {}, sort = {}) {
     let filter = {
       awid,
       ...filterObject,
     };
-    return await super.find(filter, pageInfo);
+    return await super.find(filter, pageInfo, sort);
   }
 
   async getStatistics(awid, filterObject = {}) {
@@ -170,6 +170,14 @@ class AttendanceMongo extends UuObjectDao {
     let filter = {
       awid,
       activityId,
+    };
+    return await super.deleteMany(filter);
+  }
+
+  async deleteByIdList(awid, idList) {
+    let filter = {
+      awid,
+      _id: { $in: idList },
     };
     return await super.deleteMany(filter);
   }

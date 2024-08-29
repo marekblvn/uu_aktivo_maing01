@@ -129,6 +129,10 @@
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
+      "attendance/get": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
       "attendance/list": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
@@ -138,6 +142,10 @@
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/delete": {
+        "sysStateList": ["active"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "attendance/deleteBulk": {
         "sysStateList": ["active"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },

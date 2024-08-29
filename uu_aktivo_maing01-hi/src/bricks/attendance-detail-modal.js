@@ -51,7 +51,7 @@ const AttendanceDetailModal = createVisualComponent({
     //@@viewOn:render
     return (
       <Modal
-        header={<Lsi lsi={{ en: "Attendance detail", cs: "Detail docházky" }} />}
+        header={<DateTime value={data.datetime} timeFormat="medium" dateFormat="long" />}
         open={open}
         onClose={onClose}
         actionList={[
@@ -63,14 +63,7 @@ const AttendanceDetailModal = createVisualComponent({
           { divider: true },
         ]}
       >
-        <Block
-          header={
-            <Text category="story" segment="body" type="major">
-              <DateTime value={datetime} timeFormat="medium" dateFormat="long" />
-            </Text>
-          }
-          style={{ padding: "0 14px 8px" }}
-        >
+        <Block style={{ padding: "0 14px 8px" }}>
           <Grid templateColumns={{ xs: "100%" }} templateRows={{ xs: "repeat(3,auto)" }} style={{ marginTop: "8px" }}>
             <LinkPanel
               header={

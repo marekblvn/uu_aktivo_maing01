@@ -126,6 +126,10 @@ const Calls = {
       const commandUri = Calls.getCommandUri("attendance/delete");
       return Calls.call("cmdPost", commandUri, dtoIn);
     },
+    deleteBulk(dtoIn) {
+      const commandUri = Calls.getCommandUri("attendance/deleteBulk");
+      return Calls.call("cmdPost", commandUri, dtoIn);
+    },
   },
 
   Datetime: {

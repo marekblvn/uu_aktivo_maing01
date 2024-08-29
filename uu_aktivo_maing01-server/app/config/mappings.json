@@ -166,6 +166,11 @@
         "httpMethod": "POST",
         "type": "CMD"
       },
+      "attendance/deleteBulk": {
+        "realization": "api/controllers/AttendanceController.deleteBulk",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
       "datetime/create": {
         "realization": "api/controllers/DatetimeController.create",
         "httpMethod": "POST",

@@ -252,7 +252,7 @@ const ActivityDetail = createVisualComponent({
           return <ActivityAttendanceView activityId={id} />;
         case "info":
         default:
-          return <ActivityInformationView {...data} onReload={handleReload} />;
+          return <ActivityInformationView data={data} onReload={handleReload} />;
       }
     }
 

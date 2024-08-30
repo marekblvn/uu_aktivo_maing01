@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, useLsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Button, Grid, Line, PlaceholderBox, Skeleton } from "uu5g05-elements";
 import DateBlock from "./date-block.js";
@@ -12,6 +12,7 @@ import CreateDatetimeForm from "./create-datetime-form.js";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 import ParticipationBlock from "./participation-block.js";
+import ExportDatetimesModal from "./export-datetimes-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -55,8 +56,9 @@ const DatetimeDetail = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ idealParticipants, minParticipants, isMember, datetimeId, activityId, onReload }) {
+  render({ activity, isMember, onReload }) {
     //@@viewOn:private
+    const { id: activityId, minParticipants, idealParticipants, datetimeId } = activity;
     const { identity } = useSession();
     const [screenSize] = useScreenSize();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
@@ -65,6 +67,7 @@ const DatetimeDetail = createVisualComponent({
     const [modalOpen, setModalOpen] = useState(false);
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner } = useActivityAuthorization();
+    const [openExportDatetimeModal, setOpenExportDatetimeModal] = useState(false);
     //@@viewOff:private
 
     function renderLoading() {
@@ -76,11 +79,11 @@ const DatetimeDetail = createVisualComponent({
     }
 
     function renderError(errorData) {
+      const errorCode = errorData.error?.code;
       switch (errorData.operation) {
         case "load":
         case "loadNext":
         default:
-          const errorCode = errorData.error?.code;
           return (
             <Error
               title={errorLsi[errorCode]?.header || { en: "Something went wrong", cs: "Něco se pokazilo" }}
@@ -163,27 +166,35 @@ const DatetimeDetail = createVisualComponent({
       };
 
       return (
-        <Grid templateRows={{ xs: "repeat(3,1fr) auto" }} rowGap={{ xs: "8px", m: "12px" }}>
-          <DateBlock datetime={datetime} />
-          <ParticipationStatusBlock
-            idealParticipants={idealParticipants}
-            minParticipants={minParticipants}
-            confirmedCount={confirmed.length}
-            deniedCount={denied.length}
-            undecidedCount={undecided.length}
-          />
-          {isMember && (
-            <UserStatusBlock
-              onChangeParticipation={handleChangeParticipation}
-              userParticipationType={currentUserParticipationType}
+        <Fragment>
+          <Grid templateRows={{ xs: "repeat(3,1fr) auto" }} rowGap={{ xs: "8px", m: "12px" }}>
+            <DateBlock datetime={datetime} onClickDownload={() => setOpenExportDatetimeModal(true)} />
+            <ParticipationStatusBlock
+              idealParticipants={idealParticipants}
+              minParticipants={minParticipants}
+              confirmedCount={confirmed.length}
+              deniedCount={denied.length}
+              undecidedCount={undecided.length}
             />
-          )}
-          <Line colorScheme="neutral" significance="subdued" />
-          <ParticipationBlock
-            items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}
+            {isMember && (
+              <UserStatusBlock
+                onChangeParticipation={handleChangeParticipation}
+                userParticipationType={currentUserParticipationType}
+              />
+            )}
+            <Line colorScheme="neutral" significance="subdued" />
+            <ParticipationBlock
+              items={{ confirmed: filteredConfirmed, undecided: filteredUndecided, denied: filteredDenied }}
+            />
+            {["xs", "s"].includes(screenSize) && <Line colorScheme="neutral" significance="subdued" margin="6px 0" />}
+          </Grid>
+          <ExportDatetimesModal
+            open={openExportDatetimeModal}
+            onClose={() => setOpenExportDatetimeModal(false)}
+            datetime={datetime}
+            activity={activity}
           />
-          {["xs", "s"].includes(screenSize) && <Line colorScheme="neutral" significance="subdued" margin="6px 0" />}
-        </Grid>
+        </Fragment>
       );
     }
 

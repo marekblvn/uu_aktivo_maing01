@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useTimeZone } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { DateTime, Grid, ListItem, RichIcon, Text } from "uu5g05-elements";
+import { ActionGroup, DateTime, Grid, RichIcon, Text } from "uu5g05-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -29,7 +29,7 @@ const DateBlock = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ datetime }) {
+  render({ datetime, onClickDownload }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     //@@viewOff:private
@@ -37,39 +37,58 @@ const DateBlock = createVisualComponent({
     //@@viewOn:render
     return (
       <Grid
-        templateColumns={{ xs: "auto auto" }}
-        justifyContent={{ xs: "start", s: "space-between" }}
+        templateRows={{ xs: "100%" }}
+        templateColumns={{ xs: "auto 36px" }}
         style={{
           backgroundColor: "rgb(208, 239, 236)",
           color: "rgb(0, 150, 136)",
-          padding: "4px 16px 4px 6px",
+          padding: "4px 6px",
           borderRadius: "8px",
         }}
-        alignItems="center"
-        columnGap={{ xs: "4px" }}
       >
         <Grid
-          templateRows={{ xs: "100%" }}
-          columnGap={{ xs: "12px", s: "16px" }}
-          templateColumns={{ xs: "36px", s: "25px 1fr" }}
+          templateColumns={{ xs: "36px auto", s: "auto auto" }}
+          justifyContent={{ xs: "start", s: "space-between" }}
           alignItems="center"
+          columnGap={{ xs: "4px" }}
         >
-          <RichIcon icon="uugdsstencil-time-calendar-time" colorScheme="secondary" significance="subdued" />
-          {screenSize !== "xs" && (
-            <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
-              <Lsi lsi={{ en: "Upcoming date", cs: "Nadcházející datum" }} />
-            </Text>
-          )}
+          <Grid
+            templateRows={{ xs: "100%" }}
+            columnGap={{ xs: "12px", s: "16px" }}
+            templateColumns={{ xs: "36px", s: "25px 1fr" }}
+            alignItems="center"
+          >
+            <RichIcon icon="uugdsstencil-time-calendar-time" colorScheme="secondary" significance="subdued" />
+            {screenSize !== "xs" && (
+              <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
+                <Lsi lsi={{ en: "Upcoming date", cs: "Nadcházející datum" }} />
+              </Text>
+            )}
+          </Grid>
+          <Text
+            category="story"
+            segment="body"
+            type={`${["xs", "s"].includes(screenSize) ? "minor" : "common"}`}
+            bold
+            style={{ textAlign: "right" }}
+          >
+            <DateTime
+              value={datetime}
+              dateFormat={["xs", "m"].includes(screenSize) ? "medium" : "long"}
+              timeFormat="medium"
+            />
+          </Text>
         </Grid>
-        <Text
-          category="story"
-          segment="body"
-          type={`${["xs", "s"].includes(screenSize) ? "minor" : "common"}`}
-          bold
-          style={{ textAlign: "right" }}
-        >
-          <DateTime value={datetime} dateFormat="long" timeFormat="medium" />
-        </Text>
+        <ActionGroup
+          itemList={[
+            {
+              icon: "uugdsstencil-media-qr-code",
+              onClick: onClickDownload,
+              colorScheme: "secondary",
+              significance: "common",
+            },
+          ]}
+        />
       </Grid>
     );
     //@@viewOff:render

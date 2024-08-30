@@ -35,8 +35,15 @@ const ActivityInformationView = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ description, location, members, minParticipants, idealParticipants, id: activityId, datetimeId, onReload }) {
+  render({ data, onReload }) {
     //@@viewOn:private
+    const {
+      description,
+      location,
+      members,
+
+      id: activityId,
+    } = data;
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const [openDescription, setOpenDescription] = useState(false);
@@ -113,14 +120,7 @@ const ActivityInformationView = createVisualComponent({
           templateColumns={{ xl: "2fr 1fr", m: "3fr 2fr", xs: "100%" }}
           templateRows={{ xs: "auto auto", m: "100%" }}
         >
-          <DatetimeDetail
-            activityId={activityId}
-            datetimeId={datetimeId}
-            idealParticipants={idealParticipants}
-            minParticipants={minParticipants}
-            onReload={onReload}
-            isMember={members.includes(identity.uuIdentity)}
-          />
+          <DatetimeDetail activity={data} onReload={onReload} isMember={members.includes(identity.uuIdentity)} />
           <PostBlock activityId={activityId} />
         </Grid>
       </Grid>

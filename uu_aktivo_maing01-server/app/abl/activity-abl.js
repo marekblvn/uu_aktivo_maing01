@@ -365,7 +365,7 @@ class ActivityAbl {
       dtoIn.notificationOffset.days * 24 + dtoIn.notificationOffset.hours + dtoIn.notificationOffset.minutes / 60;
 
     if (notificationOffsetInHours < 1) {
-      throw new Errors.UpdateNotificationOffset.InvalidNotificationOffset({ uuAppErrorMap });
+      throw new Errors.UpdateNotificationOffset.NotificationOffsetTooSmall({ uuAppErrorMap });
     }
 
     if (activity.frequency) {
@@ -390,7 +390,7 @@ class ActivityAbl {
       );
 
       if (notificationDate <= datetime.datetime) {
-        throw new Errors.UpdateNotificationOffset.InvalidCombination({ uuAppErrorMap });
+        throw new Errors.UpdateNotificationOffset.InvalidNotificationOffset({ uuAppErrorMap });
       }
     }
 

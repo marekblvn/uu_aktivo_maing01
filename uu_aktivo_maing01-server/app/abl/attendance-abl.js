@@ -101,7 +101,7 @@ class AttendanceAbl {
       dtoOut = await this.attendanceDao.get(awid, dtoIn.id);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
-        throw new Errors.Get.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        throw new Errors.Get.AttendanceDaoGetFailed({ uuAppErrorMap }, error);
       }
       throw error;
     }

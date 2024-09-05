@@ -1,7 +1,0 @@
-{
-  "uuapp.perflog.logger.log_level": "WARN",
-  "scriptEngineBaseUri": "",
-  "scriptConsoleUri": "",
-  "scriptRepositoryBaseUri": "----- VALUE REQUIRED -----",
-  "uu_app_oidc_providers_oidcg02_uri": "----- VALUE REQUIRED -----"
-}

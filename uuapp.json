@@ -18,6 +18,11 @@
   "uu_aktivo_maing01-hi": {},
   "uu_aktivo_maing01-server": {},
   "uu_aktivo_maing01-uuscriptlib": {
-    "scriptList": []
+    "scriptList": [
+      {
+        "code": "uu_aktivo_maing01/recycleDatetime",
+        "srcPath": "recycle-datetime.js"
+      }
+    ]
   }
 }

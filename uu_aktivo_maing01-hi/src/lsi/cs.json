@@ -661,6 +661,10 @@
     "uu-aktivo-main/datetime/delete/activityDaoUpdateFailed": {
       "header": "Při pokusu o smazání termínu nastala chyba",
       "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/invitation/create/targetUserAlreadyMember": {
+      "header": "Při vytváření pozvánky nastala chyba",
+      "message": "Uživatel kterého chcete pozvat už je členem této aktivity."
     }
   }
 }

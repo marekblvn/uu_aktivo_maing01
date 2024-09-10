@@ -153,7 +153,7 @@ const ActivityMembersView = createVisualComponent({
     const handleOpenCreateInvitationModal = () =>
       showInvitationCreateModal(async (e) => {
         e.preventDefault();
-        const uuIdentity = e.data.value.uuIdentity;
+        const uuIdentity = e.data.value.user.value.uuIdentity;
         try {
           await callInvitationCreate({ activityId, uuIdentity });
           setModalProps(null);

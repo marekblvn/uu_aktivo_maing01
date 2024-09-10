@@ -661,6 +661,10 @@
     "uu-aktivo-main/datetime/delete/activityDaoUpdateFailed": {
       "header": "Error occurred while trying to delete datetime",
       "message": "Something went wrong. Please try again later."
+    },
+    "uu-aktivo-main/invitation/create/targetUserAlreadyMember": {
+      "header": "Error occurred while creating invitation",
+      "message": "The user you want to invite is already a member of this activity."
     }
   }
 }

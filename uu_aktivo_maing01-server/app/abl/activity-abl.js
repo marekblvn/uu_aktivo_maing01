@@ -31,6 +31,7 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
     dtoIn.awid = awid;
     if (!dtoIn.description) {
       dtoIn.description = "";
@@ -47,11 +48,17 @@ class ActivityAbl {
     const userIdentity = session.getIdentity().getUuIdentity();
     dtoIn.owner = userIdentity;
     dtoIn.administrators = [];
-    dtoIn.members = [userIdentity];
+    dtoIn.members = [
+      {
+        uuIdentity: userIdentity,
+        email: dtoIn.email || null,
+      },
+    ];
     dtoIn.recurrent = false;
     dtoIn.datetimeId = null;
     dtoIn.frequency = {};
     dtoIn.notificationOffset = {};
+    delete dtoIn.email;
     let dtoOut;
     try {
       dtoOut = await this.activityDao.create(dtoIn);
@@ -101,7 +108,7 @@ class ActivityAbl {
       const userUuIdentity = session.getIdentity().getUuIdentity();
 
       // Check if user is member of the activity
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
       }
     }
@@ -137,7 +144,7 @@ class ActivityAbl {
         }
         if (members) {
           filter.members = {
-            $all: members,
+            $all: members.map((uuIdentity) => ({ $elemMatch: { uuIdentity } })),
           };
         }
         if (hasDatetime !== undefined) {
@@ -149,7 +156,7 @@ class ActivityAbl {
         }
       }
     } else {
-      filter.members = { $in: [session.getIdentity().getUuIdentity()] };
+      filter.members = { $elemMatch: { uuIdentity: session.getIdentity().getUuIdentity() } };
     }
 
     const sort = {};
@@ -444,7 +451,7 @@ class ActivityAbl {
       throw new Errors.AddAdministrator.OwnerCannotBeAdministrator({ uuAppErrorMap });
     }
 
-    if (!activity.members.includes(dtoIn.uuIdentity)) {
+    if (!activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.AddAdministrator.TargetUserIsNotMember({ uuAppErrorMap });
     }
 
@@ -500,7 +507,7 @@ class ActivityAbl {
       }
     }
 
-    if (!activity.members.includes(dtoIn.uuIdentity)) {
+    if (!activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.RemoveAdministrator.TargetUserIsNotMember({ uuAppErrorMap });
     }
 
@@ -559,7 +566,7 @@ class ActivityAbl {
       }
     }
 
-    if (!activity.members.includes(dtoIn.uuIdentity)) {
+    if (!activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.TransferOwnership.TargetUserIsNotMember({ uuAppErrorMap });
     }
 
@@ -617,15 +624,20 @@ class ActivityAbl {
     }
 
     let administratorsUpdate = {};
+
+    // Check if member to be removed is owner
     if (dtoIn.uuIdentity === activity.owner) {
       throw new Errors.RemoveMember.TargetUserIsOwner({ uuAppErrorMap });
-    } else if (activity.administrators.includes(dtoIn.uuIdentity)) {
+    } // Check if member to be removed is administrator
+    else if (activity.administrators.includes(dtoIn.uuIdentity)) {
+      // Only owner can remove members that are administrators
       if (userUuIdentity !== activity.owner) {
         throw new Errors.RemoveMember.TargetUserIsAdministrator({ uuAppErrorMap });
       } else {
         administratorsUpdate = { $pull: { administrators: dtoIn.uuIdentity } };
       }
-    } else if (!activity.members.includes(dtoIn.uuIdentity)) {
+    } // Check if member to be removed is actually a member
+    else if (!activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.RemoveMember.TargetUserIsNotMember({ uuAppErrorMap });
     }
 
@@ -633,7 +645,7 @@ class ActivityAbl {
     const updateObject = {
       id: dtoIn.id,
       awid,
-      $pull: { members: dtoIn.uuIdentity },
+      $pull: { members: { uuIdentity: dtoIn.uuIdentity } },
       ...administratorsUpdate,
     };
 
@@ -709,7 +721,7 @@ class ActivityAbl {
 
     const userUuIdentity = session.getIdentity().getUuIdentity();
 
-    if (!activity.members.includes(userUuIdentity)) {
+    if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
       throw new Errors.Leave.UserNotAuthorized({ uuAppErrorMap });
     }
 
@@ -722,7 +734,7 @@ class ActivityAbl {
       awid,
       $pull: {
         administrators: userUuIdentity,
-        members: userUuIdentity,
+        members: { uuIdentity: userUuIdentity },
       },
     };
 

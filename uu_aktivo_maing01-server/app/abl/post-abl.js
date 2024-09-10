@@ -51,7 +51,7 @@ class PostAbl {
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
       !authorizedProfiles.includes(PROFILE_CODES.Executives)
     ) {
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Create.UserNotMember({ uuAppErrorMap });
       }
       if (dtoIn.type === "important") {
@@ -130,6 +130,7 @@ class PostAbl {
         throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
       }
 
+      // don't allow any other filters for StandardUsers
       dtoIn.filters = { activityId: dtoIn.filters.activityId };
 
       let activity;
@@ -146,7 +147,7 @@ class PostAbl {
         throw new Errors.List.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.activityId });
       }
 
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.List.UserNotMember({ uuAppErrorMap });
       }
     }
@@ -253,7 +254,7 @@ class PostAbl {
         throw new Errors.Update.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: post.activityId });
       }
 
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Update.UserNotMember({ uuAppErrorMap });
       }
 
@@ -322,7 +323,7 @@ class PostAbl {
         throw new Errors.Delete.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: post.activityId });
       }
 
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Delete.UserNotMember({ uuAppErrorMap });
       }
 

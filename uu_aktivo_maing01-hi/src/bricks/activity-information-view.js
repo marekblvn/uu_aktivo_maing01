@@ -47,6 +47,7 @@ const ActivityInformationView = createVisualComponent({
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const [openDescription, setOpenDescription] = useState(false);
+    const isMember = members.some((member) => member.uuIdentity === identity.uuIdentity);
     //@@viewOff:private
 
     //@@viewOn:render
@@ -120,7 +121,7 @@ const ActivityInformationView = createVisualComponent({
           templateColumns={{ xl: "2fr 1fr", m: "3fr 2fr", xs: "100%" }}
           templateRows={{ xs: "auto auto", m: "100%" }}
         >
-          <DatetimeDetail activity={data} onReload={onReload} isMember={members.includes(identity.uuIdentity)} />
+          <DatetimeDetail activity={data} onReload={onReload} isMember={isMember} />
           <PostBlock activityId={activityId} />
         </Grid>
       </Grid>

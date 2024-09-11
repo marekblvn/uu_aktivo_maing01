@@ -88,7 +88,7 @@ const MemberList = createVisualComponent({
           {members.map((item, idx) => (
             <MemberTile
               key={idx}
-              uuIdentity={item}
+              uuIdentity={item.uuIdentity}
               onLeaveActivity={onLeaveActivity}
               onRemoveMember={onRemoveMember}
               onPromoteAdmin={onPromoteAdmin}

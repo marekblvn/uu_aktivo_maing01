@@ -43,7 +43,7 @@ const ExportDatetimesModal = createVisualComponent({
     //@@viewOff:private
 
     useEffect(() => {
-      if (!recurrent) {
+      if (!recurrent && open) {
         const cal = ical({ name: name });
         let date = new Date(datetime);
         let end = new Date(date.getTime() + 60 * 60 * 1000);
@@ -68,7 +68,7 @@ const ExportDatetimesModal = createVisualComponent({
         const url = URL.createObjectURL(blob);
         setQRCodeUrl(url);
       }
-    }, [recurrent]);
+    }, [recurrent, open]);
 
     const generateUID = () => `event-series-${Date.now()}`;
 
@@ -114,6 +114,9 @@ const ExportDatetimesModal = createVisualComponent({
     };
 
     //@@viewOn:render
+    if (!open) {
+      return null;
+    }
     return (
       <Modal open={open} onClose={onClose} header={<Lsi lsi={{ en: "Export datetimes", cs: "Exportovat termíny" }} />}>
         {recurrent && (

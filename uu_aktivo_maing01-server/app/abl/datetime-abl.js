@@ -113,7 +113,7 @@ class DatetimeAbl {
     const datetimeCreateObject = {
       awid,
       activityId: activity.id,
-      undecided: activity.members,
+      undecided: activity.members.map((member) => member.uuIdentity),
       confirmed: [],
       denied: [],
       datetime: datetimeAsDate,
@@ -197,7 +197,7 @@ class DatetimeAbl {
       }
 
       const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
       }
     }
@@ -290,7 +290,7 @@ class DatetimeAbl {
       }
     }
 
-    dtoOut.uuAppErrorMap;
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
 
@@ -459,7 +459,7 @@ class DatetimeAbl {
       activityId: datetime.activityId,
       datetime: nextDatetime,
       notification: nextNotification,
-      undecided: activity.members,
+      undecided: activity.members.map((member) => member.uuIdentity),
       confirmed: [],
       denied: [],
     };

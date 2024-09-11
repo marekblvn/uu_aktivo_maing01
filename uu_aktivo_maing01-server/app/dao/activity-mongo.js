@@ -7,7 +7,7 @@ const { UuObjectDao } = require("uu_appg01_server").ObjectStore;
 class ActivityMongo extends UuObjectDao {
   async createSchema() {
     await super.createIndex({ awid: 1, _id: 1 }, { unique: true });
-    await super.createIndex({ awid: 1, members: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, "members.uuIdentity": 1 }, { unique: false });
     await super.createIndex({ awid: 1, name: 1 }, { unique: false });
     await super.createIndex({ awid: 1, owner: 1 }, { unique: false });
   }
@@ -75,24 +75,6 @@ class ActivityMongo extends UuObjectDao {
       ...filterObject,
     };
     return await super.find(filter, pageInfo, sort);
-  }
-
-  /**
-   * Returns a object consisting of itemList - list of matched uuObjects and pageInfo - object with pageIndex, pageSize and total.
-   * @param {string} awid
-   * @param {[string]} uuIdentityList
-   * @param {object} pageInfo
-   *
-   * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
-   */
-  async listByMembers(awid, uuIdentityList, pageInfo = {}) {
-    let filter = {
-      awid,
-      members: {
-        $all: uuIdentityList,
-      },
-    };
-    return await super.find(filter, pageInfo);
   }
 }
 

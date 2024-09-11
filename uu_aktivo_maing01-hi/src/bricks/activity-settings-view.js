@@ -193,7 +193,7 @@ const ActivitySettingsView = createVisualComponent({
       );
 
     const handleTransferOwnership = () => {
-      const filteredMembers = members.filter((i) => i !== identity.uuIdentity);
+      const filteredMembers = members.filter((member) => member.uuIdentity !== identity.uuIdentity);
       showModal("transferOwnership", <TransferOwnershipForm members={filteredMembers} />, async ({ data }) => {
         delete data.value.consent;
         try {

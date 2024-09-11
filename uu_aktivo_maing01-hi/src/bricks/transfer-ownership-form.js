@@ -44,8 +44,8 @@ const TransferOwnershipForm = createVisualComponent({
             label={{ en: "Select new owner", cs: "Vyberte nového vlastníka" }}
             autoFocus
             itemList={members.map((member) => ({
-              value: member,
-              children: <PersonItem uuIdentity={member} size="s" />,
+              value: member.uuIdentity,
+              children: <PersonItem uuIdentity={member.uuIdentity} size="s" />,
             }))}
             required
             validationMap={{
@@ -62,7 +62,7 @@ const TransferOwnershipForm = createVisualComponent({
             name="consent"
             box={false}
             label={{
-              en: "I understand that the transfer of ownership is an irreversible decision and that I will become a normal member and lose access to activity and deadline settings.",
+              en: "I understand that the transfer of ownership is an irreversible decision and that I will become a normal member and lose access to activity and datetime settings.",
               cs: "Beru na vědomí, že převod vlastnictví je nevratné rozhodnutí a že se tak stanu normálním členem a ztratím přístup k nastavením aktivity a termínu.",
             }}
             required

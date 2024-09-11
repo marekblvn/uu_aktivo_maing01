@@ -32,6 +32,7 @@ const invitationListDtoInType = shape({
 
 const invitationAcceptDtoInType = shape({
   id: id().isRequired(),
+  email: string(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
 });
 
 const invitationRejectDtoInType = shape({

@@ -98,7 +98,9 @@ const ActivityMembersView = createVisualComponent({
     const [dialogProps, setDialogProps] = useState(null);
     const [modalProps, setModalProps] = useState(null);
     const [openInvitations, setOpenInvitations] = useState(false);
-    const membersFiltered = members.filter((item) => !administrators.includes(item) && item !== owner);
+    const membersFiltered = members.filter(
+      (item) => !administrators.includes(item.uuIdentity) && item.uuIdentity !== owner,
+    );
     //@@viewOff:private
 
     const showDialog = useCallback(
@@ -144,7 +146,7 @@ const ActivityMembersView = createVisualComponent({
               </SubmitButton>
             </Grid>
           ),
-          children: <CreateInvitationForm members={members} />,
+          children: <CreateInvitationForm />,
         });
       },
       [setModalProps],

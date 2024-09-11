@@ -61,7 +61,7 @@ class InvitationAbl {
       }
     }
 
-    if (activity.members.includes(dtoIn.uuIdentity)) {
+    if (activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.Create.TargetUserAlreadyMember({ uuAppErrorMap });
     }
 
@@ -271,11 +271,16 @@ class InvitationAbl {
       throw new Errors.Accept.ActivityMemberLimitReached({ uuAppErrorMap });
     }
 
-    if (activity.members.includes(invitation.uuIdentity)) {
+    if (activity.members.some((member) => member.uuIdentity === invitation.uuIdentity)) {
       throw new Errors.Accept.UserAlreadyMember({ uuAppErrorMap });
     }
 
-    const updateObject = { id: invitation.activityId, awid, $push: { members: invitation.uuIdentity } };
+    const newMemberObject = {
+      uuIdentity: invitation.uuIdentity,
+      email: dtoIn.email || null,
+    };
+
+    const updateObject = { id: invitation.activityId, awid, $push: { members: newMemberObject } };
     try {
       await this.activityDao.update(updateObject);
     } catch (error) {

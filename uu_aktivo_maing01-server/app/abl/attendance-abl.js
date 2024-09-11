@@ -130,7 +130,7 @@ class AttendanceAbl {
       }
 
       const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
       }
     }
@@ -172,7 +172,7 @@ class AttendanceAbl {
       }
 
       const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.List.UserNotMember({ uuAppErrorMap });
       }
     }
@@ -253,7 +253,7 @@ class AttendanceAbl {
       }
 
       const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.GetStatistics.UserNotMember({ uuAppErrorMap });
       }
     }

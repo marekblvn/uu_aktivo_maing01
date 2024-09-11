@@ -91,6 +91,11 @@
         "httpMethod": "POST",
         "type": "CMD"
       },
+      "activity/updateEmail": {
+        "realization": "api/controllers/ActivityController.updateEmail",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
       "post/create": {
         "realization": "api/controllers/PostController.create",
         "httpMethod": "POST",

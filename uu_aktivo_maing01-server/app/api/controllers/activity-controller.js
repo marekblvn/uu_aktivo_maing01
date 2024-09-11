@@ -84,6 +84,12 @@ class ActivityController {
     const authorizationResult = ucEnv.getAuthorizationResult();
     return ActivityAbl.delete(awid, dtoIn, session, authorizationResult);
   }
+  updateEmail(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    return ActivityAbl.updateEmail(awid, dtoIn, session);
+  }
 }
 
 module.exports = new ActivityController();

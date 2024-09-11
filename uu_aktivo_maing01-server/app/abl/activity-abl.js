@@ -870,6 +870,62 @@ class ActivityAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
+
+  async updateEmail(awid, dtoIn, session) {
+    let validationResult = this.validator.validate("activityUpdateEmailDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.UpdateEmail),
+      Errors.UpdateEmail.InvalidDtoIn,
+    );
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateEmail.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.UpdateEmail.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+    if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
+      throw new Errors.UpdateEmail.UserNotAuthorized({ uuAppErrorMap });
+    }
+
+    const updatedMembers = activity.members.map((member) => {
+      if (member.uuIdentity !== userUuIdentity) return member;
+      return {
+        uuIdentity: member.uuIdentity,
+        email: dtoIn.email,
+      };
+    });
+
+    const updateObject = {
+      id: dtoIn.id,
+      awid,
+      members: updatedMembers,
+    };
+
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.update(updateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateEmail.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
 }
 
 module.exports = new ActivityAbl();

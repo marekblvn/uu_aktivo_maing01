@@ -90,3 +90,8 @@ const activityLeaveDtoInType = shape({
 const activityDeleteDtoInType = shape({
   id: id().isRequired(),
 });
+
+const activityUpdateEmailDtoInType = shape({
+  id: id().isRequired(),
+  email: oneOf([string(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/), constant(null)]),
+});

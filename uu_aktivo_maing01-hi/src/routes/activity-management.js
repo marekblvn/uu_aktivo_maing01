@@ -271,7 +271,13 @@ const _ActivityManagement = createVisualComponent({
         const sort = {};
         setFilterList(e.data.filterList);
         e.data.filterList.forEach((item) => {
-          const { key, value } = item;
+          let { key, value } = item;
+          if (key === "owner") {
+            value = value.value.uuIdentity;
+          }
+          if (key === "members") {
+            value = value.map((v) => v.value.uuIdentity);
+          }
           filters[key] = value;
         });
         sorterList.forEach((item) => {
@@ -290,7 +296,13 @@ const _ActivityManagement = createVisualComponent({
           sort[key] = ascending ? 1 : -1;
         });
         filterList.forEach((item) => {
-          const { key, value } = item;
+          let { key, value } = item;
+          if (key === "owner") {
+            value = value.value.uuIdentity;
+          }
+          if (key === "members") {
+            value = value.map((v) => v.value.uuIdentity);
+          }
           filters[key] = value;
         });
         await handlerMap.load({ filters, sort });
@@ -300,7 +312,13 @@ const _ActivityManagement = createVisualComponent({
         const filters = {};
         const sort = {};
         filterList.forEach((item) => {
-          const { key, value } = item;
+          let { key, value } = item;
+          if (key === "owner") {
+            value = value.value.uuIdentity;
+          }
+          if (key === "members") {
+            value = value.map((v) => v.value.uuIdentity);
+          }
           filters[key] = value;
         });
         sorterList.forEach((item) => {
@@ -314,7 +332,13 @@ const _ActivityManagement = createVisualComponent({
         const filters = {};
         const sort = {};
         filterList.forEach((item) => {
-          const { key, value } = item;
+          let { key, value } = item;
+          if (key === "owner") {
+            value = value.value.uuIdentity;
+          }
+          if (key === "members") {
+            value = value.map((v) => v.value.uuIdentity);
+          }
           filters[key] = value;
         });
         sorterList.forEach((item) => {

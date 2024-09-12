@@ -1,13 +1,14 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, Utils } from "uu5g05";
+import { AutoLoad, createVisualComponent, Environment, Lsi, Utils } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { Table } from "uu5tilesg02-elements";
 import { FilterButton, FilterBar, SorterButton } from "uu5tilesg02-controls";
 import { PersonItem } from "uu_plus4u5g02-elements";
 import { Block, Button, Icon, Link, Pending, RichIcon, Tag, Text, TouchLink } from "uu5g05-elements";
-import { TextSelect, Text as FText } from "uu5g05-forms";
+import { Text as FText } from "uu5g05-forms";
 import TextBox from "./text-box.js";
+import { PersonalCard } from "uu_plus4upeopleg01-forms";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -132,22 +133,19 @@ const FILTER_LIST = [
   {
     key: "owner",
     label: { en: "Owner", cs: "Vlastník" },
-    inputType: FText.Input,
+    inputType: PersonalCard.FormSelect,
     inputProps: {
-      placeholder: { en: "Enter owner's Plus4U ID", cs: "Zadejte Plus4U ID vlastníka" },
-      pattern: "^\\d{1,4}(-\\d{1,4}){1,3}$",
+      baseUri: Environment.get("uu_plus4u5g02_peopleBaseUri"),
     },
+    valueFormatter: (value) => value.value.name,
   },
   {
     key: "members",
     label: { en: "Members", cs: "Členové" },
-    inputType: TextSelect.Input,
+    inputType: PersonalCard.FormSelect,
     inputProps: {
-      insertable: true,
       multiple: true,
-      itemList: [],
-      value: [],
-      placeholder: { en: "Enter Plus4U IDs of members", cs: "Zadejte Plus4U ID členů" },
+      baseUri: Environment.get("uu_plus4u5g02_peopleBaseUri"),
     },
   },
   {

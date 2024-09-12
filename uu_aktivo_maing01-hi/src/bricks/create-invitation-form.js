@@ -41,7 +41,13 @@ const CreateInvitationForm = createVisualComponent({
     return (
       <Form.View>
         <Grid>
-          <PersonalCard.FormSelect name="user" baseUri={uuPlus4UPeopleBaseUri} required />
+          <PersonalCard.FormSelect
+            name="user"
+            baseUri={uuPlus4UPeopleBaseUri}
+            required
+            iconLeft="uugds-account"
+            autoFocus
+          />
         </Grid>
       </Form.View>
     );

@@ -1,13 +1,16 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useLsi, useRef, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Error, withRoute } from "uu_plus4u5g02-app";
 import Container from "../bricks/container.js";
-import { Dialog, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
+import { Dialog, Grid, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
+import { SubmitButton } from "uu5g05-forms";
 import InvitationListProvider from "../providers/invitation-list-provider.js";
 import InvitationList from "../bricks/invitation-list.js";
 import importLsi from "../lsi/import-lsi.js";
 import { useAlertBus } from "uu_plus4u5g02-elements";
+import UpdateEmailForm from "../bricks/update-email-form.js";
+import FormModal from "../bricks/form-modal.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -22,7 +25,7 @@ const Css = {
 //@@viewOn:helpers
 //@@viewOff:helpers
 
-let Invitations = createVisualComponent({
+const _Invitations = createVisualComponent({
   //@@viewOn:statics
   uu5Tag: Config.TAG + "Invitations",
   //@@viewOff:statics
@@ -40,55 +43,89 @@ let Invitations = createVisualComponent({
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const { showError, addAlert } = useAlertBus({ import: importLsi, path: ["Errors"] });
-    const [dialogProps, setDialogProps] = useState();
+    const [dialogProps, setDialogProps] = useState(null);
+    const [modalProps, setModalProps] = useState(null);
     const placeholderLsi = useLsi({ import: importLsi, path: ["Placeholder", "noInvitations"] });
     //@@viewOff:private
 
-    const showDeleteDialog = useCallback((invitation = {}, onConfirm) => {
-      setDialogProps({
-        header: (
-          <Lsi import={importLsi} path={["Dialog", "declineInvitation", "header"]} params={[invitation.activityName]} />
-        ),
-        info: <Lsi import={importLsi} path={["Dialog", "declineInvitation", "info"]} />,
-        icon: "mdi-email-remove",
-        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-        actionList: [
-          {
-            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: () => setDialogProps(null),
-          },
-          {
-            children: <Lsi import={importLsi} path={["Dialog", "declineInvitation", "confirm"]} />,
-            onClick: onConfirm,
-            colorScheme: "negative",
-            significance: "highlighted",
-          },
-        ],
-      });
-    }, []);
+    const showDeleteDialog = useCallback(
+      (invitation = {}, onConfirm) => {
+        setDialogProps({
+          header: (
+            <Lsi
+              import={importLsi}
+              path={["Dialog", "declineInvitation", "header"]}
+              params={[invitation.activityName]}
+            />
+          ),
+          info: <Lsi import={importLsi} path={["Dialog", "declineInvitation", "info"]} />,
+          icon: "mdi-email-remove",
+          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+          actionList: [
+            {
+              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+              onClick: () => setDialogProps(null),
+            },
+            {
+              children: <Lsi import={importLsi} path={["Dialog", "declineInvitation", "confirm"]} />,
+              onClick: onConfirm,
+              colorScheme: "negative",
+              significance: "highlighted",
+            },
+          ],
+        });
+      },
+      [setDialogProps],
+    );
 
-    const showAcceptDialog = useCallback((invitation = {}, onConfirm) => {
-      setDialogProps({
+    const showAcceptDialog = useCallback(
+      (invitation = {}, onConfirm) => {
+        setDialogProps({
+          header: (
+            <Lsi
+              import={importLsi}
+              path={["Dialog", "acceptInvitation", "header"]}
+              params={[invitation.activityName]}
+            />
+          ),
+          info: <Lsi import={importLsi} path={["Dialog", "acceptInvitation", "info"]} />,
+          icon: "mdi-email-check",
+          actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
+          actionList: [
+            {
+              children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
+              onClick: () => setDialogProps(null),
+            },
+            {
+              children: <Lsi import={importLsi} path={["Dialog", "acceptInvitation", "confirm"]} />,
+              colorScheme: "positive",
+              significance: "highlighted",
+              onClick: () => showUpdatEmailDialog(onConfirm),
+            },
+          ],
+        });
+      },
+      [setDialogProps],
+    );
+
+    const showUpdatEmailDialog = useCallback((onSubmit) => {
+      setModalProps({
+        open: true,
+        onClose: () => setModalProps(null),
+        onSubmit: onSubmit,
         header: (
-          <Lsi import={importLsi} path={["Dialog", "acceptInvitation", "header"]} params={[invitation.activityName]} />
+          <Lsi lsi={{ en: "Set email for receiving notifications", cs: "Nastavte e-mail pro zasílání upozornění" }} />
         ),
-        info: <Lsi import={importLsi} path={["Dialog", "acceptInvitation", "info"]} />,
-        icon: "mdi-email-check",
-        actionDirection: ["xs", "s"].includes(screenSize) ? "vertical" : "horizontal",
-        actionList: [
-          {
-            children: <Lsi lsi={{ en: "Cancel", cs: "Zrušit" }} />,
-            onClick: () => setDialogProps(null),
-          },
-          {
-            children: <Lsi import={importLsi} path={["Dialog", "acceptInvitation", "confirm"]} />,
-            colorScheme: "positive",
-            significance: "highlighted",
-            onClick: onConfirm,
-          },
-        ],
+        footer: (
+          <Grid>
+            <SubmitButton>
+              <Lsi lsi={{ en: "Confirm", cs: "Potvrdit" }} />
+            </SubmitButton>
+          </Grid>
+        ),
+        children: <UpdateEmailForm />,
       });
-    }, []);
+    });
 
     function renderLoading() {
       return <Pending size="max" colorScheme="primary" />;
@@ -125,9 +162,9 @@ let Invitations = createVisualComponent({
             await item.handlerMap.delete({ id: item.data.id });
             setDialogProps(null);
             addAlert({
-              header: { en: "Invitation denied", cs: "Pozvánka odmítnuta" },
+              header: { en: "Invitation rejected", cs: "Pozvánka odmítnuta" },
               message: {
-                en: `Invitation to ${item.data.activityName} was denied.`,
+                en: `Invitation to ${item.data.activityName} was rejected.`,
                 cs: `Pozvánka do ${item.data.activityName} byla odmítnuta.`,
               },
               priority: "info",
@@ -143,13 +180,14 @@ let Invitations = createVisualComponent({
         showAcceptDialog(item.data, async (e) => {
           e.preventDefault();
           try {
-            await item.handlerMap.accept({ id: item.data.id });
+            await item.handlerMap.accept({ id: item.data.id, email: e.data.value.email });
             setDialogProps(null);
+            setModalProps(null);
             addAlert({
               header: { en: "Invitation accepted", cs: "Pozvánka přijata" },
               message: {
                 en: `Invitation to ${item.data.activityName} was accepted. You are now a member of this activity.`,
-                cs: `Pozvánka do ${item.data.activityName} byla odmítnuta. Nyní jste členem této aktivity.`,
+                cs: `Pozvánka do ${item.data.activityName} byla přijata. Nyní jste členem této aktivity.`,
               },
               priority: "success",
               durationMs: 2_000,
@@ -218,13 +256,14 @@ let Invitations = createVisualComponent({
           }}
         </InvitationListProvider>
         <Dialog {...dialogProps} open={!!dialogProps} onClose={() => setDialogProps(null)} />
+        <FormModal {...modalProps} open={!!modalProps} onClose={() => setModalProps(null)} />
       </Container>
     );
     //@@viewOff:render
   },
 });
 
-Invitations = withRoute(Invitations, { authenticated: true });
+const Invitations = withRoute(_Invitations, { authenticated: true });
 
 //@@viewOn:exports
 export { Invitations };

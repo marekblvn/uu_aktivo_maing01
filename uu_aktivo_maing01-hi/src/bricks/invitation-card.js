@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { ActionGroup, Box, DateTime, Grid, Text } from "uu5g05-elements";
 //@@viewOff:imports
@@ -38,12 +38,14 @@ const InvitationCard = createVisualComponent({
         onClick: onInvitationAccept,
         colorScheme: "positive",
         significance: "subdued",
+        children: <Lsi lsi={{ en: "Accept", cs: "Přijmout" }} />,
       },
       {
         icon: "mdi-close",
         onClick: onInvitationDelete,
         colorScheme: "negative",
         significance: "subdued",
+        children: <Lsi lsi={{ en: "Deny", cs: "Odmítnout" }} />,
       },
     ];
     //@@viewOff:private

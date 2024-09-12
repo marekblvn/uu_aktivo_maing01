@@ -140,7 +140,10 @@ const _InvitationManagement = createVisualComponent({
         const sort = {};
         setFilterList(e.data.filterList);
         e.data.filterList.forEach((item) => {
-          const { key, value } = item;
+          let { key, value } = item;
+          if (key === "uuIdentity") {
+            value = value.value.uuIdentity;
+          }
           filters[key] = value;
         });
         sorterList.forEach((item) => {
@@ -159,7 +162,10 @@ const _InvitationManagement = createVisualComponent({
           sort[key] = ascending ? 1 : -1;
         });
         filterList.forEach((item) => {
-          const { key, value } = item;
+          let { key, value } = item;
+          if (key === "uuIdentity") {
+            value = value.value.uuIdentity;
+          }
           filters[key] = value;
         });
         await handlerMap.load({ filters, sort });
@@ -169,7 +175,10 @@ const _InvitationManagement = createVisualComponent({
         const filters = {};
         const sort = {};
         filterList.forEach((item) => {
-          const { key, value } = item;
+          let { key, value } = item;
+          if (key === "uuIdentity") {
+            value = value.value.uuIdentity;
+          }
           filters[key] = value;
         });
         sorterList.forEach((item) => {
@@ -183,7 +192,10 @@ const _InvitationManagement = createVisualComponent({
         const filters = {};
         const sort = {};
         filterList.forEach((item) => {
-          const { key, value } = item;
+          let { key, value } = item;
+          if (key === "uuIdentity") {
+            value = value.value.uuIdentity;
+          }
           filters[key] = value;
         });
         sorterList.forEach((item) => {

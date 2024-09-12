@@ -32,7 +32,16 @@ const MemberList = createVisualComponent({
   },
   //@@viewOff:defaultProps
 
-  render({ owner, administrators, members, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity }) {
+  render({
+    owner,
+    administrators,
+    members,
+    onRemoveMember,
+    onPromoteAdmin,
+    onDemoteAdmin,
+    onLeaveActivity,
+    onUpdateEmail,
+  }) {
     //@@viewOn:private
     //@@viewOff:private
 
@@ -44,7 +53,7 @@ const MemberList = createVisualComponent({
             <Icon icon={"mdi-crown"} margin={{ right: "4px" }} style={{ color: "rgb(218,165,32)" }} />
             <Lsi lsi={{ en: "Activity owner", cs: "Vlastník aktivity" }} />
           </Text>
-          <MemberTile uuIdentity={owner} colorScheme="primary" />
+          <MemberTile uuIdentity={owner} colorScheme="primary" onUpdateEmail={onUpdateEmail} />
         </Fragment>
         <Line colorScheme="neutral" significance="subdued" />
         <LinkPanel
@@ -68,6 +77,7 @@ const MemberList = createVisualComponent({
               onRemoveMember={onRemoveMember}
               onPromoteAdmin={onPromoteAdmin}
               onDemoteAdmin={onDemoteAdmin}
+              onUpdateEmail={onUpdateEmail}
             />
           ))}
         </LinkPanel>
@@ -93,6 +103,7 @@ const MemberList = createVisualComponent({
               onRemoveMember={onRemoveMember}
               onPromoteAdmin={onPromoteAdmin}
               onDemoteAdmin={onDemoteAdmin}
+              onUpdateEmail={onUpdateEmail}
             />
           ))}
         </LinkPanel>

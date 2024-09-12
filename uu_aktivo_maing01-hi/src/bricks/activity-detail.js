@@ -179,6 +179,10 @@ const ActivityDetail = createVisualComponent({
       return await handlerMap.removeAdministrator({ id, uuIdentity });
     };
 
+    const handleUpdateEmail = async ({ email }) => {
+      return await handlerMap.updateEmail({ id, email });
+    };
+
     const handleLeaveActivity = async () => {
       handlerMap.leave({ id }).then(() => {
         setRoute("my-activities");
@@ -233,6 +237,7 @@ const ActivityDetail = createVisualComponent({
               onPromoteAdmin={handleAddAdministrator}
               onDemoteAdmin={handleRemoveAdministrator}
               onLeaveActivity={handleLeaveActivity}
+              onUpdateEmail={handleUpdateEmail}
             />
           );
         case "settings":

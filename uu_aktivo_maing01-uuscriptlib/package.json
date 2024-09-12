@@ -6,6 +6,7 @@
   "namespace": "UuAktivoMaing01",
   "spec": "nodejs-scriptlib; uu_appg01@1.12.2",
   "dependencies": {
+    "nodemailer": "^6.9.15",
     "uu_appg01_server": "^6.0.0"
   },
   "devDependencies": {

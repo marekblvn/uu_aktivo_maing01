@@ -8,6 +8,7 @@ import {
   useCallback,
   useLsi,
   useScreenSize,
+  useSession,
   useState,
 } from "uu5g05";
 import { useAlertBus, PersonItem, Error } from "uu_plus4u5g02-elements";
@@ -35,7 +36,8 @@ import InvitationListProvider from "../providers/invitation-list-provider.js";
 import importLsi from "../lsi/import-lsi.js";
 import { CancelButton, SubmitButton } from "uu5g05-forms";
 import FormModal from "./form-modal.js";
-import { List, Table } from "uu5tilesg02-elements";
+import { List } from "uu5tilesg02-elements";
+import UpdateEmailForm from "./update-email-form.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -87,9 +89,11 @@ const ActivityMembersView = createVisualComponent({
     onPromoteAdmin,
     onDemoteAdmin,
     onLeaveActivity,
+    onUpdateEmail,
   }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
+    const { identity } = useSession();
     const { call: callInvitationCreate } = useCall(Calls.Invitation.create);
     const { addAlert, showError } = useAlertBus({ import: importLsi, path: ["Errors"] });
     const errorLsi = useLsi({ import: importLsi, path: ["Errors"] });
@@ -101,6 +105,7 @@ const ActivityMembersView = createVisualComponent({
     const membersFiltered = members.filter(
       (item) => !administrators.includes(item.uuIdentity) && item.uuIdentity !== owner,
     );
+    const userAsMember = members.find((member) => member.uuIdentity === identity.uuIdentity);
     //@@viewOff:private
 
     const showDialog = useCallback(
@@ -152,6 +157,24 @@ const ActivityMembersView = createVisualComponent({
       [setModalProps],
     );
 
+    const showEmailUpdateModal = useCallback((email, onSubmit) => {
+      setModalProps({
+        open: true,
+        onClose: () => setModalProps(null),
+        onSubmit: onSubmit,
+        header: <Lsi lsi={{ en: "Change your notification email", cs: "Změnit email pro upozornění" }} />,
+        footer: (
+          <Grid templateColumns={{ xs: "repeat(2,1fr)", s: "repeat(2,auto)" }} justifyContent={{ s: "end" }}>
+            <CancelButton onClick={() => setModalProps(null)} />
+            <SubmitButton>
+              <Lsi lsi={{ en: "Update", cs: "Změnit" }} />
+            </SubmitButton>
+          </Grid>
+        ),
+        children: <UpdateEmailForm initialValues={{ email }} />,
+      });
+    });
+
     const handleOpenCreateInvitationModal = () =>
       showInvitationCreateModal(async (e) => {
         e.preventDefault();
@@ -175,6 +198,30 @@ const ActivityMembersView = createVisualComponent({
           showError(error);
         }
       });
+
+    const handleUpdateEmail = () => {
+      showEmailUpdateModal(userAsMember.email, async (e) => {
+        e.preventDefault();
+        try {
+          await onUpdateEmail(e.data.value);
+          setModalProps(null);
+          addAlert({
+            priority: "info",
+            header: {
+              en: "Email updated",
+              cs: "E-mail změněn",
+            },
+            message: {
+              en: "Your email has been successfully changed.",
+              cs: "Váš e-mail by úspěšně změněn.",
+            },
+            durationMs: 2000,
+          });
+        } catch (error) {
+          showError(error);
+        }
+      });
+    };
 
     const handlePromoteAdmin = (uuIdentity) => {
       showDialog("addAdministrator", async (e) => {
@@ -409,6 +456,7 @@ const ActivityMembersView = createVisualComponent({
           onDemoteAdmin={handleDemoteAdmin}
           onRemoveMember={handleRemoveMember}
           onLeaveActivity={handleLeaveActivity}
+          onUpdateEmail={handleUpdateEmail}
         />
         {(isAdministrator || isOwner || isAuthority || isExecutive) && (
           <Fragment>

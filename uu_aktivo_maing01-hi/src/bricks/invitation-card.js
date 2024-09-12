@@ -34,18 +34,18 @@ const InvitationCard = createVisualComponent({
     const [screenSize] = useScreenSize();
     const itemList = [
       {
-        icon: "mdi-check",
+        icon: "uugds-check",
         onClick: onInvitationAccept,
         colorScheme: "positive",
         significance: "subdued",
         children: <Lsi lsi={{ en: "Accept", cs: "Přijmout" }} />,
       },
       {
-        icon: "mdi-close",
+        icon: "uugds-close",
         onClick: onInvitationDelete,
         colorScheme: "negative",
         significance: "subdued",
-        children: <Lsi lsi={{ en: "Deny", cs: "Odmítnout" }} />,
+        children: <Lsi lsi={{ en: "Reject", cs: "Odmítnout" }} />,
       },
     ];
     //@@viewOff:private

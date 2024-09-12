@@ -90,9 +90,9 @@
       "confirm": "Delete"
     },
     "declineInvitation": {
-      "header": "Are you sure you want to decline invitation to '%s'?",
+      "header": "Are you sure you want to reject invitation to '%s'?",
       "info": "The invitation will be deleted.",
-      "confirm": "Decline"
+      "confirm": "Reject"
     },
     "acceptInvitation": {
       "header": "You are about to accept an invitation to '%s'",

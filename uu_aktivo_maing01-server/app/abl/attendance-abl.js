@@ -105,7 +105,7 @@ class AttendanceAbl {
 
     await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
       Authorities: ["active", "restricted", "readOnly"],
-      Executives: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
       StandardUsers: ["active"],
     });
 
@@ -163,7 +163,7 @@ class AttendanceAbl {
 
     await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
       Authorities: ["active", "restricted", "readOnly"],
-      Executives: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
       StandardUsers: ["active"],
     });
 
@@ -247,7 +247,7 @@ class AttendanceAbl {
 
     await InstanceChecker.ensureInstanceAndState(awid, Errors.GetStatistics, uuAppErrorMap, authorizationResult, {
       Authorities: ["active", "restricted", "readOnly"],
-      Executives: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
       StandardUsers: ["active"],
     });
 

@@ -27,7 +27,7 @@
         "profileList": ["Public"]
       },
       "sys/uuAppWorkspace/getAuthorizedProfiles": {
-        "sysStateList": ["active"],
+        "sysStateList": ["created", "assigned", "active", "restricted", "readOnly", "closed", "suspended"],
         "profileList": ["Authorities", "Executives", "StandardUsers", "Public"]
       },
       "defaultUve": {

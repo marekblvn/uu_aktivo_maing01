@@ -110,23 +110,23 @@
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/get": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/list": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/accept": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/create": {

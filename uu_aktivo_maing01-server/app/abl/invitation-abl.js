@@ -5,6 +5,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/invitation-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
@@ -30,6 +31,12 @@ class InvitationAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -103,6 +110,12 @@ class InvitationAbl {
       Errors.Get.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let invitation;
     try {
       invitation = await this.invitationDao.get(awid, dtoIn.id);
@@ -139,6 +152,12 @@ class InvitationAbl {
       UnsupportedKeysWarning(Errors.List),
       Errors.List.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
@@ -224,7 +243,7 @@ class InvitationAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
-  async accept(awid, dtoIn, session) {
+  async accept(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("invitationAcceptDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -232,6 +251,12 @@ class InvitationAbl {
       UnsupportedKeysWarning(Errors.Accept),
       Errors.Accept.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Accept, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let invitation;
     try {
@@ -335,6 +360,12 @@ class InvitationAbl {
       UnsupportedKeysWarning(Errors.Delete),
       Errors.Delete.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (

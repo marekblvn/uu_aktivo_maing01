@@ -31,7 +31,8 @@ class InvitationController {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();
     const session = ucEnv.getSession();
-    return InvitationAbl.accept(awid, dtoIn, session);
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return InvitationAbl.accept(awid, dtoIn, session, authorizationResult);
   }
 
   delete(ucEnv) {

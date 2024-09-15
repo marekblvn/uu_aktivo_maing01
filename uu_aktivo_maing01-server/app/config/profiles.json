@@ -154,23 +154,23 @@
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/get": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/updateParticipation": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/createNext": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       }
     }

@@ -4,6 +4,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/datetime-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeysWarning`;
 
@@ -30,6 +31,12 @@ class DatetimeAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -162,6 +169,12 @@ class DatetimeAbl {
       Errors.Get.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let datetime;
     try {
       datetime = await this.datetimeDao.get(awid, dtoIn.id);
@@ -215,6 +228,12 @@ class DatetimeAbl {
       UnsupportedKeysWarning(Errors.UpdateParticipation),
       Errors.UpdateParticipation.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.UpdateParticipation, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let datetime;
     try {
@@ -303,6 +322,12 @@ class DatetimeAbl {
       Errors.Delete.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let datetime;
     try {
       datetime = await this.datetimeDao.get(awid, dtoIn.id);
@@ -390,6 +415,12 @@ class DatetimeAbl {
       UnsupportedKeysWarning(Errors.CreateNext),
       Errors.CreateNext.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.CreateNext, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let datetime;
     try {

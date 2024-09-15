@@ -130,15 +130,15 @@
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/get": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/list": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/getStatistics": {
@@ -146,11 +146,11 @@
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/deleteBulk": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/create": {

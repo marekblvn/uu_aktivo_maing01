@@ -38,55 +38,55 @@
         "profileList": ["Public", "AwidLicenseOwner", "AwidInitiator"]
       },
       "activity/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/get": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/list": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/update": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/updateFrequency": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/updateNotificationOffset": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/addAdministrator": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/removeAdministrator": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/transferOwnership": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/removeMember": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/leave": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/updateEmail": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "post/create": {

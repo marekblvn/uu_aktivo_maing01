@@ -13,7 +13,8 @@ class PostController {
   get(ucEnv) {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();
-    return PostAbl.get(awid, dtoIn);
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return PostAbl.get(awid, dtoIn, authorizationResult);
   }
 
   list(ucEnv) {

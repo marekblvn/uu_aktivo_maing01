@@ -6,7 +6,8 @@ class AttendanceController {
   create(ucEnv) {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();
-    return AttendanceAbl.create(awid, dtoIn);
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return AttendanceAbl.create(awid, dtoIn, authorizationResult);
   }
   get(ucEnv) {
     const awid = ucEnv.getUri().getAwid();

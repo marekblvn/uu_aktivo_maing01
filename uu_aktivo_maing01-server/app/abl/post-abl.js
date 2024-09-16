@@ -5,6 +5,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/post-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
@@ -30,6 +31,12 @@ class PostAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -84,7 +91,7 @@ class PostAbl {
     return dtoOut;
   }
 
-  async get(awid, dtoIn) {
+  async get(awid, dtoIn, authorizationResult) {
     let validationResult = this.validator.validate("postGetDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -92,6 +99,11 @@ class PostAbl {
       UnsupportedKeysWarning(Errors.Get),
       Errors.Get.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+    });
 
     let dtoOut;
     try {
@@ -119,6 +131,12 @@ class PostAbl {
       UnsupportedKeysWarning(Errors.List),
       Errors.List.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
@@ -216,6 +234,12 @@ class PostAbl {
       Errors.Update.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Update, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
@@ -288,6 +312,12 @@ class PostAbl {
       UnsupportedKeysWarning(Errors.Delete),
       Errors.Delete.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (

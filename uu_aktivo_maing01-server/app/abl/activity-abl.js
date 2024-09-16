@@ -4,6 +4,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/activity-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
@@ -23,7 +24,7 @@ class ActivityAbl {
     this.invitationDao = DaoFactory.getDao("invitation");
     this.attendanceDao = DaoFactory.getDao("attendance");
   }
-  async create(awid, dtoIn, session) {
+  async create(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("activityCreateDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -31,6 +32,12 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     dtoIn.awid = awid;
     if (!dtoIn.description) {
@@ -81,6 +88,12 @@ class ActivityAbl {
       Errors.Get.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     // Get user's authorized profiles
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
 
@@ -124,6 +137,11 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.List),
       Errors.List.InvalidDtoIn,
     );
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const filter = {};
@@ -194,6 +212,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Update),
       Errors.Update.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Update, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
 
     let activity;
@@ -245,6 +270,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.UpdateFrequency),
       Errors.UpdateFrequency.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.UpdateFrequency, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
 
     let activity;
@@ -334,6 +366,19 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.UpdateNotificationOffset),
       Errors.UpdateNotificationOffset.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(
+      awid,
+      Errors.UpdateNotificationOffset,
+      uuAppErrorMap,
+      authorizationResult,
+      {
+        Authorities: ["active", "restricted"],
+        Executives: ["active", "restricted"],
+        StandardUsers: ["active"],
+      },
+    );
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
 
     let activity;
@@ -422,6 +467,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.AddAdministrator),
       Errors.AddAdministrator.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.AddAdministrator, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.id);
@@ -481,6 +533,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.RemoveAdministrator),
       Errors.RemoveAdministrator.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.RemoveAdministrator, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.id);
@@ -538,6 +597,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.TransferOwnership),
       Errors.TransferOwnership.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.TransferOwnership, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.id);
@@ -597,6 +663,12 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.TransferOwnership),
       Errors.TransferOwnership.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.RemoveMember, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -696,7 +768,7 @@ class ActivityAbl {
     return dtoOut;
   }
 
-  async leave(awid, dtoIn, session) {
+  async leave(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("activityLeaveDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -704,6 +776,12 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Leave),
       Errors.Leave.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Leave, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -796,6 +874,12 @@ class ActivityAbl {
       Errors.Delete.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.id);
@@ -871,7 +955,7 @@ class ActivityAbl {
     return dtoOut;
   }
 
-  async updateEmail(awid, dtoIn, session) {
+  async updateEmail(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("activityUpdateEmailDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -879,6 +963,12 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.UpdateEmail),
       Errors.UpdateEmail.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Leave, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {

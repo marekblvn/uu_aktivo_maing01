@@ -5,6 +5,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/attendance-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
@@ -23,7 +24,7 @@ class AttendanceAbl {
     this.datetimeDao = DaoFactory.getDao("datetime");
   }
 
-  async create(awid, dtoIn) {
+  async create(awid, dtoIn, authorizationResult) {
     let validationResult = this.validator.validate("attendanceCreateDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -31,6 +32,12 @@ class AttendanceAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let datetime;
     try {
@@ -96,6 +103,12 @@ class AttendanceAbl {
       Errors.Get.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let dtoOut;
     try {
       dtoOut = await this.attendanceDao.get(awid, dtoIn.id);
@@ -147,6 +160,12 @@ class AttendanceAbl {
       UnsupportedKeysWarning(Errors.List),
       Errors.List.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
@@ -226,6 +245,12 @@ class AttendanceAbl {
       Errors.GetStatistics.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.GetStatistics, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
@@ -304,6 +329,12 @@ class AttendanceAbl {
       Errors.Delete.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
 
@@ -367,6 +398,12 @@ class AttendanceAbl {
       UnsupportedKeysWarning(Errors.DeleteBulk),
       Errors.DeleteBulk.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.DeleteBulk, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const { idList } = dtoIn;
 

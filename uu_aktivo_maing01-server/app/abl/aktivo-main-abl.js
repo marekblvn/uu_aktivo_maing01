@@ -34,7 +34,7 @@ class AktivoMainAbl {
     );
 
     // HDS 2
-    const schemas = ["aktivoMain"];
+    const schemas = ["aktivoMain", "activity", "datetime", "attendance", "post", "invitation"];
     let schemaCreateResults = schemas.map(async (schema) => {
       try {
         return await DaoFactory.getDao(schema).createSchema();

@@ -16,7 +16,8 @@
   },
   "Home": {
     "welcome": "Vítejte v",
-    "intro": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Integer tempor. Aliquam ante. Fusce nibh. Aliquam in lorem sit amet leo accumsan lacinia. Duis risus. Praesent id justo in neque elementum ultrices. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce dui leo, imperdiet in, aliquam sit amet, feugiat eu, orci."
+    "intro1": "Aktivo je aplikace sloužící k organizování volnočasových skupinových aktivit. Pokud máte skupinu ve které se pravidelně scházíte a nebaví vás se zdlouhavě domlouvat SMSkami, emaily nebo skrze jiné komunikační prostředky, stačí si vytvořit vlastní aktivitu a pozvat do ní ostatní! V aktivitě si následně můžete vytvořit termín, nastavit jak často se má opakovat a kdy se má členům vaší aktivity posílat upozornění a pak už nemusíte nic řešit. Aplikace Aktivo vám v nastavenou dobu před termínem pošle na email upozornění o blížícím se termínu.",
+    "intro2": "V aktivitě mohou členové potvrdit svou účast na nadcházejícím termínu a dát tak ostatním vědět, zda přijdou nebo ne. V aktivitě také uvidíte kolik členů plánuje přijít a podle toho se rozhodnout, zda má vůbec smysl v daném termínu vaší aktivitu pořádat. Po proběhlém termínu můžete zkontrolovat kdo přišel a kdo se nezúčastnil prostřednictvím docházky."
   },
   "InitAppWorkspace": {
     "notAuthorized": "Nemáte dostatečná práva k použití aplikace.",

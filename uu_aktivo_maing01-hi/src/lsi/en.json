@@ -16,7 +16,8 @@
   },
   "Home": {
     "welcome": "Welcome to",
-    "intro": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Integer tempor. Aliquam ante. Fusce nibh. Aliquam in lorem sit amet leo accumsan lacinia. Duis risus. Praesent id justo in neque elementum ultrices. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce dui leo, imperdiet in, aliquam sit amet, feugiat eu, orci."
+    "intro1": "Aktivo is an application used to organize leisure group activities. If you have a group where you meet regularly and you are tired of lengthy text messages, emails or other means of communication, just create your own activity and invite others to it! In the activity you can then create a deadline, set how often it should be repeated and when notifications should be sent to the members of your activity and then you don't have to worry about anything. The Aktivo app will send you an email notification of the upcoming deadline at a set time before the deadline.",
+    "intro2": "In the activity, members can confirm their attendance at an upcoming date and let others know whether they will be coming or not. In the activity you can also see how many members are planning to come and decide whether it makes sense to hold your activity on that date. After the date has passed, you can check who came and who didn't attend through the attendance tab in the activity."
   },
   "InitAppWorkspace": {
     "notAuthorized": "You do not have sufficient rights to use the application.",

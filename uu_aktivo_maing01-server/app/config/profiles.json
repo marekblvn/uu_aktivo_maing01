@@ -161,6 +161,10 @@
         "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
+      "datetime/list": {
+        "sysStateList": ["active", "restricted", "readOnly"],
+        "profileList": ["Authorities", "Executives"]
+      },
       "datetime/updateParticipation": {
         "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]

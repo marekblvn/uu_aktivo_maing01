@@ -186,6 +186,11 @@
         "httpMethod": "GET",
         "type": "CMD"
       },
+      "datetime/list": {
+        "realization": "api/controllers/DatetimeController.list",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
       "datetime/updateParticipation": {
         "realization": "api/controllers/DatetimeController.updateParticipation",
         "httpMethod": "POST",

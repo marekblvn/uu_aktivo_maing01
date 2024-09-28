@@ -220,6 +220,85 @@ class DatetimeAbl {
     return dtoOut;
   }
 
+  async list(awid, dtoIn, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeListDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.List),
+      Errors.List.InvalidDtoIn,
+    );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+    });
+
+    const filters = {};
+    if (dtoIn.filters) {
+      const { datetime, notification } = dtoIn.filters;
+
+      if (datetime && datetime.filter((item) => item != null).length > 0) {
+        filters.datetime = {};
+        if (datetime[0]) {
+          filters.datetime.$gt = new Date(datetime[0]);
+        }
+        if (datetime[1]) {
+          filters.datetime.$lte = new Date(datetime[1]);
+        }
+      }
+
+      if (notification && notification.filter((item) => item != null).length > 0) {
+        filters.notification = {};
+        if (notification[0]) {
+          filters.notification.$gt = new Date(notification[0]);
+        }
+        if (notification[1]) {
+          filters.notification.$lte = new Date(notification[1]);
+        }
+      }
+    }
+
+    const sort = {};
+    if (dtoIn.sort) {
+      const { datetime, notification } = dtoIn.sort;
+      if (datetime) {
+        sort.datetime = datetime;
+      }
+
+      if (notification) {
+        sort.notification = notification;
+      }
+    }
+
+    const pageIndex = dtoIn.pageInfo?.pageIndex || 0;
+    const pageSize = dtoIn.pageInfo?.pageSize || 10;
+
+    let dtoOut;
+    if (dtoIn.withActivity === true) {
+      try {
+        [dtoOut] = await this.datetimeDao.listWithActivity(awid, filters, { pageIndex, pageSize }, sort);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.List.DatetimeDaoListWithActivityFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    } else {
+      try {
+        dtoOut = await this.datetimeDao.list(awid, filters, { pageIndex, pageSize }, sort);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.List.DatetimeDaoListFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    }
+
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
   async updateParticipation(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("datetimeUpdateParticipationDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(

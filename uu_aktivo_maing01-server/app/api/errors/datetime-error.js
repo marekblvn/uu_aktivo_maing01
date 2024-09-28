@@ -211,6 +211,31 @@ const Get = {
   },
 };
 
+const List = {
+  UC_CODE: `${ERR_PREFIX}list/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${List.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  DatetimeDaoListFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${List.UC_CODE}datetimeDaoListFailed`;
+      this.message = "List datetimes by datetime DAO list failed.";
+    }
+  },
+  DatetimeDaoListWithActivityFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${List.UC_CODE}datetimeDaoListWithActivityFailed`;
+      this.message = "List datetimes with activity by datetime DAO listWithActivity failed.";
+    }
+  },
+};
+
 const UpdateParticipation = {
   UC_CODE: `${ERR_PREFIX}updateParticipation/`,
   InvalidDtoIn: class extends AktivoMainUseCaseError {
@@ -328,6 +353,7 @@ module.exports = {
   Create,
   CreateNext,
   Get,
+  List,
   UpdateParticipation,
   Delete,
 };

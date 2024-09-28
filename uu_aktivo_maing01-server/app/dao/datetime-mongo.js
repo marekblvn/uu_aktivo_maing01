@@ -64,11 +64,75 @@ class DatetimeMongo extends UuObjectDao {
    * @param {object} pageInfo
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, pageInfo = {}) {
+  async list(awid, filters = {}, pageInfo = {}, sort = {}) {
     let filter = {
       awid,
+      ...filters,
     };
-    return await super.find(filter, pageInfo);
+    return await super.find(filter, pageInfo, sort);
+  }
+
+  async listWithActivity(awid, filters = {}, pageInfo = { pageIndex: 0, pageSize: 100 }, sort = {}) {
+    const skip = pageInfo.pageIndex * pageInfo.pageSize;
+    const filter = {
+      awid,
+      ...filters,
+    };
+    let aggregationPipeline = [{ $match: filter }];
+
+    if (Object.keys(sort).length > 0) {
+      aggregationPipeline.push({ $sort: sort });
+    }
+
+    aggregationPipeline.push(
+      {
+        $lookup: {
+          from: "activity",
+          localField: "activityId",
+          foreignField: "_id",
+          as: "activity",
+        },
+      },
+      {
+        $unwind: "$activity",
+      },
+      {
+        $facet: {
+          metadata: [{ $count: "total" }],
+          paginatedResults: [
+            { $skip: skip },
+            { $limit: pageInfo.pageSize },
+            {
+              $project: {
+                id: "$_id",
+                _id: 0,
+                datetime: 1,
+                notification: 1,
+                undecided: 1,
+                denied: 1,
+                confirmed: 1,
+                activityId: 1,
+                "activity.name": 1,
+                "activity.location": 1,
+                "activity.members": 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          itemList: "$paginatedResults",
+          pageInfo: {
+            pageIndex: { $literal: pageInfo.pageIndex },
+            pageSize: { $literal: pageInfo.pageSize },
+            total: { $arrayElemAt: ["$metadata.total", 0] },
+          },
+        },
+      },
+    );
+
+    return await super.aggregate(aggregationPipeline);
   }
 
   /**

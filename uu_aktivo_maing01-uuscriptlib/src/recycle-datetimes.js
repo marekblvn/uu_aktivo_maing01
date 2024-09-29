@@ -4,13 +4,13 @@ const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const { UseCaseError } = require("uu_appg01_server").AppServer;
 
 const dtoInSchema = `
-  const recycleDatetimeDtoInType = shape({
+  const recycleDatetimesDtoInType = shape({
     aktivoServerBaseUri: uri().isRequired(),
   })
 `;
 
 const Errors = {
-  ERROR_PREFIX: "uu-aktivo-scriptsg01/recycle-datetime/",
+  ERROR_PREFIX: "uu-aktivo-scriptsg01/recycle-datetimes/",
   InvalidDtoIn: class extends UseCaseError {
     constructor(dtoOut, paramMap) {
       super({ dtoOut, paramMap, status: 400 });
@@ -50,7 +50,7 @@ const Errors = {
 
 function validateDtoIn(dtoInSchema) {
   const validator = new Validator(dtoInSchema);
-  const validationResult = validator.validate("recycleDatetimeDtoInType", dtoIn);
+  const validationResult = validator.validate("recycleDatetimesDtoInType", dtoIn);
 
   return ValidationHelper.processValidationResult(dtoIn, validationResult, `${Errors.ERROR_PREFIX}unsupportedKeys`, Errors.InvalidDtoIn);
 }

@@ -20,8 +20,8 @@
   "uu_aktivo_maing01-uuscriptlib": {
     "scriptList": [
       {
-        "code": "uu_aktivo_maing01/recycleDatetime",
-        "srcPath": "recycle-datetime.js"
+        "code": "uu_aktivo_maing01/recycleDatetimes",
+        "srcPath": "recycle-datetimes.js"
       },
       {
         "code": "uu_aktivo_maing01/sendNotifications",

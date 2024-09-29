@@ -131,7 +131,7 @@ let aktivoClient;
 async function main() {
   const uuAppErrorMap = validateDtoIn(dtoInSchema);
 
-  aktivoClient = new AppClient({ baseUri: dtoIn.baseUri, session });
+  aktivoClient = new AppClient({ baseUri: dtoIn.aktivoServerBaseUri, session });
 
   const dateNow = new Date();
   dateNow.setSeconds(0, 0);

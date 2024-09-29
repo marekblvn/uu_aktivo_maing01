@@ -4,9 +4,8 @@ const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const { UseCaseError } = require("uu_appg01_server").AppServer;
 
 const dtoInSchema = `
-  const recycleDatetimeDtoInSchemaType = shape({
-    baseUri: uri().isRequired(),
-    id: id().isRequired(),
+  const recycleDatetimeDtoInType = shape({
+    aktivoServerBaseUri: uri().isRequired(),
   })
 `;
 
@@ -19,18 +18,11 @@ const Errors = {
       this.code = `${Errors.ERROR_PREFIX}InvalidDtoIn`;
     }
   },
-  DatetimeGetFailed: class extends UseCaseError {
+  DatetimeListFailed: class extends UseCaseError {
     constructor(dtoOut, paramMap, cause) {
       super({ dtoOut, paramMap, status: 400 }, cause);
-      this.message = "UuCmd datetime/get failed.";
-      this.code = `${Errors.ERROR_PREFIX}datetimeGetFailed`;
-    }
-  },
-  ActivityGetFailed: class extends UseCaseError {
-    constructor(dtoOut, paramMap, cause) {
-      super({ dtoOut, paramMap, status: 400 }, cause);
-      this.message = "UuCmd activity/get failed.";
-      this.code = `${Errors.ERROR_PREFIX}activityGetFailed`;
+      this.message = "UuCmd datetime/list failed.";
+      this.code = `${Errors.ERROR_PREFIX}datetimeListFailed`;
     }
   },
   AttendanceCreateFailed: class extends UseCaseError {
@@ -50,42 +42,35 @@ const Errors = {
   DatetimeDeleteFailed: class extends UseCaseError {
     constructor(dtoOut, paramMap, cause) {
       super({ dtoOut, paramMap, status: 400 }, cause);
-      (this.message = "UuCmd datetime/delete failed."), (this.code = `${Errors.ERROR_PREFIX}datetimeDeleteFailed`);
+      this.message = "UuCmd datetime/delete failed.";
+      this.code = `${Errors.ERROR_PREFIX}datetimeDeleteFailed`;
     }
   },
 };
 
 function validateDtoIn(dtoInSchema) {
   const validator = new Validator(dtoInSchema);
-  const validationResult = validator.validate("recycleDatetimeDtoInSchemaType", dtoIn);
+  const validationResult = validator.validate("recycleDatetimeDtoInType", dtoIn);
 
   return ValidationHelper.processValidationResult(dtoIn, validationResult, `${Errors.ERROR_PREFIX}unsupportedKeys`, Errors.InvalidDtoIn);
 }
 
-async function getDatetime(datetimeId) {
-  const datetimeGetDtoIn = {
-    id: datetimeId,
+async function loadDatetimeBatch(filters, batchIndex, batchSize) {
+  const datetimeListDtoIn = {
+    filters: filters,
+    withActivity: true,
+    pageInfo: {
+      pageIndex: batchIndex,
+      pageSize: batchSize,
+    },
   };
-  let datetimeGetDtoOut;
+  let datetimeListDtoOut;
   try {
-    datetimeGetDtoOut = await aktivoClient.get("datetime/get", datetimeGetDtoIn);
+    datetimeListDtoOut = await aktivoClient.cmdGet("datetime/list", datetimeListDtoIn);
   } catch (error) {
-    throw new Errors.DatetimeGetFailed(dtoOut, { id: datetimeId }, error);
+    throw new Errors.DatetimeListFailed(dtoOut, { baseUri: dtoIn.aktivoServerBaseUri }, error);
   }
-  return datetimeGetDtoOut;
-}
-
-async function getActivity(activityId) {
-  const activityGetDtoIn = {
-    id: activityId,
-  };
-  let activityGetDtoOut;
-  try {
-    activityGetDtoOut = await aktivoClient.get("activity/get", activityGetDtoIn);
-  } catch (error) {
-    throw new Errors.ActivityGetFailed(dtoOut, { id: activityId }, error);
-  }
-  return activityGetDtoOut;
+  return datetimeListDtoOut;
 }
 
 async function createAttendance(datetimeId) {
@@ -98,7 +83,6 @@ async function createAttendance(datetimeId) {
   } catch (error) {
     throw new Errors.AttendanceCreateFailed(dtoOut, { datetimeId }, error);
   }
-  console.info(`Attendance created - ${attendanceCreateDtoOut}`);
   return attendanceCreateDtoOut;
 }
 
@@ -112,7 +96,6 @@ async function createNextDatetime(datetimeId) {
   } catch (error) {
     throw new Errors.DatetimeCreateNextFailed(dtoOut, { id: datetimeId }, error);
   }
-  console.info(`Next datetime created - ${datetimeCreateNextDtoOut}`);
   return datetimeCreateNextDtoOut;
 }
 
@@ -125,12 +108,24 @@ async function deleteDatetime(datetimeId) {
   } catch (error) {
     throw new Errors.DatetimeDeleteFailed(dtoOut, { id: datetimeId }, error);
   }
-  console.info(`Datetime ${datetimeId} deleted.`);
   return;
+}
+
+async function processDatetime(datetime) {
+  const { activity } = datetime;
+  await createAttendance(datetime.id);
+  if (activity.recurrent === true) {
+    await createNextDatetime(datetime.id);
+    console.info(`[Activity ${datetime.activityId}] Created next datetime`);
+  } else {
+    await deleteDatetime(datetime.id);
+    console.info(`[Activity ${datetime.activityId}] Deleted datetime`);
+  }
 }
 
 const { dtoIn, console, session } = scriptContext;
 const dtoOut = {};
+const INTERVAL = 10 * 60 * 1000;
 let aktivoClient;
 
 async function main() {
@@ -138,23 +133,42 @@ async function main() {
 
   aktivoClient = new AppClient({ baseUri: dtoIn.baseUri, session });
 
-  // Getting datetime
-  const datetime = await getDatetime(dtoIn.id);
-  const { activityId } = datetime;
+  const dateNow = new Date();
+  dateNow.setSeconds(0, 0);
+  const loadDatetimeFilters = {
+    datetime: [new Date(dateNow - INTERVAL).toISOString(), dateNow.toISOString()],
+  };
 
-  // Getting activity
-  const activity = await getActivity(activityId);
-  const { recurrent } = activity;
+  const BATCH_SIZE = 100;
+  let batchIndex = 0;
 
-  if (recurrent) {
-    const attendance = await createAttendance(dtoIn.id);
-    dtoOut.attendanceId = attendance.id;
-    const nextDatetime = await createNextDatetime(dtoIn.id);
-    dtoOut.nextDatetimeId = nextDatetime.id;
-  } else {
-    await deleteDatetime(dtoIn.id);
+  const datetimes = await loadDatetimeBatch(loadDatetimeFilters, batchIndex, BATCH_SIZE);
+
+  if (datetimes.itemList.length === 0) {
+    console.info("No datetimes to process - exiting");
+    return;
   }
 
+  const BATCH_INDEX_MAX = Math.floor(datetimes.pageInfo.total / BATCH_SIZE);
+  console.info(`${BATCH_INDEX_MAX + 1} batches to process`);
+
+  console.info(`Processing batch ${batchIndex + 1} of ${BATCH_INDEX_MAX + 1}`);
+
+  await Promise.all(datetimes.itemList.map((datetime) => processDatetime(datetime)));
+
+  batchIndex += 1;
+  while (batchIndex <= BATCH_INDEX_MAX) {
+    console.info(`Processing batch ${batchIndex + 1} of ${BATCH_INDEX_MAX + 1}`);
+
+    const datetimeBatch = await loadDatetimeBatch(loadDatetimeFilters, batchIndex, BATCH_SIZE);
+
+    await Promise.all(datetimeBatch.itemList.map((datetime) => processDatetime(datetime)));
+
+    batchIndex += 1;
+  }
+
+  console.info("Finished processing batches");
+  dtoOut.timeInterval = [loadDatetimeFilters.datetime];
   dtoOut.uuAppErrorMap = uuAppErrorMap;
   return dtoOut;
 }

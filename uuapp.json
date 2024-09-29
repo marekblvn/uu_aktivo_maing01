@@ -24,8 +24,8 @@
         "srcPath": "recycle-datetime.js"
       },
       {
-        "code": "uu_aktivo_maing01/send-notification",
-        "srcPath": "send-notification.js"
+        "code": "uu_aktivo_maing01/sendNotifications",
+        "srcPath": "send-notifications.js"
       }
     ]
   }

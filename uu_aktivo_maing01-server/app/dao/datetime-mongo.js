@@ -115,6 +115,8 @@ class DatetimeMongo extends UuObjectDao {
                 "activity.name": 1,
                 "activity.location": 1,
                 "activity.members": 1,
+                "activity.recurrent": 1,
+                "activity.frequency": 1,
               },
             },
           ],

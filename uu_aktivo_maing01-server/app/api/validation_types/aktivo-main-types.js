@@ -10,4 +10,12 @@ const initDtoInType = shape({
     severity: oneOf(["debug", "info", "warning", "error", "fatal"]),
     estimatedEndTime: datetime(),
   }),
+  secrets: shape({
+    nodemailer: shape({
+      host: uu5String().isRequired(),
+      port: integer().isRequired(), // default 587
+      user: uu5String().isRequired(),
+      pass: uu5String().isRequired(),
+    }),
+  }),
 });

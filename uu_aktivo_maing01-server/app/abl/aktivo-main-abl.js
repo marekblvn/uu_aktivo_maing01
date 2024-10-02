@@ -2,7 +2,8 @@
 const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
-const { Profile, AppClientTokenService, UuAppWorkspace, UuAppWorkspaceError } = require("uu_appg01_server").Workspace;
+const { Profile, AppClientTokenService, UuAppWorkspace, UuAppWorkspaceError, UuAppSecretStore } =
+  require("uu_appg01_server").Workspace;
 const { UriBuilder } = require("uu_appg01_server").Uri;
 const { LoggerFactory } = require("uu_appg01_server").Logging;
 const { AppClient } = require("uu_appg01_server");
@@ -102,7 +103,15 @@ class AktivoMainAbl {
     }
 
     // HDS 4 - HDS N
-    // TODO Implement according to application needs...
+    if (dtoIn.secrets?.nodemailer) {
+      dtoIn.secrets.nodemailer.port = dtoIn.secrets.nodemailer.port.toString();
+      const nodemailerSet = "nodemailer";
+      await Promise.all(
+        Object.entries(dtoIn.secrets.nodemailer).map(([key, value]) =>
+          UuAppSecretStore.putSecret(awid, nodemailerSet, key, value.toString()),
+        ),
+      );
+    }
 
     // HDS N+1
     const workspace = UuAppWorkspace.get(awid);

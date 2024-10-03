@@ -17,6 +17,13 @@ class AktivoMainController {
   getAuthorizedProfiles(ucEnv) {
     return AktivoMainAbl.getAuthorizedProfiles(ucEnv.getAuthorizationResult());
   }
+
+  sendEmailNotification(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return AktivoMainAbl.sendEmailNotification(awid, dtoIn, authorizationResult);
+  }
 }
 
 module.exports = new AktivoMainController();

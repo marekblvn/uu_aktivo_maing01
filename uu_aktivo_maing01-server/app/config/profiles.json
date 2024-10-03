@@ -33,6 +33,10 @@
       "defaultUve": {
         "profileList": ["Public"]
       },
+      "sendEmailNotification": {
+        "sysStateList": ["active", "restricted"],
+        "profileList": ["Authorities"]
+      },
       "sys/uuAppWorkspace/initUve": {
         "sysStateList": ["created", "assigned"],
         "profileList": ["Public", "AwidLicenseOwner", "AwidInitiator"]

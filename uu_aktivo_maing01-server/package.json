@@ -6,6 +6,7 @@
   "spec": "nodejs-app; uu_appg01_devkit@6.0.1",
   "dependencies": {
     "cors": "^2.8.5",
+    "nodemailer": "^6.9.15",
     "uu_appg01_server": "^6.0.0",
     "uu_apprepresentationg01": "^3.0.0"
   },

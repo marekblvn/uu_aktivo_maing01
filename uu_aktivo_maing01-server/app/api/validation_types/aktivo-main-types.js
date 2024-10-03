@@ -19,3 +19,11 @@ const initDtoInType = shape({
     }),
   }),
 });
+
+const sendEmailNotificationDtoInType = shape({
+  activityId: id().isRequired(),
+  activityName: uu5String().isRequired(),
+  receiverEmailList: array(uu5String(), 100).isRequired(),
+  emailHtmlContent: uu5String().isRequired("emailTextContent"),
+  emailTextContent: uu5String(),
+});

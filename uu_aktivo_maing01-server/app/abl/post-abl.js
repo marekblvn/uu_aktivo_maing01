@@ -75,7 +75,7 @@ class PostAbl {
     dtoIn.activityId = ObjectId.createFromHexString(dtoIn.activityId);
     dtoIn.uuIdentity = userUuIdentity;
     dtoIn.uuIdentityName = session.getIdentity().getName();
-    dtoIn.createdAt = new Date();
+    dtoIn.createdAt = new Date(dtoIn.createdAt);
 
     let dtoOut;
     try {

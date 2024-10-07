@@ -88,6 +88,7 @@ class InvitationAbl {
 
     dtoIn.awid = awid;
     dtoIn.activityId = activity.id;
+    dtoIn.createdAt = new Date();
     let dtoOut;
     try {
       dtoOut = await this.invitationDao.create(dtoIn);
@@ -180,10 +181,10 @@ class InvitationAbl {
           throw error;
         }
         if (!activity) {
-          throw new Errors.List.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.activityId });
+          throw new Errors.List.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.filters.activityId });
         }
 
-        if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
+        if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
           throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
         }
       }

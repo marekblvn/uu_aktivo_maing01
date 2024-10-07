@@ -179,7 +179,7 @@
       },
       "datetime/createNext": {
         "sysStateList": ["active", "restricted"],
-        "profileList": ["Authorities", "Executives", "StandardUsers"]
+        "profileList": ["Authorities", "Executives"]
       }
     }
   }

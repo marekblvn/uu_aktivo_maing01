@@ -111,6 +111,7 @@ const dtoInSchema = `
   const sendNotificationsDtoInType = shape({
     aktivoClientBaseUri: uri().isRequired(),
     aktivoServerBaseUri: uri().isRequired(),
+    intervalInMinutes: integer(1, null).isRequired(),
   })
 `;
 
@@ -189,12 +190,12 @@ function getReceiverEmails(activity) {
 
 const { dtoIn, console, session } = scriptContext;
 const dtoOut = {};
-const INTERVAL = 10 * 60 * 1000; // 10 minutes in ms
 let batchMessageIds = {};
 let appClient;
 
 async function main() {
   const uuAppErrorMap = validateDtoIn(dtoInSchema);
+  const INTERVAL = dtoIn.intervalInMinutes * 60 * 1000; // interval in ms
   appClient = new AppClient({ baseUri: dtoIn.aktivoServerBaseUri, session });
 
   const dateNow = new Date();
@@ -212,7 +213,9 @@ async function main() {
 
   if (datetimes.itemList.length === 0) {
     console.info(`No notifications to process - Exiting`);
-    return;
+    dtoOut.timeInterval = loadDatetimeFilters.notification;
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
   }
 
   const BATCH_INDEX_MAX = Math.floor(datetimes.pageInfo.total / BATCH_SIZE);
@@ -240,7 +243,7 @@ async function main() {
   }
 
   console.info("Finished processing batches");
-  dtoOut.timeInterval = [loadDatetimeFilters.notification];
+  dtoOut.timeInterval = loadDatetimeFilters.notification;
   dtoOut.uuAppErrorMap = uuAppErrorMap;
   return dtoOut;
 }

@@ -139,6 +139,7 @@ class DatetimeMongo extends UuObjectDao {
 
   /**
    * Finds one uuObject based on awid and activityId.
+   * @deprecated Not used anywhere - soon to be removed
    * @param {string} awid
    * @param {string} activityId
    * @returns {Promise<object>}

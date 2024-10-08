@@ -52,6 +52,9 @@ class AttendanceMongo extends UuObjectDao {
     return await super.findOneAndUpdate(filter, uuObject, "NONE");
   }
 
+  /**
+   * @deprecated To be removed
+   */
   async updateMany(awid, filterObject, updateObject) {
     let filter = {
       awid,

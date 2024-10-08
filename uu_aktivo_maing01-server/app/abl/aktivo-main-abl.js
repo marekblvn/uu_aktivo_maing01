@@ -2,17 +2,15 @@
 const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
-const { Profile, AppClientTokenService, UuAppWorkspace, UuAppWorkspaceError } = require("uu_appg01_server").Workspace;
+const { Profile, AppClientTokenService, UuAppWorkspace, UuAppWorkspaceError, UuAppSecretStore } =
+  require("uu_appg01_server").Workspace;
 const { UriBuilder } = require("uu_appg01_server").Uri;
 const { LoggerFactory } = require("uu_appg01_server").Logging;
 const { AppClient } = require("uu_appg01_server");
 const Errors = require("../api/errors/aktivo-main-error.js");
+const InstanceChecker = require("../api/components/instance-checker.js");
 
-const WARNINGS = {
-  initUnsupportedKeys: {
-    code: `${Errors.Init.UC_CODE}unsupportedKeys`,
-  },
-};
+const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
 const logger = LoggerFactory.get("AktivoMainAbl");
 
@@ -29,7 +27,7 @@ class AktivoMainAbl {
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
       validationResult,
-      WARNINGS.initUnsupportedKeys.code,
+      UnsupportedKeysWarning(Errors.Init),
       Errors.Init.InvalidDtoIn,
     );
 
@@ -102,7 +100,15 @@ class AktivoMainAbl {
     }
 
     // HDS 4 - HDS N
-    // TODO Implement according to application needs...
+    if (dtoIn.secrets?.nodemailer) {
+      dtoIn.secrets.nodemailer.port = dtoIn.secrets.nodemailer.port.toString();
+      const nodemailerSet = "nodemailer";
+      await Promise.all(
+        Object.entries(dtoIn.secrets.nodemailer).map(([key, value]) =>
+          UuAppSecretStore.putSecret(awid, nodemailerSet, key, value.toString()),
+        ),
+      );
+    }
 
     // HDS N+1
     const workspace = UuAppWorkspace.get(awid);
@@ -150,6 +156,84 @@ class AktivoMainAbl {
   async getAuthorizedProfiles(authorizationResult) {
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const dtoOut = { authorizedProfiles };
+    return dtoOut;
+  }
+
+  async sendEmailNotification(awid, dtoIn, authorizationResult) {
+    let validationResult = this.validator.validate("sendEmailNotificationDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.SendEmailNotification),
+      Errors.SendEmailNotification.InvalidDtoIn,
+    );
+
+    await InstanceChecker.ensureInstanceAndState(
+      awid,
+      Errors.SendEmailNotification,
+      uuAppErrorMap,
+      authorizationResult,
+      {
+        Authorities: ["active", "restricted"],
+      },
+    );
+
+    const nodemailerSecretSet = "nodemailer";
+
+    const host = await UuAppSecretStore.getSecret(awid, nodemailerSecretSet, "host");
+    const port = await UuAppSecretStore.getSecret(awid, nodemailerSecretSet, "port");
+    const user = await UuAppSecretStore.getSecret(awid, nodemailerSecretSet, "user");
+    const pass = await UuAppSecretStore.getSecret(awid, nodemailerSecretSet, "pass");
+
+    Object.entries({ host, port, user, pass }).forEach(([key, val]) => {
+      if (val == null) {
+        throw new Errors.SendEmailNotification.MissingResources({ uuAppErrorMap }, { resource: key });
+      }
+    });
+
+    const nodemailer = require("nodemailer");
+    const TRANSPORTER = nodemailer.createTransport({
+      host,
+      port: parseInt(port),
+      auth: {
+        user,
+        pass,
+      },
+    });
+
+    TRANSPORTER.verify((error, _) => {
+      if (error) {
+        throw new Errors.SendEmailNotification.NodemailerConnectionFailed({ uuAppErrorMap });
+      }
+    });
+
+    const { activityId, activityName, receiverEmailList, emailHtmlContent, emailTextContent } = dtoIn;
+
+    if (receiverEmailList.length === 0) {
+      throw new Errors.SendEmailNotification.NoReceiversProvided({ uuAppErrorMap }, { activityId });
+    }
+
+    let content;
+    if (emailHtmlContent) {
+      content = { html: emailHtmlContent };
+    } else {
+      content = { text: emailTextContent };
+    }
+
+    let dtoOut;
+    try {
+      dtoOut = await TRANSPORTER.sendMail({
+        from: '"Aktivo"<noreply@aktivoapp.online>',
+        to: receiverEmailList.join(","),
+        subject: activityName,
+        ...content,
+      });
+    } catch (error) {
+      throw new Errors.SendEmailNotification.NodemailerError({ uuAppErrorMap }, error);
+    }
+
+    delete dtoOut.ehlo;
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
 }

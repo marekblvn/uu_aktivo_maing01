@@ -35,10 +35,6 @@ const invitationAcceptDtoInType = shape({
   email: string(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
 });
 
-const invitationRejectDtoInType = shape({
-  id: id().isRequired(),
-});
-
 const invitationDeleteDtoInType = shape({
   id: id().isRequired(),
 });

@@ -533,17 +533,6 @@ class DatetimeAbl {
       throw new Errors.CreateNext.ActivityNotRecurrent({ uuAppErrorMap });
     }
 
-    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
-    if (
-      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
-      !authorizedProfiles.includes(PROFILE_CODES.Executives)
-    ) {
-      const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (activity.owner !== userUuIdentity) {
-        throw new Errors.CreateNext.UserNotAuthorized({ uuAppErrorMap });
-      }
-    }
-
     const nextDatetime = new Date(datetime.datetime);
     nextDatetime.setMonth(nextDatetime.getMonth() + activity.frequency.months);
     nextDatetime.setDate(nextDatetime.getDate() + activity.frequency.days);

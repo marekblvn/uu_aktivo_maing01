@@ -26,6 +26,11 @@
         "httpMethod": "GET",
         "type": "UVE"
       },
+      "sendEmailNotification": {
+        "realization": "api/controllers/AktivoMainController.sendEmailNotification",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
       "sys/uuAppWorkspace/initUve": {
         "realization": "index.html",
         "httpMethod": "GET",

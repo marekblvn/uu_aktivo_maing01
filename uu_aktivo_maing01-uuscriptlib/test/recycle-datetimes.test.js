@@ -6,6 +6,7 @@ describe("RecycleDatetimes", () => {
 
     const dtoIn = {
       aktivoServerBaseUri: "http://localhost:8080/uu-aktivo-maing01/22222222222222222222222222222222/",
+      intervalInMinutes: 10,
     };
 
     const result = await TestHelper.runScript("recycle-datetimes.js", dtoIn, session);

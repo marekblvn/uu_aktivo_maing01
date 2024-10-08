@@ -6,6 +6,7 @@ const { UseCaseError } = require("uu_appg01_server").AppServer;
 const dtoInSchema = `
   const recycleDatetimesDtoInType = shape({
     aktivoServerBaseUri: uri().isRequired(),
+    intervalInMinutes: integer(1, null).isRequired(),
   })
 `;
 
@@ -125,13 +126,13 @@ async function processDatetime(datetime) {
 
 const { dtoIn, console, session } = scriptContext;
 const dtoOut = {};
-const INTERVAL = 10 * 60 * 1000;
 let aktivoClient;
 
 async function main() {
   const uuAppErrorMap = validateDtoIn(dtoInSchema);
 
   aktivoClient = new AppClient({ baseUri: dtoIn.aktivoServerBaseUri, session });
+  const INTERVAL = dtoIn.intervalInMinutes * 60 * 1000;
 
   const dateNow = new Date();
   dateNow.setSeconds(0, 0);
@@ -146,7 +147,9 @@ async function main() {
 
   if (datetimes.itemList.length === 0) {
     console.info("No datetimes to process - exiting");
-    return;
+    dtoOut.timeInterval = loadDatetimeFilters.datetime;
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
   }
 
   const BATCH_INDEX_MAX = Math.floor(datetimes.pageInfo.total / BATCH_SIZE);
@@ -168,7 +171,7 @@ async function main() {
   }
 
   console.info("Finished processing batches");
-  dtoOut.timeInterval = [loadDatetimeFilters.datetime];
+  dtoOut.timeInterval = loadDatetimeFilters.datetime;
   dtoOut.uuAppErrorMap = uuAppErrorMap;
   return dtoOut;
 }

@@ -1,32 +1,10 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Block, Grid, Icon, Text } from "uu5g05-elements";
 //@@viewOff:imports
 
 //@@viewOn:constants
-const questions = [
-  {
-    label: {
-      en: "How can I create an activity?",
-      cs: "Jak si můžu vytvořit aktivitu?",
-    },
-    content: {
-      en: 'To create an activity you first need to be logged in to the Plus4U service. Then you can go to the "My Activities" tab and create activity from there, or you can click the link in the text above. After you create your activity, it will be available in the "My Activities" tab.',
-      cs: "K vytvoření aktivity musíte být nejprve přihlášeni do služby Plus4U. Poté můžete přejít na záložku „Moje aktivity“ a vytvořit aktivitu odtud, nebo můžete kliknout na odkaz v textu výše. Po vytvoření aktivity bude tato dostupná v záložce „Moje aktivity“.",
-    },
-  },
-  {
-    label: {
-      en: "How can I disable / enable email notifications?",
-      cs: "Jak můžu zrušit / povolit posílání upozornění na e-mail?",
-    },
-    content: {
-      en: 'Notifications are sent only to those members, who have their email address set up in the particular activity. If the user does not have an email address set up in the activity, then no notification is sent to them. In the activity "Members" tab, you can click on the button next to your name to change the email for the activity or to set that you do not want to receive email notifications.',
-      cs: "Oznámení jsou zasílána pouze těm členům, kteří mají v dané aktivitě nastavenou e-mailovou adresu. Pokud uživatel nemá v aktivitě nastavenou e-mailovou adresu, není mu zasláno žádné oznámení. V aktivitě v kartě „Členové“ můžete kliknutím na tlačítko vedle svého jména změnit e-mail pro danou aktivitu nebo nastavit, že nechcete dostávat e-mailová oznámení.",
-    },
-  },
-];
 //@@viewOff:constants
 
 //@@viewOn:css
@@ -44,14 +22,18 @@ const WelcomeQuestions = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    questions: PropTypes.arrayOf(PropTypes.object),
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    questions: [],
+  },
   //@@viewOff:defaultProps
 
-  render(props) {
+  render({ questions }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     //@@viewOff:private

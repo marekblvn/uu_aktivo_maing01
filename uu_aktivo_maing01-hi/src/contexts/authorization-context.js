@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createComponent, Utils, useDataObject, useSession } from "uu5g05";
+import { createComponent, Utils, useDataObject, useSession, PropTypes } from "uu5g05";
 import { Error, SpaPending } from "uu_plus4u5g02-app";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
@@ -17,6 +17,13 @@ export const AuthorizationContextProvider = createComponent({
   //@@viewOn:statics
   uu5Tag: Config.TAG + "AuthorizationContextProvider",
   //@@viewOff:statics
+  propTypes: {
+    children: PropTypes.node,
+  },
+
+  defaultProps: {
+    children: null,
+  },
 
   render({ children }) {
     const { state: sessionState } = useSession();

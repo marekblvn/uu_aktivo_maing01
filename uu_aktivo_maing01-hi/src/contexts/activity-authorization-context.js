@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createComponent, useSession, Utils } from "uu5g05";
+import { createComponent, PropTypes, useSession, Utils } from "uu5g05";
 import Config from "./config/config.js";
 //@@viewOff:imports
 
@@ -22,11 +22,16 @@ export const ActivityAuthorizationContextProvider = createComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    children: PropTypes.node,
+    activity: PropTypes.object.isRequired,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    children: null,
+  },
   //@@viewOff:defaultProps
 
   render({ children, activity }) {

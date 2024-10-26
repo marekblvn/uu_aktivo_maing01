@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useDataList } from "uu5g05";
+import { createVisualComponent, PropTypes, useDataList } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
 //@@viewOff:imports
@@ -22,11 +22,21 @@ const AttendanceListProvider = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    children: PropTypes.func,
+    filters: PropTypes.object,
+    sort: PropTypes.object,
+    pageSize: PropTypes.number,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    children: () => {},
+    filters: {},
+    sort: {},
+    pageSize: 50,
+  },
   //@@viewOff:defaultProps
 
   render({ children, filters, pageSize, sort }) {

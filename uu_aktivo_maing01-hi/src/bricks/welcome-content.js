@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Link, Text } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
@@ -23,11 +23,15 @@ const WelcomeContent = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    onCreateActivity: PropTypes.func.isRequired,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    onCreateActivity: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({ onCreateActivity }) {
@@ -60,26 +64,19 @@ const WelcomeContent = createVisualComponent({
         >
           <Lsi import={importLsi} path={["Home", "intro2"]} />
         </Text>
-        <Grid
-          templateColumns={{ xs: "repeat(2, auto)" }}
-          templateRows={{ xs: "100%" }}
-          justifyContent={{ xs: "start" }}
-          alignItems={{ xs: "center" }}
+        <Text
+          category="interface"
+          segment="content"
+          type={["xl", "l", "m"].includes(screenSize) ? "large" : "medium"}
+          autoFit
+          style={{ fontFamily: "'Red Hat Display', sans-serif", fontOpticalSizing: "auto", textAlign: "justify" }}
         >
-          <Text
-            category="interface"
-            segment="content"
-            type={["xl", "l", "m"].includes(screenSize) ? "large" : "medium"}
-            autoFit
-            style={{ fontFamily: "'Red Hat Display', sans-serif", fontOpticalSizing: "auto", textAlign: "justify" }}
-          >
-            <Lsi lsi={{ en: "So don't hesitate and ", cs: "Tak neváhejte a " }} />
-            <Link onClick={onCreateActivity}>
-              <Lsi lsi={{ en: "create an activity", cs: "vytvořte si aktivitu" }} />
-            </Link>
-            .
-          </Text>
-        </Grid>
+          <Lsi lsi={{ en: "So don't hesitate and ", cs: "Tak neváhejte a " }} />
+          <Link onClick={onCreateActivity}>
+            <Lsi lsi={{ en: "create an activity", cs: "vytvořte si aktivitu" }} />
+          </Link>
+          .
+        </Text>
       </Grid>
     );
     //@@viewOff:render

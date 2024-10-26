@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useDataList, useSession } from "uu5g05";
+import { createVisualComponent, PropTypes, useDataList, useSession } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
 //@@viewOff:imports
@@ -22,13 +22,17 @@ const InvitationListProvider = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    children: PropTypes.func,
+    filters: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
     filters: {},
-    pageSize: 10,
+    pageSize: 50,
+    children: () => {},
   },
   //@@viewOff:defaultProps
 

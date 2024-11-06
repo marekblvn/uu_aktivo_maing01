@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession, useRoute } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize, useSession, useRoute, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { Block, Button, Header, Icon, Text } from "uu5g05-elements";
 //@@viewOff:imports
@@ -22,7 +22,10 @@ const ActivityCard = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    activity: PropTypes.object,
+    onActivityLeave: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps

@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Fragment, Lsi } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Icon, Line, LinkPanel, Text } from "uu5g05-elements";
 import MemberTile from "./member-tile.js";
@@ -23,12 +23,28 @@ const MemberList = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    owner: PropTypes.string,
+    administrators: PropTypes.array,
+    members: PropTypes.array,
+    onRemoveMember: PropTypes.func,
+    onPromoteAdmin: PropTypes.func,
+    onDemoteAdmin: PropTypes.func,
+    onLeaveActivity: PropTypes.func,
+    onUpdateEmail: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
-    collapsible: false,
+    owner: "",
+    administrators: [],
+    members: [],
+    onRemoveMember: () => {},
+    onPromoteAdmin: () => {},
+    onDemoteAdmin: () => {},
+    onLeaveActivity: () => {},
+    onUpdateEmail: () => {},
   },
   //@@viewOff:defaultProps
 

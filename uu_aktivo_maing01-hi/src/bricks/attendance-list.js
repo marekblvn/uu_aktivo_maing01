@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Block, DateTime, Number, Pending, RichIcon } from "uu5g05-elements";
 import { List } from "uu5tilesg02-elements";
@@ -56,13 +56,26 @@ const AttendanceList = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    pending: PropTypes.bool,
+    data: PropTypes.array,
+    onDeleteBulk: PropTypes.func,
+    onLoadNext: PropTypes.func,
+    onRefresh: PropTypes.func,
+    getActionList: PropTypes.func,
+    children: PropTypes.node,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
     data: [],
     pending: false,
+    children: null,
+    onDeleteBulk: () => {},
+    onLoadNext: () => {},
+    onRefresh: () => {},
+    getActionList: () => {},
   },
   //@@viewOff:defaultProps
 

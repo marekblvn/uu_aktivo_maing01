@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Block, DateTime, Grid, Icon, Number, Text } from "uu5g05-elements";
 import { useAuthorization } from "../contexts/authorization-context.js";
@@ -24,11 +24,19 @@ const AttendanceTile = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    data: PropTypes.object,
+    onDelete: PropTypes.func,
+    onOpenDetail: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    data: {},
+    onDelete: () => {},
+    onOpenDetail: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({ data, onDelete, onOpenDetail }) {

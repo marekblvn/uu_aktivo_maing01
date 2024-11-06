@@ -31,12 +31,14 @@ let ActivityPage = createVisualComponent({
   //@@viewOn:propTypes
   propTypes: {
     id: PropTypes.string,
+    tab: PropTypes.string,
   },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
     id: "",
+    tab: "information",
   },
   //@@viewOff:defaultProps
 

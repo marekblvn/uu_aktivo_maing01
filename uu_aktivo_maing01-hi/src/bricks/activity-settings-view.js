@@ -2,6 +2,7 @@
 import {
   createVisualComponent,
   Lsi,
+  PropTypes,
   useCall,
   useCallback,
   useRoute,
@@ -48,11 +49,47 @@ const ActivitySettingsView = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    id: PropTypes.string,
+    name: PropTypes.string,
+    description: PropTypes.string,
+    location: PropTypes.string,
+    minParticipants: PropTypes.number,
+    idealParticipants: PropTypes.number,
+    members: PropTypes.array,
+    datetimeId: PropTypes.string,
+    frequency: PropTypes.object,
+    notificationOffset: PropTypes.object,
+    recurrent: PropTypes.bool,
+    onUpdateActivity: PropTypes.func,
+    onTransferOwnership: PropTypes.func,
+    onDeleteActivity: PropTypes.func,
+    onUpdateFrequency: PropTypes.func,
+    onUpdateNotificationOffset: PropTypes.func,
+    onReload: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    id: "",
+    name: "",
+    description: "",
+    location: "",
+    minParticipants: 0,
+    idealParticipants: 0,
+    members: [],
+    datetimeId: null,
+    frequency: {},
+    notificationOffset: {},
+    recurrent: false,
+    onUpdateActivity: () => {},
+    onTransferOwnership: () => {},
+    onDeleteActivity: () => {},
+    onUpdateFrequency: () => {},
+    onUpdateNotificationOffset: () => {},
+    onReload: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({
@@ -70,7 +107,6 @@ const ActivitySettingsView = createVisualComponent({
     onUpdateActivity,
     onTransferOwnership,
     onDeleteActivity,
-    onChangeRecurrence,
     onUpdateFrequency,
     onUpdateNotificationOffset,
     onReload,

@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useEffect, useRoute, useScrollDirection, Utils } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useEffect, useRoute, useScrollDirection, Utils } from "uu5g05";
 import Config from "./config/config.js";
 import { Drawer, MenuList } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
@@ -24,11 +24,19 @@ const SideMenuDrawer = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    children: PropTypes.node,
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    children: null,
+    open: false,
+    onClose: () => {},
+  },
   //@@viewOff:defaultProps
 
   render(props) {

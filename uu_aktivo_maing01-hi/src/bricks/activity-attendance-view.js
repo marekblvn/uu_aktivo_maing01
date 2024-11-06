@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import { Dialog, Pending } from "uu5g05-elements";
 import { DateRange } from "uu5g05-forms";
@@ -50,11 +50,15 @@ const ActivityAttendanceView = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    activityId: PropTypes.string,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    activityId: null,
+  },
   //@@viewOff:defaultProps
 
   render({ activityId }) {

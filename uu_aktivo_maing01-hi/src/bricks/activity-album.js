@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useScreenSize } from "uu5g05";
+import { createVisualComponent, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Skeleton } from "uu5g05-elements";
 import ActivityCard from "./activity-card.js";
@@ -23,13 +23,16 @@ const ActivityAlbum = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    itemList: PropTypes.array,
+    onActivityLeave: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
     itemList: [],
-    children: null,
+    onActivityLeave: () => {},
   },
   //@@viewOff:defaultProps
 

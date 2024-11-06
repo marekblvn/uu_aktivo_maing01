@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { Form, FormSelect } from "uu5g05-forms";
 import { Grid } from "uu5g05-elements";
@@ -24,11 +24,17 @@ const UpdateFrequencyForm = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    initialValues: PropTypes.object,
+    notificationOffset: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    initialValues: {},
+    notificationOffset: {},
+  },
   //@@viewOff:defaultProps
 
   render({ initialValues, notificationOffset }) {

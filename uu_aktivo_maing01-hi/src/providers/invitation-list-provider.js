@@ -46,6 +46,7 @@ const InvitationListProvider = createVisualComponent({
       },
       handlerMap: {
         load: Calls.Invitation.list,
+        create: Calls.Invitation.create,
       },
       itemHandlerMap: {
         accept: Calls.Invitation.accept,

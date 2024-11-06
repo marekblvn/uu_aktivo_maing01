@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { ActionGroup, DateTime, Grid, RichIcon, Text } from "uu5g05-elements";
 //@@viewOff:imports
@@ -22,11 +22,17 @@ const DateBlock = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    datetime: PropTypes.string,
+    onClickDownload: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    datetime: "",
+    onClickDownload: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({ datetime, onClickDownload }) {

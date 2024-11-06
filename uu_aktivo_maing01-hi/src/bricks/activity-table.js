@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Environment, Lsi, Utils } from "uu5g05";
+import { AutoLoad, createVisualComponent, Environment, Lsi, PropTypes, Utils } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { Table } from "uu5tilesg02-elements";
@@ -190,11 +190,31 @@ const ActivityTable = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    pending: PropTypes.bool,
+    data: PropTypes.array,
+    filterList: PropTypes.array,
+    sorterList: PropTypes.array,
+    onSorterListChange: PropTypes.func,
+    onFilterListChange: PropTypes.func,
+    getActionList: PropTypes.func,
+    onRefresh: PropTypes.func,
+    onLoadNext: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    pending: false,
+    data: [],
+    filterList: [],
+    sorterList: [],
+    onFilterListChange: () => {},
+    onSorterListChange: () => {},
+    getActionList: () => {},
+    onRefresh: () => {},
+    onLoadNext: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({

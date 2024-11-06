@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useEffect, useState } from "uu5g05";
+import { createVisualComponent, PropTypes, useEffect, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Form, FormNumber, FormSelect, useFormApi } from "uu5g05-forms";
 import { Grid } from "uu5g05-elements";
@@ -23,11 +23,17 @@ const UpdateNotificationOffsetForm = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    initialValues: PropTypes.object,
+    frequency: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    initialValues: {},
+    frequency: {},
+  },
   //@@viewOff:defaultProps
 
   render({ initialValues, frequency }) {

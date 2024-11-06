@@ -43,7 +43,7 @@ export const getIndexByValues = (frequency) => {
 };
 
 export const limitedFrequencyOptions = (notificationOffset) => {
-  if (notificationOffset.months === 0 && notificationOffset.days === 0) return FREQUENCY_OPTIONS;
+  if (!!notificationOffset) return FREQUENCY_OPTIONS;
   return FREQUENCY_OPTIONS.filter((item) => {
     const { months, days } = item.value;
     if (months === 0 && days < notificationOffset.days + 1) return false;

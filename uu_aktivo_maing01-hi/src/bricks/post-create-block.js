@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useState } from "uu5g05";
+import { createVisualComponent, PropTypes, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, RichIcon } from "uu5g05-elements";
 import { TextArea } from "uu5g05-forms";
@@ -23,7 +23,11 @@ const PostCreateBlock = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    onSubmit: PropTypes.func,
+    disabled: PropTypes.bool,
+    inputProps: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
@@ -36,16 +40,16 @@ const PostCreateBlock = createVisualComponent({
 
   render({ onSubmit, disabled, inputProps }) {
     //@@viewOn:private
-    const [value, setValue] = useState("");
+    const [content, setContent] = useState("");
     //@@viewOff:private
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-      await onSubmit(value);
+      await onSubmit(content);
     };
 
     const handleChange = ({ data }) => {
-      setValue(data.value);
+      setContent(data.value);
     };
 
     //@@viewOn:render
@@ -86,7 +90,7 @@ const PostCreateBlock = createVisualComponent({
             }}
             autoResize={false || inputProps.autoResize}
             style={{ width: "100%", resize: "none !important" }}
-            value={value}
+            value={content}
             onChange={handleChange}
             disabled={disabled}
             placeholder={{ en: "Type something...", cs: "Napište něco..." }}
@@ -99,7 +103,7 @@ const PostCreateBlock = createVisualComponent({
             colorScheme="primary"
             significance="subdued"
             borderRadius="moderate"
-            disabled={disabled || !value || value?.length === 0 || value?.length > 256}
+            disabled={disabled || !content || content?.length === 0 || content?.length > 256}
             onClick={handleSubmit}
           />
         </Grid.Item>

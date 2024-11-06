@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useState } from "uu5g05";
+import { createVisualComponent, PropTypes, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Form, FormNumber, FormText, FormTextArea } from "uu5g05-forms";
 import { Grid } from "uu5g05-elements";
@@ -23,11 +23,15 @@ const UpdateActivityForm = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    initialValues: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    initialValues: {},
+  },
   //@@viewOff:defaultProps
 
   render({ initialValues }) {

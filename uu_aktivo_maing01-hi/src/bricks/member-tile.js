@@ -1,8 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { ActionGroup, Box, Grid, RichIcon, Text } from "uu5g05-elements";
-import { PersonItem, PersonPhoto, usePersonPhoto } from "uu_plus4u5g02-elements";
+import { ActionGroup, Box, Grid } from "uu5g05-elements";
+import { PersonItem } from "uu_plus4u5g02-elements";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
@@ -25,15 +25,24 @@ const MemberTile = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    uuIdentity: PropTypes.string,
+    onRemoveMember: PropTypes.func,
+    onPromoteAdmin: PropTypes.func,
+    onDemoteAdmin: PropTypes.func,
+    onLeaveActivity: PropTypes.func,
+    onUpdateEmail: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
+    uuIdentity: "",
     onRemoveMember: () => {},
     onPromoteAdmin: () => {},
     onDemoteAdmin: () => {},
     onLeaveActivity: () => {},
+    onUpdateEmail: () => {},
   },
   //@@viewOff:defaultProps
 

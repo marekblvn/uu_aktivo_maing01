@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { Badge, Block, DateTime, Link, Pending, RichIcon, Tag, Text } from "uu5g05-elements";
@@ -150,18 +150,30 @@ const PostTable = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    pending: PropTypes.bool,
+    data: PropTypes.array,
+    sorterList: PropTypes.array,
+    filterList: PropTypes.array,
+    onSorterListChange: PropTypes.func,
+    onFilterListChange: PropTypes.func,
+    getActionList: PropTypes.func,
+    onRefresh: PropTypes.func,
+    onLoadNext: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
+    pending: false,
     data: [],
     onSorterListChange: () => {},
     sorterList: [],
     onFilterListChange: () => {},
     filterList: [],
-    getActionList: [],
+    getActionList: () => {},
     onRefresh: () => {},
+    onLoadNext: () => {},
   },
   //@@viewOff:defaultProps
 

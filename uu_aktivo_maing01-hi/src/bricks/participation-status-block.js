@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Box, Grid, RichIcon, Text } from "uu5g05-elements";
 //@@viewOff:imports
@@ -28,14 +28,22 @@ const ParticipationStatusBlock = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    minParticipants: PropTypes.number,
+    idealParticipants: PropTypes.number,
+    confirmedCount: PropTypes.number,
+    deniedCount: PropTypes.number,
+    undecidedCount: PropTypes.number,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
-    value: 0,
     minParticipants: 0,
     idealParticipants: 0,
+    confirmedCount: 0,
+    deniedCount: 0,
+    undecidedCount: 0,
   },
   //@@viewOff:defaultProps
 

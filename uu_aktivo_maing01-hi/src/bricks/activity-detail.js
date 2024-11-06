@@ -2,6 +2,7 @@
 import {
   createVisualComponent,
   Lsi,
+  PropTypes,
   useEffect,
   useRoute,
   useRouteLeave,
@@ -37,13 +38,18 @@ const ActivityDetail = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    data: PropTypes.object,
+    handlerMap: PropTypes.object,
+    tab: PropTypes.string,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
     data: {},
     handlerMap: {},
+    tab: "information",
   },
   //@@viewOff:defaultProps
 
@@ -255,7 +261,7 @@ const ActivityDetail = createVisualComponent({
           );
         case "attendance":
           return <ActivityAttendanceView activityId={id} />;
-        case "info":
+        case "information":
         default:
           return <ActivityInformationView data={data} onReload={handleReload} />;
       }

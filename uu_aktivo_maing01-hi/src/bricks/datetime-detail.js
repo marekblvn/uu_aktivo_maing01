@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Fragment, Lsi, useLsi, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, PropTypes, useLsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Button, Grid, Line, PlaceholderBox, Skeleton } from "uu5g05-elements";
 import DateBlock from "./date-block.js";
@@ -45,14 +45,18 @@ const DatetimeDetail = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    onReload: PropTypes.func,
+    activity: PropTypes.object,
+    isMember: PropTypes.bool,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
-    onUpdateParticipation: () => {},
-    idealParticipants: 0,
-    minParticipants: 0,
+    onReload: () => {},
+    activity: {},
+    isMember: false,
   },
   //@@viewOff:defaultProps
 

@@ -1,7 +1,8 @@
 //@@viewOn:imports
 import { AutoLoad, createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Error, withRoute } from "uu_plus4u5g02-app";
+import { withRoute } from "uu_plus4u5g02-app";
+import { Error } from "uu_plus4u5g02-elements";
 import Container from "../bricks/container.js";
 import ActivityListProvider from "../providers/activity-list-provider.js";
 import { ActionGroup, Dialog, Grid, Header, Pending, PlaceholderBox, RichIcon } from "uu5g05-elements";
@@ -151,7 +152,7 @@ const _MyActivities = createVisualComponent({
                 title={<Lsi lsi={{ en: "My Activities", cs: "Moje aktivity" }} />}
                 icon={
                   <RichIcon
-                    icon="mdi-pulse"
+                    icon="uugdsstencil-chart-pulse"
                     colorScheme="primary"
                     significance="subdued"
                     borderRadius="moderate"

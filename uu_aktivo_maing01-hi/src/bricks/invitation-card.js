@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { ActionGroup, Box, DateTime, Grid, Text } from "uu5g05-elements";
 //@@viewOff:imports
@@ -22,11 +22,19 @@ const InvitationCard = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    data: PropTypes.object,
+    onInvitationAccept: PropTypes.func,
+    onInvitationDelete: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    data: {},
+    onInvitationAccept: () => {},
+    onInvitationDelete: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({ data, onInvitationAccept, onInvitationDelete }) {

@@ -1,8 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCall, useEffect, useRef, useState, Utils } from "uu5g05";
+import { createVisualComponent, PropTypes, useCall, useEffect, useRef, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Form, FormTextSelect, Label, Radios } from "uu5g05-forms";
-import { Grid, Line, Tag } from "uu5g05-elements";
+import { Form, FormRadios, FormTextSelect } from "uu5g05-forms";
+import { Grid } from "uu5g05-elements";
 import Calls from "../calls.js";
 //@@viewOff:imports
 
@@ -24,14 +24,14 @@ const UpdateEmailForm = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    initialValues: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
-    initialValues: {
-      email: null,
-    },
+    initialValues: {},
   },
   //@@viewOff:defaultProps
 
@@ -60,7 +60,7 @@ const UpdateEmailForm = createVisualComponent({
     return (
       <Form.View>
         <Grid>
-          <Radios
+          <FormRadios
             box={false}
             label={{
               en: `Do you ${initialValues.email === null ? "" : "still"} want to receive email notifications from this activity?`,
@@ -83,6 +83,7 @@ const UpdateEmailForm = createVisualComponent({
               },
             ]}
             onChange={(e) => setShowEmailSelect(e.data.value)}
+            initialValue={showEmailSelect}
             value={showEmailSelect}
           />
           {showEmailSelect && (

@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, PlaceholderBox } from "uu5g05-elements";
 import ParticipationItem from "./participation-item.js";
@@ -23,7 +23,11 @@ const ParticipationList = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    confirmed: PropTypes.array,
+    undecided: PropTypes.array,
+    denied: PropTypes.array,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps

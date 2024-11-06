@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import InvitationCard from "../bricks/invitation-card.js";
 import { Grid, Skeleton } from "uu5g05-elements";
@@ -23,7 +23,11 @@ const InvitationList = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    itemList: PropTypes.array,
+    onInvitationAccept: PropTypes.func,
+    onInvitationDelete: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
@@ -50,7 +54,7 @@ const InvitationList = createVisualComponent({
             />
           );
         } else {
-          return <Skeleton />;
+          return <Skeleton width="100%" height="3em" />;
         }
       });
     }

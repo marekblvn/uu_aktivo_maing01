@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Line, LinkPanel, RichIcon, Text } from "uu5g05-elements";
 import DatetimeDetail from "./datetime-detail.js";
@@ -24,14 +24,20 @@ const ActivityInformationView = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    data: PropTypes.object,
+    onReload: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
-    description: "",
-    location: "",
-    activityId: "",
+    data: {
+      description: "",
+      location: "",
+      id: "",
+    },
+    onReload: () => {},
   },
   //@@viewOff:defaultProps
 

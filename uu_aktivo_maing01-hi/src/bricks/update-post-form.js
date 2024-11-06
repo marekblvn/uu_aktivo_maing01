@@ -1,6 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
+import { Grid } from "uu5g05-elements";
 import { Form, FormRadios, FormTextArea } from "uu5g05-forms";
 //@@viewOff:imports
 
@@ -22,7 +23,9 @@ const UpdatePostForm = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    initialValues: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
@@ -38,7 +41,7 @@ const UpdatePostForm = createVisualComponent({
     //@@viewOn:render
     return (
       <Form.View>
-        <div style={{ display: "grid", rowGap: 12, marginBottom: 8, gridTemplateRows: "repeat(2, auto)" }}>
+        <Grid templateRows={{ xs: "repeat(2, auto)" }}>
           <FormTextArea
             name="content"
             label={{ en: "Content", cs: "Obsah" }}
@@ -78,7 +81,7 @@ const UpdatePostForm = createVisualComponent({
               },
             ]}
           />
-        </div>
+        </Grid>
       </Form.View>
     );
     //@@viewOff:render

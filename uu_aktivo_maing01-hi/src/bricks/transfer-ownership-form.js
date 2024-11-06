@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { Form, FormCheckbox, FormSelect } from "uu5g05-forms";
 import { Grid } from "uu5g05-elements";
@@ -24,11 +24,15 @@ const TransferOwnershipForm = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    members: PropTypes.array,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    members: [],
+  },
   //@@viewOff:defaultProps
 
   render({ members }) {

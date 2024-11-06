@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { Block, DateTime, Grid, Icon, Line, LinkPanel, Modal } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
@@ -24,7 +24,11 @@ const AttendanceDetailModal = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    data: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
@@ -37,7 +41,6 @@ const AttendanceDetailModal = createVisualComponent({
       undecided: [],
       denied: [],
     },
-    onDelete: () => {},
   },
   //@@viewOff:defaultProps
 
@@ -50,11 +53,7 @@ const AttendanceDetailModal = createVisualComponent({
 
     //@@viewOn:render
     return (
-      <Modal
-        header={<DateTime value={data.datetime} timeFormat="medium" dateFormat="long" />}
-        open={open}
-        onClose={onClose}
-      >
+      <Modal header={<DateTime value={datetime} timeFormat="medium" dateFormat="long" />} open={open} onClose={onClose}>
         <Block style={{ padding: "0 14px 8px" }}>
           <Grid templateColumns={{ xs: "100%" }} templateRows={{ xs: "repeat(3,auto)" }} style={{ marginTop: "8px" }}>
             <LinkPanel

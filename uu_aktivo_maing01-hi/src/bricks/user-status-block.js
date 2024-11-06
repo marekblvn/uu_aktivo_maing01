@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
 import { ActionGroup, Grid } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
@@ -32,11 +32,17 @@ const UserStatusBlock = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    userParticipationType: PropTypes.oneOf(["confirmed", "denied", "undecided"]),
+    onChangeParticipation: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    userParticipationType: "undecided",
+    onChangeParticipation: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({ userParticipationType, onChangeParticipation }) {

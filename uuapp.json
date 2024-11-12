@@ -1,10 +1,10 @@
 {
   "product": "uu_aktivo_maing01",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "license": "License Commercial",
   "description": {
-    "en": "",
-    "cs": ""
+    "en": "Aktivo is an application for organizing leisure group activities (sports etc.). It was created as a MVP for a bachelor's thesis.",
+    "cs": "Aktivo je aplikace pro organizaci volnočasových skupinových aktivit. Aplikace byla vytvořena jako MVP v rámci bakalářské práce."
   },
   "devkit": {
     "development": {

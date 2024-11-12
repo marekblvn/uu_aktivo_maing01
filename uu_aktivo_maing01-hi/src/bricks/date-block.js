@@ -67,7 +67,7 @@ const DateBlock = createVisualComponent({
             <RichIcon icon="uugdsstencil-time-calendar-time" colorScheme="secondary" significance="subdued" />
             {screenSize !== "xs" && (
               <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
-                <Lsi lsi={{ en: "Upcoming date", cs: "Nadcházející datum" }} />
+                <Lsi lsi={{ en: "Upcoming datetime", cs: "Nadcházející termín" }} />
               </Text>
             )}
           </Grid>

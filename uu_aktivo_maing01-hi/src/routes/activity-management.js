@@ -349,19 +349,17 @@ const _ActivityManagement = createVisualComponent({
       };
 
       return (
-        <>
-          <ActivityTable
-            data={data}
-            pending={pending}
-            getActionList={getActionList}
-            filterList={filterList}
-            onFilterListChange={handleChangeFilterList}
-            sorterList={sorterList}
-            onSorterListChange={handleChangeSorterList}
-            onRefresh={handleRefresh}
-            onLoadNext={handleLoadNext}
-          />
-        </>
+        <ActivityTable
+          data={data}
+          pending={pending}
+          getActionList={getActionList}
+          filterList={filterList}
+          onFilterListChange={handleChangeFilterList}
+          sorterList={sorterList}
+          onSorterListChange={handleChangeSorterList}
+          onRefresh={handleRefresh}
+          onLoadNext={handleLoadNext}
+        />
       );
     }
 

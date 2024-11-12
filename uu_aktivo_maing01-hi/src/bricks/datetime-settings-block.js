@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useLsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useLsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Button, Grid, ListLayout, PlaceholderBox, RichIcon, Text } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
@@ -27,11 +27,27 @@ const DatetimeSettingsBlock = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    datetimeId: PropTypes.string,
+    recurrent: PropTypes.bool,
+    frequency: PropTypes.object,
+    notificationOffset: PropTypes.object,
+    onEditFrequency: PropTypes.func,
+    onEditNotificationOffset: PropTypes.func,
+    onDeleteDatetime: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    datetimeId: null,
+    recurrent: false,
+    frequency: {},
+    notificationOffset: {},
+    onEditFrequency: () => {},
+    onEditNotificationOffset: () => {},
+    onDeleteDatetime: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({
@@ -58,11 +74,9 @@ const DatetimeSettingsBlock = createVisualComponent({
     //@@viewOn:render
     return (
       <Grid rowGap={{ xs: 2, l: 16 }}>
-        <div>
-          <Text category="interface" segment="title" type={["xl", "l", "m"].includes(screenSize) ? "minor" : "micro"}>
-            <Lsi lsi={{ en: "Datetime settings", cs: "Nastavení termínu" }} />
-          </Text>
-        </div>
+        <Text category="interface" segment="title" type={["xl", "l", "m"].includes(screenSize) ? "minor" : "micro"}>
+          <Lsi lsi={{ en: "Datetime settings", cs: "Nastavení termínu" }} />
+        </Text>
 
         {datetimeId === null ? (
           <PlaceholderBox

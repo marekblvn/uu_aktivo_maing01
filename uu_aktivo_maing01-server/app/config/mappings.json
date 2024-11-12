@@ -26,6 +26,11 @@
         "httpMethod": "GET",
         "type": "UVE"
       },
+      "sendEmailNotification": {
+        "realization": "api/controllers/AktivoMainController.sendEmailNotification",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
       "sys/uuAppWorkspace/initUve": {
         "realization": "index.html",
         "httpMethod": "GET",
@@ -91,6 +96,11 @@
         "httpMethod": "POST",
         "type": "CMD"
       },
+      "activity/updateEmail": {
+        "realization": "api/controllers/ActivityController.updateEmail",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
       "post/create": {
         "realization": "api/controllers/PostController.create",
         "httpMethod": "POST",
@@ -146,6 +156,11 @@
         "httpMethod": "POST",
         "type": "CMD"
       },
+      "attendance/get": {
+        "realization": "api/controllers/AttendanceController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
       "attendance/list": {
         "realization": "api/controllers/AttendanceController.list",
         "httpMethod": "GET",
@@ -161,6 +176,11 @@
         "httpMethod": "POST",
         "type": "CMD"
       },
+      "attendance/deleteBulk": {
+        "realization": "api/controllers/AttendanceController.deleteBulk",
+        "httpMethod": "POST",
+        "type": "CMD"
+      },
       "datetime/create": {
         "realization": "api/controllers/DatetimeController.create",
         "httpMethod": "POST",
@@ -168,6 +188,11 @@
       },
       "datetime/get": {
         "realization": "api/controllers/DatetimeController.get",
+        "httpMethod": "GET",
+        "type": "CMD"
+      },
+      "datetime/list": {
+        "realization": "api/controllers/DatetimeController.list",
         "httpMethod": "GET",
         "type": "CMD"
       },

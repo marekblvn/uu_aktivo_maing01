@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Error, useAlertBus } from "uu_plus4u5g02-elements";
 import { Button, DateTime, Dialog, Grid, Icon, ListLayout, Modal, Pending, PlaceholderBox } from "uu5g05-elements";
@@ -27,12 +27,22 @@ const DatetimeManagementModal = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    activity: PropTypes.object,
+    onUpdateFrequency: PropTypes.func,
+    onUpdateNotificationOffset: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
     activity: {},
+    open: false,
+    onClose: () => {},
+    onUpdateFrequency: () => {},
+    onUpdateNotificationOffset: () => {},
   },
   //@@viewOff:defaultProps
 

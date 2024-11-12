@@ -2,14 +2,7 @@
   "log_level": "WARN",
   "uuapp.perflog.logger.log_level": "OFF",
   "uuapp.appserver.monitoring.accesslog.log_level": "OFF",
-  "userMap": {
-    "Executive": {
-      "passwordFile": "test-user.json"
-    },
-    "Reader": {
-      "accessCode1": "UafUaf",
-      "accessCode2": "tester4321"
-    }
-  },
-  "useMockData": false
+  "userMap": {},
+  "useMockData": false,
+  "uu_app_oidc_providers_oidcg02_uri": "https://uuapp-dev.plus4u.net/uu-oidc-maing02/eca71064ecce44b0a25ce940eb8f053d/oidc"
 }

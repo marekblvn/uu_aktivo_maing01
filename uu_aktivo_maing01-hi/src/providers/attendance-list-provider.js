@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useDataList } from "uu5g05";
+import { createVisualComponent, PropTypes, useDataList } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
 //@@viewOff:imports
@@ -22,31 +22,41 @@ const AttendanceListProvider = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    children: PropTypes.func,
+    filters: PropTypes.object,
+    sort: PropTypes.object,
+    pageSize: PropTypes.number,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    children: () => {},
+    filters: {},
+    sort: {},
+    pageSize: 50,
+  },
   //@@viewOff:defaultProps
 
-  render({ children, activityId, dateFilter, sort }) {
+  render({ children, filters, pageSize, sort }) {
     //@@viewOn:private
-    const filter = { activityId, ...dateFilter };
-    Object.keys(filter).forEach((key) => filter[key] === undefined && delete filter[key]);
-    const dataObject = useDataList(
-      {
-        itemIdentifier: "uuIdentity",
-        skipInitialLoad: true,
-        initialDtoIn: {
-          filters: filter,
-          sort,
-        },
-        handlerMap: {
-          load: Calls.Attendance.listStatistics,
-        },
+    const dataObject = useDataList({
+      pageSize,
+      itemIdentifier: "id",
+      initialDtoIn: {
+        filters,
+        sort,
       },
-      [dateFilter, sort],
-    );
+      handlerMap: {
+        load: Calls.Attendance.list,
+        deleteBulk: Calls.Attendance.deleteBulk,
+      },
+      itemHandlerMap: {
+        delete: Calls.Attendance.delete,
+        get: Calls.Attendance.get,
+      },
+    });
     let { state, data, errorData, pendingData, handlerMap } = dataObject;
     //@@viewOff:private
 

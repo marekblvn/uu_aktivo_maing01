@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, PropTypes } from "uu5g05";
 import { Modal } from "uu5g05-elements";
-import { Form, useFormApi } from "uu5g05-forms";
+import { Form } from "uu5g05-forms";
 import Config from "./config/config.js";
 //@@viewOff:imports
 
@@ -23,11 +23,21 @@ const FormModal = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    onSubmit: PropTypes.func,
+    children: PropTypes.node,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    open: false,
+    onClose: () => {},
+    onSubmit: () => {},
+    children: null,
+  },
   //@@viewOff:defaultProps
 
   render({ open, onClose, onSubmit, children, ...props }) {

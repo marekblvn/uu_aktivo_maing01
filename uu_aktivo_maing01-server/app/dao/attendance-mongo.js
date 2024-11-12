@@ -9,9 +9,7 @@ class AttendanceMongo extends UuObjectDao {
   async createSchema() {
     await super.createIndex({ awid: 1, _id: 1 }, { unique: true });
     await super.createIndex({ awid: 1, activityId: 1 }, { unique: false });
-    await super.createIndex({ awid: 1, activityId: 1, datetime: 1 }, { unique: false });
-    await super.createIndex({ awid: 1, activityId: 1, datetime: 1, archived: 1 }, { unique: false });
-    await super.createIndex({ awid: 1, datetimeId: 1 }, { unique: false });
+    await super.createIndex({ awid: 1, activityId: 1, datetime: 1 }, { unique: true });
   }
 
   /**
@@ -54,6 +52,9 @@ class AttendanceMongo extends UuObjectDao {
     return await super.findOneAndUpdate(filter, uuObject, "NONE");
   }
 
+  /**
+   * @deprecated To be removed
+   */
   async updateMany(awid, filterObject, updateObject) {
     let filter = {
       awid,
@@ -98,12 +99,12 @@ class AttendanceMongo extends UuObjectDao {
    * @param {object} pageInfo
    * @returns {Promise<{itemList: [object], pageInfo: PageInfo}>}
    */
-  async list(awid, filterObject = {}, pageInfo = {}) {
+  async list(awid, filterObject = {}, pageInfo = {}, sort = {}) {
     let filter = {
       awid,
       ...filterObject,
     };
-    return await super.find(filter, pageInfo);
+    return await super.find(filter, pageInfo, sort);
   }
 
   async getStatistics(awid, filterObject = {}) {
@@ -172,6 +173,14 @@ class AttendanceMongo extends UuObjectDao {
     let filter = {
       awid,
       activityId,
+    };
+    return await super.deleteMany(filter);
+  }
+
+  async deleteByIdList(awid, idList) {
+    let filter = {
+      awid,
+      _id: { $in: idList },
     };
     return await super.deleteMany(filter);
   }

@@ -4,13 +4,24 @@ const attendanceCreateDtoInType = shape({
   datetimeId: id().isRequired(),
 });
 
+const attendanceGetDtoInType = shape({
+  id: id().isRequired(),
+});
+
 const attendanceListDtoInType = shape({
-  filters: shape({
-    activityId: id(),
-    before: date(),
-    after: date(),
-    archived: boolean(),
-  }),
+  filters: shape(
+    {
+      activityId: id(),
+      datetime: array(oneOf([date(), constant(null)]), 1, 2),
+    },
+    true,
+  ),
+  sort: shape(
+    {
+      datetime: integer(-1, 1),
+    },
+    true,
+  ),
   pageInfo: shape({
     pageIndex: integer(),
     pageSize: integer(),
@@ -22,10 +33,13 @@ const attendanceGetStatisticsDtoInType = shape({
     activityId: id().isRequired(),
     before: date(),
     after: date(),
-    archived: boolean(),
   }).isRequired(),
 });
 
 const attendanceDeleteDtoInType = shape({
   id: id().isRequired(),
+});
+
+const attendanceDeleteBulkDtoInType = shape({
+  idList: array(id(), 1, 100).isRequired(),
 });

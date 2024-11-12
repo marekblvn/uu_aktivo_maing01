@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Fragment, Lsi, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, PropTypes, useCallback, useLsi, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import PostListProvider from "../providers/post-list-provider.js";
 import { Button, Dialog, Grid, Pending, PlaceholderBox, RichIcon, ScrollableBox, Text } from "uu5g05-elements";
@@ -30,11 +30,15 @@ const PostBlock = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    activityId: PropTypes.string,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    activityId: null,
+  },
   //@@viewOff:defaultProps
 
   render({ activityId }) {
@@ -203,7 +207,7 @@ const PostBlock = createVisualComponent({
                   return (
                     <PostCard
                       key={item.data.id}
-                      {...item.data}
+                      post={item.data}
                       onDelete={() => handlePostDelete(item)}
                       onEdit={() => handleUpdatePost(item)}
                     />

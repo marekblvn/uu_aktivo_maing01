@@ -4,6 +4,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/activity-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
@@ -23,7 +24,7 @@ class ActivityAbl {
     this.invitationDao = DaoFactory.getDao("invitation");
     this.attendanceDao = DaoFactory.getDao("attendance");
   }
-  async create(awid, dtoIn, session) {
+  async create(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("activityCreateDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -31,6 +32,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     dtoIn.awid = awid;
     if (!dtoIn.description) {
       dtoIn.description = "";
@@ -47,11 +55,17 @@ class ActivityAbl {
     const userIdentity = session.getIdentity().getUuIdentity();
     dtoIn.owner = userIdentity;
     dtoIn.administrators = [];
-    dtoIn.members = [userIdentity];
+    dtoIn.members = [
+      {
+        uuIdentity: userIdentity,
+        email: dtoIn.email || null,
+      },
+    ];
     dtoIn.recurrent = false;
     dtoIn.datetimeId = null;
     dtoIn.frequency = {};
     dtoIn.notificationOffset = {};
+    delete dtoIn.email;
     let dtoOut;
     try {
       dtoOut = await this.activityDao.create(dtoIn);
@@ -73,6 +87,12 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Get),
       Errors.Get.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     // Get user's authorized profiles
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
@@ -101,7 +121,7 @@ class ActivityAbl {
       const userUuIdentity = session.getIdentity().getUuIdentity();
 
       // Check if user is member of the activity
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
       }
     }
@@ -117,6 +137,11 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.List),
       Errors.List.InvalidDtoIn,
     );
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const filter = {};
@@ -137,7 +162,7 @@ class ActivityAbl {
         }
         if (members) {
           filter.members = {
-            $all: members,
+            $all: members.map((uuIdentity) => ({ $elemMatch: { uuIdentity } })),
           };
         }
         if (hasDatetime !== undefined) {
@@ -149,7 +174,7 @@ class ActivityAbl {
         }
       }
     } else {
-      filter.members = { $in: [session.getIdentity().getUuIdentity()] };
+      filter.members = { $elemMatch: { uuIdentity: session.getIdentity().getUuIdentity() } };
     }
 
     const sort = {};
@@ -187,6 +212,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Update),
       Errors.Update.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Update, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
 
     let activity;
@@ -238,6 +270,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.UpdateFrequency),
       Errors.UpdateFrequency.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.UpdateFrequency, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
 
     let activity;
@@ -327,6 +366,19 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.UpdateNotificationOffset),
       Errors.UpdateNotificationOffset.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(
+      awid,
+      Errors.UpdateNotificationOffset,
+      uuAppErrorMap,
+      authorizationResult,
+      {
+        Authorities: ["active", "restricted"],
+        Executives: ["active", "restricted"],
+        StandardUsers: ["active"],
+      },
+    );
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
 
     let activity;
@@ -365,7 +417,7 @@ class ActivityAbl {
       dtoIn.notificationOffset.days * 24 + dtoIn.notificationOffset.hours + dtoIn.notificationOffset.minutes / 60;
 
     if (notificationOffsetInHours < 1) {
-      throw new Errors.UpdateNotificationOffset.InvalidNotificationOffset({ uuAppErrorMap });
+      throw new Errors.UpdateNotificationOffset.NotificationOffsetTooSmall({ uuAppErrorMap });
     }
 
     if (activity.frequency) {
@@ -390,7 +442,7 @@ class ActivityAbl {
       );
 
       if (notificationDate <= datetime.datetime) {
-        throw new Errors.UpdateNotificationOffset.InvalidCombination({ uuAppErrorMap });
+        throw new Errors.UpdateNotificationOffset.InvalidNotificationOffset({ uuAppErrorMap });
       }
     }
 
@@ -415,6 +467,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.AddAdministrator),
       Errors.AddAdministrator.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.AddAdministrator, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.id);
@@ -444,7 +503,7 @@ class ActivityAbl {
       throw new Errors.AddAdministrator.OwnerCannotBeAdministrator({ uuAppErrorMap });
     }
 
-    if (!activity.members.includes(dtoIn.uuIdentity)) {
+    if (!activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.AddAdministrator.TargetUserIsNotMember({ uuAppErrorMap });
     }
 
@@ -474,6 +533,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.RemoveAdministrator),
       Errors.RemoveAdministrator.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.RemoveAdministrator, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.id);
@@ -500,7 +566,7 @@ class ActivityAbl {
       }
     }
 
-    if (!activity.members.includes(dtoIn.uuIdentity)) {
+    if (!activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.RemoveAdministrator.TargetUserIsNotMember({ uuAppErrorMap });
     }
 
@@ -531,6 +597,13 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.TransferOwnership),
       Errors.TransferOwnership.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.TransferOwnership, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.id);
@@ -559,7 +632,7 @@ class ActivityAbl {
       }
     }
 
-    if (!activity.members.includes(dtoIn.uuIdentity)) {
+    if (!activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.TransferOwnership.TargetUserIsNotMember({ uuAppErrorMap });
     }
 
@@ -591,6 +664,12 @@ class ActivityAbl {
       Errors.TransferOwnership.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.RemoveMember, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.id);
@@ -617,15 +696,20 @@ class ActivityAbl {
     }
 
     let administratorsUpdate = {};
+
+    // Check if member to be removed is owner
     if (dtoIn.uuIdentity === activity.owner) {
       throw new Errors.RemoveMember.TargetUserIsOwner({ uuAppErrorMap });
-    } else if (activity.administrators.includes(dtoIn.uuIdentity)) {
+    } // Check if member to be removed is administrator
+    else if (activity.administrators.includes(dtoIn.uuIdentity)) {
+      // Only owner can remove members that are administrators
       if (userUuIdentity !== activity.owner) {
         throw new Errors.RemoveMember.TargetUserIsAdministrator({ uuAppErrorMap });
       } else {
         administratorsUpdate = { $pull: { administrators: dtoIn.uuIdentity } };
       }
-    } else if (!activity.members.includes(dtoIn.uuIdentity)) {
+    } // Check if member to be removed is actually a member
+    else if (!activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.RemoveMember.TargetUserIsNotMember({ uuAppErrorMap });
     }
 
@@ -633,7 +717,7 @@ class ActivityAbl {
     const updateObject = {
       id: dtoIn.id,
       awid,
-      $pull: { members: dtoIn.uuIdentity },
+      $pull: { members: { uuIdentity: dtoIn.uuIdentity } },
       ...administratorsUpdate,
     };
 
@@ -684,7 +768,7 @@ class ActivityAbl {
     return dtoOut;
   }
 
-  async leave(awid, dtoIn, session) {
+  async leave(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("activityLeaveDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -692,6 +776,12 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Leave),
       Errors.Leave.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Leave, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -709,7 +799,7 @@ class ActivityAbl {
 
     const userUuIdentity = session.getIdentity().getUuIdentity();
 
-    if (!activity.members.includes(userUuIdentity)) {
+    if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
       throw new Errors.Leave.UserNotAuthorized({ uuAppErrorMap });
     }
 
@@ -722,7 +812,7 @@ class ActivityAbl {
       awid,
       $pull: {
         administrators: userUuIdentity,
-        members: userUuIdentity,
+        members: { uuIdentity: userUuIdentity },
       },
     };
 
@@ -783,6 +873,12 @@ class ActivityAbl {
       UnsupportedKeysWarning(Errors.Delete),
       Errors.Delete.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -855,6 +951,68 @@ class ActivityAbl {
       throw error;
     }
     dtoOut = dtoOut || {};
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async updateEmail(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("activityUpdateEmailDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.UpdateEmail),
+      Errors.UpdateEmail.InvalidDtoIn,
+    );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Leave, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
+    let activity;
+    try {
+      activity = await this.activityDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateEmail.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!activity) {
+      throw new Errors.UpdateEmail.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.id });
+    }
+
+    const userUuIdentity = session.getIdentity().getUuIdentity();
+    if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
+      throw new Errors.UpdateEmail.UserNotAuthorized({ uuAppErrorMap });
+    }
+
+    const updatedMembers = activity.members.map((member) => {
+      if (member.uuIdentity !== userUuIdentity) return member;
+      return {
+        uuIdentity: member.uuIdentity,
+        email: dtoIn.email,
+      };
+    });
+
+    const updateObject = {
+      id: dtoIn.id,
+      awid,
+      members: updatedMembers,
+    };
+
+    let dtoOut;
+    try {
+      dtoOut = await this.activityDao.update(updateObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.UpdateEmail.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

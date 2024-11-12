@@ -1,9 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, Utils } from "uu5g05";
+import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Text } from "uu5g05-elements";
+import { Grid, Text } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
-import Container from "./container.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -11,22 +10,14 @@ import Container from "./container.js";
 
 //@@viewOn:css
 const Css = {
-  main: (props) =>
-    Config.Css.css({
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      color: "#191919",
-      textJustify: "auto",
-    }),
-  aktivoLogo: (screenSize) =>
+  aktivoLogo: () =>
     Config.Css.css({
       fontFamily: "'Josefin Sans', sans-serif",
       fontOpticalSizing: "auto",
       fontWeight: 600,
       fontStyle: "normal",
       display: "inline",
-      color: "rgb(33, 150, 243)",
+      color: "#f5f5f5",
     }),
 };
 //@@viewOff:css
@@ -55,27 +46,30 @@ const WelcomeHeader = createVisualComponent({
     //@@viewOn:render
 
     return (
-      <Container
+      <Grid
+        templateRows={{ xs: "100%" }}
+        templateColumns={{ xs: "100%" }}
+        justifyItems={{ xs: "center" }}
+        alignItems={{ xs: "center" }}
         style={{
-          marginTop: "32px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          rowGap: "16px",
-          color: "#191919",
-          textAlign: "justify",
+          height: "156px",
+          paddingBottom: "16px",
+          background: "rgb(33,150,243)",
+          background:
+            "linear-gradient(180deg, rgba(33,150,243,1) 51%, rgba(82,173,246,1) 74%, rgba(255,255,255,0.9668461134453782) 100%)",
         }}
       >
-        <Text category="story" segment="heading" type={["xs"].includes(screenSize) ? "h3" : "h1"}>
+        <Text
+          category="story"
+          segment="heading"
+          type={["xs"].includes(screenSize) ? "h3" : "h1"}
+          style={{ color: "#f9f9f9" }}
+        >
           <Lsi import={importLsi} path={["Home", "welcome"]} />
           &nbsp;
           <div className={Css.aktivoLogo()}>Aktivo</div>!
         </Text>
-        <Text category="story" segment="body" type={["xs"].includes(screenSize) ? "minor" : "common"}>
-          <Lsi import={importLsi} path={["Home", "intro"]} />
-        </Text>
-      </Container>
+      </Grid>
     );
     //@@viewOff:render
   },

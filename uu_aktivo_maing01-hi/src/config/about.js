@@ -1,5 +1,5 @@
 import { Lsi } from "uu5g05";
-import Uu5Elements from "uu5g05-elements";
+import Uu5Elements, { Grid } from "uu5g05-elements";
 import importLsi from "../lsi/import-lsi.js";
 
 const About = {
@@ -12,35 +12,18 @@ const About = {
     },
     authorities: [
       {
-        name: "Name Surname",
+        name: "Marek Balvín",
         uri: "https://www.unicorn.com/",
       },
     ],
   },
   leadingAuthors: [
     {
-      name: "Some Name",
-      uuIdentity: "4-4-1",
-      role: "Chief Business Architect & Stakeholder",
-    },
-    {
-      name: "Other Name",
-      uuIdentity: "4-4-1",
-      role: "Head of Development",
+      name: "Marek Balvín",
+      uuIdentity: "3857-7491-1",
     },
   ],
-  otherAuthors: [
-    {
-      name: "Your Name",
-      uuIdentity: "4-4-1",
-      role: "Developer",
-    },
-    {
-      name: "More Names",
-      uuIdentity: "4-4-1",
-      role: "Developer",
-    },
-  ],
+  otherAuthors: [],
   usedTechnologies: {
     technologies: [
       <Uu5Elements.Link key="uaf" href="https://docs.plus4u.net/uaf" target="_blank">
@@ -76,7 +59,16 @@ const About = {
         uuCloud
       </Uu5Elements.Link>,
     ],
-    content: <Lsi import={importLsi} path={["AboutContent", "technologiesContent"]} />,
+    content: (
+      <Grid>
+        <div>
+          <Lsi import={importLsi} path={["AboutContent", "technologiesContent"]} />
+        </div>
+        <div>
+          <Lsi import={importLsi} path={["AboutContent", "packages"]} />
+        </div>
+      </Grid>
+    ),
   },
 };
 

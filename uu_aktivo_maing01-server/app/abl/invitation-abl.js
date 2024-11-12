@@ -5,6 +5,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/invitation-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
@@ -30,6 +31,12 @@ class InvitationAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -61,7 +68,7 @@ class InvitationAbl {
       }
     }
 
-    if (activity.members.includes(dtoIn.uuIdentity)) {
+    if (activity.members.some((member) => member.uuIdentity === dtoIn.uuIdentity)) {
       throw new Errors.Create.TargetUserAlreadyMember({ uuAppErrorMap });
     }
 
@@ -81,6 +88,7 @@ class InvitationAbl {
 
     dtoIn.awid = awid;
     dtoIn.activityId = activity.id;
+    dtoIn.createdAt = new Date();
     let dtoOut;
     try {
       dtoOut = await this.invitationDao.create(dtoIn);
@@ -102,6 +110,12 @@ class InvitationAbl {
       UnsupportedKeysWarning(Errors.Get),
       Errors.Get.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let invitation;
     try {
@@ -140,6 +154,12 @@ class InvitationAbl {
       Errors.List.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
     if (
@@ -161,10 +181,10 @@ class InvitationAbl {
           throw error;
         }
         if (!activity) {
-          throw new Errors.List.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.activityId });
+          throw new Errors.List.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.filters.activityId });
         }
 
-        if (!activity.administrators.includes(userUuIdentity) && activity.owner !== userUuIdentity) {
+        if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
           throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
         }
       }
@@ -224,7 +244,7 @@ class InvitationAbl {
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
-  async accept(awid, dtoIn, session) {
+  async accept(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("invitationAcceptDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -232,6 +252,12 @@ class InvitationAbl {
       UnsupportedKeysWarning(Errors.Accept),
       Errors.Accept.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Accept, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let invitation;
     try {
@@ -271,11 +297,16 @@ class InvitationAbl {
       throw new Errors.Accept.ActivityMemberLimitReached({ uuAppErrorMap });
     }
 
-    if (activity.members.includes(invitation.uuIdentity)) {
+    if (activity.members.some((member) => member.uuIdentity === invitation.uuIdentity)) {
       throw new Errors.Accept.UserAlreadyMember({ uuAppErrorMap });
     }
 
-    const updateObject = { id: invitation.activityId, awid, $push: { members: invitation.uuIdentity } };
+    const newMemberObject = {
+      uuIdentity: invitation.uuIdentity,
+      email: dtoIn.email || null,
+    };
+
+    const updateObject = { id: invitation.activityId, awid, $push: { members: newMemberObject } };
     try {
       await this.activityDao.update(updateObject);
     } catch (error) {
@@ -330,6 +361,12 @@ class InvitationAbl {
       UnsupportedKeysWarning(Errors.Delete),
       Errors.Delete.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (

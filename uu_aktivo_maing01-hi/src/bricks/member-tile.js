@@ -1,8 +1,8 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useSession } from "uu5g05";
 import Config from "./config/config.js";
-import { ActionGroup, Box, Grid, RichIcon, Text } from "uu5g05-elements";
-import { PersonItem, PersonPhoto, usePersonPhoto } from "uu_plus4u5g02-elements";
+import { ActionGroup, Box, Grid } from "uu5g05-elements";
+import { PersonItem } from "uu_plus4u5g02-elements";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 import { useAuthorization } from "../contexts/authorization-context.js";
 //@@viewOff:imports
@@ -25,19 +25,28 @@ const MemberTile = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    uuIdentity: PropTypes.string,
+    onRemoveMember: PropTypes.func,
+    onPromoteAdmin: PropTypes.func,
+    onDemoteAdmin: PropTypes.func,
+    onLeaveActivity: PropTypes.func,
+    onUpdateEmail: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
+    uuIdentity: "",
     onRemoveMember: () => {},
     onPromoteAdmin: () => {},
     onDemoteAdmin: () => {},
     onLeaveActivity: () => {},
+    onUpdateEmail: () => {},
   },
   //@@viewOff:defaultProps
 
-  render({ uuIdentity, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity }) {
+  render({ uuIdentity, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity, onUpdateEmail }) {
     //@@viewOn:private
     const { identity } = useSession();
     const { isAuthority, isExecutive } = useAuthorization();
@@ -83,11 +92,23 @@ const MemberTile = createVisualComponent({
       colorScheme: "negative",
     };
 
+    const updateEmailAction = {
+      icon: "mdi-at",
+      children: <Lsi lsi={{ en: "Update email", cs: "Změnit email" }} />,
+      onClick: onUpdateEmail,
+      tooltip: { en: "Update email", cs: "Změnit email" },
+      collapsed: "always",
+      colorScheme: "neutral",
+    };
+
     const itemList = (() => {
       const items = [];
-      if (uuIdentity === identity.uuIdentity && !isOwner) {
-        items.push(leaveActivityAction);
-        return items;
+      if (uuIdentity === identity.uuIdentity) {
+        items.push(updateEmailAction);
+        if (!isOwner) {
+          items.push(leaveActivityAction);
+          return items;
+        }
       }
       if (checkIfOwner(uuIdentity)) return items;
       if (checkIfAdministrator(uuIdentity)) {
@@ -118,8 +139,12 @@ const MemberTile = createVisualComponent({
     return (
       <Box shape="ground" borderRadius="moderate" style={{ padding: "8px", margin: "8px" }}>
         <Grid templateRows={{ xs: "100%" }} templateColumns={{ xs: "auto 36px" }}>
-          <PersonItem uuIdentity={uuIdentity} subtitle={isAuthority || isExecutive ? uuIdentity : null} />
-          <ActionGroup itemList={itemList} alignment="left" />
+          <PersonItem
+            uuIdentity={uuIdentity}
+            title={uuIdentity === identity.uuIdentity ? <Lsi lsi={{ en: "You", cs: "Vy" }} /> : null}
+            subtitle={isAuthority || isExecutive ? uuIdentity : null}
+          />
+          <ActionGroup itemList={itemList} />
         </Grid>
       </Box>
     );

@@ -61,6 +61,10 @@ const Calls = {
       const commandUri = Calls.getCommandUri("activity/delete");
       return Calls.call("cmdPost", commandUri, dtoIn);
     },
+    updateEmail(dtoIn) {
+      const commandUri = Calls.getCommandUri("activity/updateEmail");
+      return Calls.call("cmdPost", commandUri, dtoIn);
+    },
   },
 
   Post: {
@@ -114,6 +118,10 @@ const Calls = {
       const commandUri = Calls.getCommandUri("attendance/create");
       return Calls.call("cmdPost", commandUri, dtoIn);
     },
+    get(dtoIn) {
+      const commandUri = Calls.getCommandUri("attendance/get");
+      return Calls.call("cmdGet", commandUri, dtoIn);
+    },
     list(dtoIn) {
       const commandUri = Calls.getCommandUri("attendance/list");
       return Calls.call("cmdGet", commandUri, dtoIn);
@@ -124,6 +132,10 @@ const Calls = {
     },
     delete(dtoIn) {
       const commandUri = Calls.getCommandUri("attendance/delete");
+      return Calls.call("cmdPost", commandUri, dtoIn);
+    },
+    deleteBulk(dtoIn) {
+      const commandUri = Calls.getCommandUri("attendance/deleteBulk");
       return Calls.call("cmdPost", commandUri, dtoIn);
     },
   },
@@ -156,6 +168,11 @@ const Calls = {
   //   const commandUri = Calls.getCommandUri("loadDemoContent");
   //   return Calls.call("cmdGet", commandUri, dtoIn);
   // },
+
+  loadPersonalCard() {
+    const commandUri = Calls.getCommandUri("personalCard/load", Environment.get("uu_plus4u5g02_peopleBaseUri"));
+    return Calls.call("cmdGet", commandUri);
+  },
 
   getAuthorizedProfiles() {
     const commandUri = Calls.getCommandUri("sys/uuAppWorkspace/getAuthorizedProfiles");

@@ -1,11 +1,13 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi } from "uu5g05";
+import { AutoLoad, createVisualComponent, Environment, Lsi, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { Block, DateTime, Link, Pending, RichIcon, Text } from "uu5g05-elements";
+import { Text as FText } from "uu5g05-forms";
 import { FilterBar, FilterButton, SorterButton } from "uu5tilesg02-controls";
 import { Table } from "uu5tilesg02-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
+import { PersonalCard } from "uu_plus4upeopleg01-forms";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -55,19 +57,25 @@ const FILTER_LIST = [
   {
     key: "activityId",
     label: { en: "Activity ID", cs: "ID aktivity" },
-    inputProps: { placeholder: { en: "Enter activity ID", cs: "Zadejte ID aktivity" } },
+    inputType: FText.Input,
+    inputProps: { placeholder: { en: "Enter Activity ID", cs: "Zadejte ID aktivity" }, pattern: "^[a-fA-F0-9]{24}$" },
   },
   {
     key: "uuIdentity",
     label: { en: "Recipient", cs: "Příjemce" },
+    inputType: PersonalCard.FormSelect,
     inputProps: {
-      placeholder: { en: "Enter recipient's Plus4U ID", cs: "Zadejte Plus4U ID příjemce" },
+      baseUri: Environment.get("uu_plus4u5g02_peopleBaseUri"),
     },
+    valueFormatter: (value) => value.value.name,
   },
   {
     key: "createdAt",
     label: { en: "Created at", cs: "Datum vytvoření" },
     inputType: "date-range",
+    inputProps: {
+      placeholder: { en: "Select a date range", cs: "Vyberte datové rozmezí" },
+    },
   },
 ];
 //@@viewOff:constants
@@ -87,11 +95,22 @@ const InvitationTable = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    pending: PropTypes.bool,
+    data: PropTypes.array,
+    sorterList: PropTypes.array,
+    filterList: PropTypes.array,
+    onSorterListChange: PropTypes.func,
+    onFilterListChange: PropTypes.func,
+    getActionList: PropTypes.func,
+    onRefresh: PropTypes.func,
+    onLoadNext: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
+    pending: false,
     data: [],
     onLoadNext: () => {},
     onRefresh: () => {},

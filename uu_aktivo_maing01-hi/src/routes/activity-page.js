@@ -31,16 +31,18 @@ let ActivityPage = createVisualComponent({
   //@@viewOn:propTypes
   propTypes: {
     id: PropTypes.string,
+    tab: PropTypes.string,
   },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
     id: "",
+    tab: "information",
   },
   //@@viewOff:defaultProps
 
-  render({ id }) {
+  render({ id, tab }) {
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const [, setRoute] = useRoute();
@@ -90,7 +92,7 @@ let ActivityPage = createVisualComponent({
       }
       return (
         <ActivityAuthorizationContextProvider activity={data}>
-          <ActivityDetail data={data} handlerMap={handlerMap} />
+          <ActivityDetail data={data} handlerMap={handlerMap} tab={tab} />
         </ActivityAuthorizationContextProvider>
       );
     }
@@ -111,10 +113,9 @@ let ActivityPage = createVisualComponent({
                 return renderReady(data, handlerMap);
               case "pendingNoData":
                 return renderLoading();
-              case "error":
-                return renderReady(data, handlerMap);
               case "errorNoData":
                 return renderError(errorData);
+              case "error":
               case "ready":
               case "readyNoData":
                 return renderReady(data, handlerMap);

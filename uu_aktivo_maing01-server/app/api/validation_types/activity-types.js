@@ -6,6 +6,7 @@ const activityCreateDtoInType = shape({
   location: uu5String(60),
   idealParticipants: integer(0, 100),
   minParticipants: integer(0, 100),
+  email: string(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
 });
 
 const activityUpdateDtoInType = shape({
@@ -88,4 +89,9 @@ const activityLeaveDtoInType = shape({
 
 const activityDeleteDtoInType = shape({
   id: id().isRequired(),
+});
+
+const activityUpdateEmailDtoInType = shape({
+  id: id().isRequired(),
+  email: oneOf([string(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/), constant(null)]),
 });

@@ -5,6 +5,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/attendance-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
@@ -23,7 +24,7 @@ class AttendanceAbl {
     this.datetimeDao = DaoFactory.getDao("datetime");
   }
 
-  async create(awid, dtoIn) {
+  async create(awid, dtoIn, authorizationResult) {
     let validationResult = this.validator.validate("attendanceCreateDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -31,6 +32,12 @@ class AttendanceAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let datetime;
     try {
@@ -71,11 +78,7 @@ class AttendanceAbl {
       undecided: datetime.undecided,
       datetime: datetime.datetime,
       activityId: activity.id,
-      datetimeId: datetime.id,
-      archived: false,
     };
-
-    delete attendanceObject.notification;
 
     let dtoOut;
     try {
@@ -91,6 +94,64 @@ class AttendanceAbl {
     return dtoOut;
   }
 
+  async get(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("attendanceGetDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.Get),
+      Errors.Get.InvalidDtoIn,
+    );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
+    let dtoOut;
+    try {
+      dtoOut = await this.attendanceDao.get(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.Get.AttendanceDaoGetFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    if (!dtoOut) {
+      throw new Errors.Get.AttendanceDoesNotExist({ uuAppErrorMap }, { attendanceId: dtoIn.id });
+    }
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      let activity;
+      try {
+        await this.activityDao.get(awid, dtoOut.activityId);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.Get.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+
+      if (!activity) {
+        throw new Errors.Get.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoOut.activityId });
+      }
+
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
+        throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
+      }
+    }
+
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
   async list(awid, dtoIn, session, authorizationResult) {
     let validationResult = this.validator.validate("attendanceListDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
@@ -99,6 +160,12 @@ class AttendanceAbl {
       UnsupportedKeysWarning(Errors.List),
       Errors.List.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
@@ -124,33 +191,41 @@ class AttendanceAbl {
       }
 
       const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.List.UserNotMember({ uuAppErrorMap });
       }
     }
 
-    const { filters } = dtoIn || {};
-    const queryFilters = {};
-    if (filters) {
-      const { after, before, activityId, archived } = filters;
+    const filters = {};
+    if (dtoIn.filters) {
+      const { activityId, datetime } = dtoIn.filters;
+
       if (activityId) {
-        queryFilters.activityId = ObjectId.createFromHexString(activityId);
+        filters.activityId = ObjectId.createFromHexString(activityId);
       }
-      if (after) {
-        queryFilters.datetime = { $gte: new Date(after) };
+
+      if (datetime && datetime.filter((item) => item != null).length > 0) {
+        filters.datetime = {};
+        if (datetime[0]) {
+          filters.datetime.$gte = new Date(datetime[0]);
+        }
+        if (datetime[1]) {
+          filters.datetime.$lt = new Date(datetime[1]);
+        }
       }
-      if (before) {
-        queryFilters.datetime = queryFilters.datetime || {};
-        queryFilters.datetime.$lt = new Date(before);
-      }
-      if (archived !== undefined) {
-        queryFilters.archived = archived;
+    }
+
+    const sort = {};
+    if (dtoIn.sort) {
+      const { datetime } = dtoIn.sort;
+      if (datetime) {
+        sort.datetime = datetime;
       }
     }
 
     let dtoOut;
     try {
-      dtoOut = await this.attendanceDao.list(awid, queryFilters, dtoIn.pageInfo);
+      dtoOut = await this.attendanceDao.list(awid, filters, dtoIn.pageInfo, sort);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
         throw new Errors.List.AttendanceDaoListFailed({ uuAppErrorMap }, error);
@@ -169,6 +244,12 @@ class AttendanceAbl {
       UnsupportedKeysWarning(Errors.GetStatistics),
       Errors.GetStatistics.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.GetStatistics, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
@@ -197,7 +278,7 @@ class AttendanceAbl {
       }
 
       const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.GetStatistics.UserNotMember({ uuAppErrorMap });
       }
     }
@@ -205,7 +286,7 @@ class AttendanceAbl {
     const { filters } = dtoIn;
     const queryFilters = {};
     if (filters) {
-      const { after, before, activityId, archived } = filters;
+      const { after, before, activityId } = filters;
       if (activityId) {
         queryFilters.activityId = ObjectId.createFromHexString(activityId);
       }
@@ -215,9 +296,6 @@ class AttendanceAbl {
       if (before) {
         queryFilters.datetime = queryFilters.datetime || {};
         queryFilters.datetime.$lt = new Date(before);
-      }
-      if (archived !== undefined) {
-        queryFilters.archived = archived;
       }
     }
 
@@ -250,6 +328,12 @@ class AttendanceAbl {
       UnsupportedKeysWarning(Errors.Delete),
       Errors.Delete.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
@@ -302,6 +386,82 @@ class AttendanceAbl {
     }
 
     dtoOut = dtoOut || {};
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async deleteBulk(awid, dtoIn, session, authorizationResult) {
+    let validationResult = this.validator.validate("attendanceDeleteBulkDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.DeleteBulk),
+      Errors.DeleteBulk.InvalidDtoIn,
+    );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.DeleteBulk, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
+    const { idList } = dtoIn;
+
+    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
+    if (
+      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
+      !authorizedProfiles.includes(PROFILE_CODES.Executives)
+    ) {
+      const userUuIdentity = session.getIdentity().getUuIdentity();
+      const activityIdSet = new Set();
+      for (const id of idList) {
+        let attendance;
+        try {
+          attendance = await this.attendanceDao.get(awid, id);
+        } catch (error) {
+          if (error instanceof ObjectStoreError) {
+            throw new Errors.DeleteBulk.AttendanceDaoGetFailed({ uuAppErrorMap }, error);
+          }
+          throw error;
+        }
+        if (!attendance) {
+          throw new Errors.DeleteBulk.AttendanceDoesNotExist({ uuAppErrorMap }, { attendanceId: id });
+        }
+        const activityIdAsString = attendance.activityId.toString();
+        if (!activityIdSet.has(activityIdAsString)) {
+          let activity;
+          try {
+            activity = await this.activityDao.get(awid, attendance.activityId);
+          } catch (error) {
+            if (error instanceof ObjectStoreError) {
+              throw new Errors.DeleteBulk.ActivityDaoGetFailed({ uuAppErrorMap }, error);
+            }
+            throw error;
+          }
+          if (!activity) {
+            throw new Errors.DeleteBulk.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: attendance.activityId });
+          }
+
+          if (activity.owner !== userUuIdentity && !activity.administrators.includes(userUuIdentity)) {
+            throw new Errors.DeleteBulk.UserNotAuthorized({ uuAppErrorMap }, { activityId: activity.id });
+          }
+          activityIdSet.add(activityIdAsString);
+        }
+      }
+    }
+
+    const idsAsObjectId = idList.map((id) => ObjectId.createFromHexString(id));
+
+    try {
+      await this.attendanceDao.deleteByIdList(awid, idsAsObjectId);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.DeleteBulk.AttendanceDaoDeleteByIdListFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    const dtoOut = {};
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }

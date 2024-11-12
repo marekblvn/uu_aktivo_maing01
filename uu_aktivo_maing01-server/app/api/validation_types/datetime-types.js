@@ -23,6 +23,28 @@ const datetimeGetDtoInType = shape({
   id: id().isRequired(),
 });
 
+const datetimeListDtoInType = shape({
+  filters: shape(
+    {
+      datetime: array(oneOf([datetime(), constant(null)]), 1, 2),
+      notification: array(oneOf([datetime(), constant(null)]), 1, 2),
+    },
+    true,
+  ),
+  sort: shape(
+    {
+      datetime: integer(-1, 1),
+      notification: integer(-1, 1),
+    },
+    true,
+  ),
+  withActivity: boolean(),
+  pageInfo: shape({
+    pageIndex: integer(0, null),
+    pageSize: integer(0, null),
+  }),
+});
+
 const datetimeUpdateParticipationDtoInType = shape({
   id: id().isRequired(),
   type: oneOf(["confirmed", "denied", "undecided"]).isRequired(),

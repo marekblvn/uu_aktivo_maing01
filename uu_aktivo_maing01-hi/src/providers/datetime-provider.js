@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useDataObject } from "uu5g05";
+import { createVisualComponent, PropTypes, useDataObject } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
 //@@viewOff:imports
@@ -22,11 +22,17 @@ const DatetimeProvider = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    datetimeId: PropTypes.string,
+    children: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    datetimeId: "",
+    children: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({ datetimeId, children }) {

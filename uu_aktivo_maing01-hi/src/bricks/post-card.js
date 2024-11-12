@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Fragment, Lsi, useScreenSize, useSession } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, PropTypes, useScreenSize, useSession } from "uu5g05";
 import Config from "./config/config.js";
 import { ActionGroup, Box, DateTime, Grid, Text } from "uu5g05-elements";
 import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
@@ -24,30 +24,40 @@ const PostCard = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    onEdit: PropTypes.func,
+    onDelete: PropTypes.func,
+    post: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    onEdit: () => {},
+    onDelete: () => {},
+    post: {},
+  },
   //@@viewOff:defaultProps
 
-  render({ onEdit, onDelete, ...props }) {
-    const { id, content, type, createdAt, uuIdentity, uuIdentityName } = props;
+  render({ onEdit, onDelete, post }) {
+    const { id, content, type, createdAt, uuIdentity, uuIdentityName } = post;
     //@@viewOn:private
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const { isAuthority, isExecutive } = useAuthorization();
     const { isOwner, isAdministrator, checkIfAdministrator, checkIfOwner } = useActivityAuthorization();
 
+    const canEditPost = uuIdentity === identity.uuIdentity;
+    const canDeletePost =
+      isAuthority ||
+      isExecutive ||
+      isOwner ||
+      (isAdministrator && !checkIfOwner(uuIdentity) && !checkIfAdministrator(uuIdentity)) ||
+      uuIdentity === identity.uuIdentity;
+
     const getActionList = () => {
       const list = [];
-      if (
-        isAuthority ||
-        isExecutive ||
-        isOwner ||
-        (isAdministrator && !checkIfOwner(uuIdentity) && !checkIfAdministrator(uuIdentity)) ||
-        uuIdentity === identity.uuIdentity
-      ) {
+      if (canDeletePost) {
         list.push({
           children: <Lsi lsi={{ en: "Delete", cs: "Smazat" }} />,
           icon: "mdi-delete",
@@ -57,7 +67,7 @@ const PostCard = createVisualComponent({
         });
       }
 
-      if (uuIdentity === identity.uuIdentity) {
+      if (canEditPost) {
         list.push({
           children: <Lsi lsi={{ en: "Edit", cs: "Upravit" }} />,
           icon: "mdi-pencil",
@@ -106,7 +116,7 @@ const PostCard = createVisualComponent({
               <DateTime value={createdAt} format="DD.MM.YY HH:mm" />
             </Text>
           </Grid>
-          {uuIdentity === identity.uuIdentity && <ActionGroup size="s" itemList={getActionList()} />}
+          {canDeletePost && <ActionGroup size="s" itemList={getActionList()} />}
         </div>
         <Text category="story" segment="body" type={["xs", "s"].includes(screenSize) ? "minor" : "common"}>
           {content}

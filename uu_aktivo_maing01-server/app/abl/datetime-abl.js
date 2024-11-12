@@ -4,6 +4,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/datetime-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeysWarning`;
 
@@ -30,6 +31,12 @@ class DatetimeAbl {
       UnsupportedKeysWarning(Errors.Create),
       Errors.Create.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let activity;
     try {
@@ -113,7 +120,7 @@ class DatetimeAbl {
     const datetimeCreateObject = {
       awid,
       activityId: activity.id,
-      undecided: activity.members,
+      undecided: activity.members.map((member) => member.uuIdentity),
       confirmed: [],
       denied: [],
       datetime: datetimeAsDate,
@@ -162,6 +169,12 @@ class DatetimeAbl {
       Errors.Get.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let datetime;
     try {
       datetime = await this.datetimeDao.get(awid, dtoIn.id);
@@ -197,12 +210,91 @@ class DatetimeAbl {
       }
 
       const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Get.UserNotAuthorized({ uuAppErrorMap });
       }
     }
 
     let dtoOut = { ...datetime };
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
+    return dtoOut;
+  }
+
+  async list(awid, dtoIn, authorizationResult) {
+    let validationResult = this.validator.validate("datetimeListDtoInType", dtoIn);
+    let uuAppErrorMap = ValidationHelper.processValidationResult(
+      dtoIn,
+      validationResult,
+      UnsupportedKeysWarning(Errors.List),
+      Errors.List.InvalidDtoIn,
+    );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+    });
+
+    const filters = {};
+    if (dtoIn.filters) {
+      const { datetime, notification } = dtoIn.filters;
+
+      if (datetime && datetime.filter((item) => item != null).length > 0) {
+        filters.datetime = {};
+        if (datetime[0]) {
+          filters.datetime.$gt = new Date(datetime[0]);
+        }
+        if (datetime[1]) {
+          filters.datetime.$lte = new Date(datetime[1]);
+        }
+      }
+
+      if (notification && notification.filter((item) => item != null).length > 0) {
+        filters.notification = {};
+        if (notification[0]) {
+          filters.notification.$gt = new Date(notification[0]);
+        }
+        if (notification[1]) {
+          filters.notification.$lte = new Date(notification[1]);
+        }
+      }
+    }
+
+    const sort = {};
+    if (dtoIn.sort) {
+      const { datetime, notification } = dtoIn.sort;
+      if (datetime) {
+        sort.datetime = datetime;
+      }
+
+      if (notification) {
+        sort.notification = notification;
+      }
+    }
+
+    const pageIndex = dtoIn.pageInfo?.pageIndex || 0;
+    const pageSize = dtoIn.pageInfo?.pageSize || 10;
+
+    let dtoOut;
+    if (dtoIn.withActivity === true) {
+      try {
+        [dtoOut] = await this.datetimeDao.listWithActivity(awid, filters, { pageIndex, pageSize }, sort);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.List.DatetimeDaoListWithActivityFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    } else {
+      try {
+        dtoOut = await this.datetimeDao.list(awid, filters, { pageIndex, pageSize }, sort);
+      } catch (error) {
+        if (error instanceof ObjectStoreError) {
+          throw new Errors.List.DatetimeDaoListFailed({ uuAppErrorMap }, error);
+        }
+        throw error;
+      }
+    }
+
     dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
@@ -215,6 +307,12 @@ class DatetimeAbl {
       UnsupportedKeysWarning(Errors.UpdateParticipation),
       Errors.UpdateParticipation.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.UpdateParticipation, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let datetime;
     try {
@@ -290,7 +388,7 @@ class DatetimeAbl {
       }
     }
 
-    dtoOut.uuAppErrorMap;
+    dtoOut.uuAppErrorMap = uuAppErrorMap;
     return dtoOut;
   }
 
@@ -302,6 +400,12 @@ class DatetimeAbl {
       UnsupportedKeysWarning(Errors.Delete),
       Errors.Delete.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     let datetime;
     try {
@@ -342,10 +446,10 @@ class DatetimeAbl {
     }
 
     try {
-      await this.attendanceDao.updateMany(awid, { datetimeId: datetime.id }, { archived: true });
+      await this.attendanceDao.deleteByActivityId(awid, datetime.activityId);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
-        throw new Errors.Delete.AttendanceDaoUpdateManyFailed({ uuAppErrorMap }, error);
+        throw new Errors.Delete.AttendanceDaoDeleteByActivityIdFailed({ uuAppErrorMap }, error);
       }
       throw error;
     }
@@ -391,6 +495,12 @@ class DatetimeAbl {
       Errors.CreateNext.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.CreateNext, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let datetime;
     try {
       datetime = await this.datetimeDao.get(awid, dtoIn.id);
@@ -423,17 +533,6 @@ class DatetimeAbl {
       throw new Errors.CreateNext.ActivityNotRecurrent({ uuAppErrorMap });
     }
 
-    const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
-    if (
-      !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
-      !authorizedProfiles.includes(PROFILE_CODES.Executives)
-    ) {
-      const userUuIdentity = session.getIdentity().getUuIdentity();
-      if (activity.owner !== userUuIdentity) {
-        throw new Errors.CreateNext.UserNotAuthorized({ uuAppErrorMap });
-      }
-    }
-
     const nextDatetime = new Date(datetime.datetime);
     nextDatetime.setMonth(nextDatetime.getMonth() + activity.frequency.months);
     nextDatetime.setDate(nextDatetime.getDate() + activity.frequency.days);
@@ -445,23 +544,46 @@ class DatetimeAbl {
       nextNotification.getMinutes() - activity.notificationOffset.minutes,
     );
 
+    try {
+      await this.datetimeDao.delete(awid, dtoIn.id);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.DatetimeDaoDeleteFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
     const nextDatetimeObject = {
       awid,
-      id: datetime.id,
       activityId: datetime.activityId,
       datetime: nextDatetime,
       notification: nextNotification,
-      undecided: activity.members,
+      undecided: activity.members.map((member) => member.uuIdentity),
       confirmed: [],
       denied: [],
     };
 
     let dtoOut;
     try {
-      dtoOut = await this.datetimeDao.update(nextDatetimeObject);
+      dtoOut = await this.datetimeDao.create(nextDatetimeObject);
     } catch (error) {
       if (error instanceof ObjectStoreError) {
-        throw new Errors.CreateNext.DatetimeDaoUpdateFailed({ uuAppErrorMap }, error);
+        throw new Errors.CreateNext.DatetimeDaoCreateFailed({ uuAppErrorMap }, error);
+      }
+      throw error;
+    }
+
+    const updateActivityObject = {
+      awid,
+      id: datetime.activityId,
+      datetimeId: dtoOut.id,
+    };
+
+    try {
+      await this.activityDao.update(updateActivityObject);
+    } catch (error) {
+      if (error instanceof ObjectStoreError) {
+        throw new Errors.CreateNext.ActivityDaoUpdateFailed({ uuAppErrorMap }, error);
       }
       throw error;
     }

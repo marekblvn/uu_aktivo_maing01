@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useDataList } from "uu5g05";
+import { createVisualComponent, PropTypes, useDataList } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
 //@@viewOff:imports
@@ -22,7 +22,12 @@ const PostListProvider = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    filters: PropTypes.object,
+    sort: PropTypes.object,
+    pageSize: PropTypes.number,
+    children: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
@@ -30,6 +35,7 @@ const PostListProvider = createVisualComponent({
     filters: {},
     sort: {},
     pageSize: 50,
+    children: () => {},
   },
   //@@viewOff:defaultProps
 

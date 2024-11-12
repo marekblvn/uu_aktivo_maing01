@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize, useSession, useState } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize, useSession, useState } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Line, LinkPanel, RichIcon, Text } from "uu5g05-elements";
 import DatetimeDetail from "./datetime-detail.js";
@@ -24,22 +24,36 @@ const ActivityInformationView = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    data: PropTypes.object,
+    onReload: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
-    description: "",
-    location: "",
-    activityId: "",
+    data: {
+      description: "",
+      location: "",
+      id: "",
+    },
+    onReload: () => {},
   },
   //@@viewOff:defaultProps
 
-  render({ description, location, members, minParticipants, idealParticipants, id: activityId, datetimeId, onReload }) {
+  render({ data, onReload }) {
     //@@viewOn:private
+    const {
+      description,
+      location,
+      members,
+
+      id: activityId,
+    } = data;
     const [screenSize] = useScreenSize();
     const { identity } = useSession();
     const [openDescription, setOpenDescription] = useState(false);
+    const isMember = members.some((member) => member.uuIdentity === identity.uuIdentity);
     //@@viewOff:private
 
     //@@viewOn:render
@@ -113,14 +127,7 @@ const ActivityInformationView = createVisualComponent({
           templateColumns={{ xl: "2fr 1fr", m: "3fr 2fr", xs: "100%" }}
           templateRows={{ xs: "auto auto", m: "100%" }}
         >
-          <DatetimeDetail
-            activityId={activityId}
-            datetimeId={datetimeId}
-            idealParticipants={idealParticipants}
-            minParticipants={minParticipants}
-            onReload={onReload}
-            isMember={members.includes(identity.uuIdentity)}
-          />
+          <DatetimeDetail activity={data} onReload={onReload} isMember={isMember} />
           <PostBlock activityId={activityId} />
         </Grid>
       </Grid>

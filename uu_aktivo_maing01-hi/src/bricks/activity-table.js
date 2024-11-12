@@ -1,13 +1,14 @@
 //@@viewOn:imports
-import { AutoLoad, createVisualComponent, Lsi, Utils } from "uu5g05";
+import { AutoLoad, createVisualComponent, Environment, Lsi, PropTypes, Utils } from "uu5g05";
 import Config from "./config/config.js";
 import { ControllerProvider } from "uu5tilesg02";
 import { Table } from "uu5tilesg02-elements";
 import { FilterButton, FilterBar, SorterButton } from "uu5tilesg02-controls";
 import { PersonItem } from "uu_plus4u5g02-elements";
 import { Block, Button, Icon, Link, Pending, RichIcon, Tag, Text, TouchLink } from "uu5g05-elements";
-import { TextSelect } from "uu5g05-forms";
+import { Text as FText } from "uu5g05-forms";
 import TextBox from "./text-box.js";
+import { PersonalCard } from "uu_plus4upeopleg01-forms";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -116,6 +117,15 @@ const COLUMN_LIST = [
 
 const FILTER_LIST = [
   {
+    key: "id",
+    label: { en: "Activity ID", cs: "ID aktivity" },
+    inputType: FText.Input,
+    inputProps: {
+      placeholder: { en: "Enter Activity ID", cs: "Zadejte ID aktivity" },
+      pattern: "^[a-fA-F0-9]{24}$",
+    },
+  },
+  {
     key: "name",
     label: { en: "Name", cs: "Název" },
     inputProps: { placeholder: { en: "Enter name", cs: "Zadejte název" } },
@@ -123,17 +133,19 @@ const FILTER_LIST = [
   {
     key: "owner",
     label: { en: "Owner", cs: "Vlastník" },
-    inputProps: { placeholder: { en: "Enter owner's Plus4U ID", cs: "Zadejte Plus4U ID vlastníka" } },
+    inputType: PersonalCard.FormSelect,
+    inputProps: {
+      baseUri: Environment.get("uu_plus4u5g02_peopleBaseUri"),
+    },
+    valueFormatter: (value) => value.value.name,
   },
   {
     key: "members",
     label: { en: "Members", cs: "Členové" },
-    inputType: TextSelect.Input,
+    inputType: PersonalCard.FormSelect,
     inputProps: {
-      insertable: true,
       multiple: true,
-      itemList: [],
-      value: [],
+      baseUri: Environment.get("uu_plus4u5g02_peopleBaseUri"),
     },
   },
   {
@@ -178,11 +190,31 @@ const ActivityTable = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    pending: PropTypes.bool,
+    data: PropTypes.array,
+    filterList: PropTypes.array,
+    sorterList: PropTypes.array,
+    onSorterListChange: PropTypes.func,
+    onFilterListChange: PropTypes.func,
+    getActionList: PropTypes.func,
+    onRefresh: PropTypes.func,
+    onLoadNext: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    pending: false,
+    data: [],
+    filterList: [],
+    sorterList: [],
+    onFilterListChange: () => {},
+    onSorterListChange: () => {},
+    getActionList: () => {},
+    onRefresh: () => {},
+    onLoadNext: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({

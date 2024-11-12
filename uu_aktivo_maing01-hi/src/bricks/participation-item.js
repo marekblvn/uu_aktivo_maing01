@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useScreenSize } from "uu5g05";
+import { createVisualComponent, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Box, RichIcon } from "uu5g05-elements";
 import { PersonItem } from "uu_plus4u5g02-elements";
@@ -24,11 +24,19 @@ const ParticipationItem = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    uuIdentity: PropTypes.string,
+    colorScheme: PropTypes.colorScheme,
+    icon: PropTypes.icon,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    uuIdentity: "",
+    colorScheme: "neutral",
+    icon: "empty",
+  },
   //@@viewOff:defaultProps
 
   render({ uuIdentity, colorScheme, icon }) {

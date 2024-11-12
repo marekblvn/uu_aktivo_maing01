@@ -2,12 +2,13 @@
   "appName": "Aplikace Aktivo",
   "About": {
     "header": "O aplikaci Aktivo",
-    "creatorsHeader": "Tvůrci aplikace",
+    "creatorsHeader": "Tvůrce aplikace",
     "termsOfUse": "Podmínky užívání"
   },
   "AboutContent": {
-    "content": "<uu5string/>Demo aplikace je šablona pro vývoj nových aplikací.",
-    "technologiesContent": "<uu5string/>Dále byly použity technologie: <Uu5Elements.Link href='http://www.w3schools.com/html/default.asp' target='_blank'>Html5</Uu5Elements.Link>, <Uu5Elements.Link href='http://www.w3schools.com/css/default.asp' target='_blank'>CSS</Uu5Elements.Link>, <Uu5Elements.Link href='http://www.w3schools.com/js/default.asp' target='_blank'>JavaScript</Uu5Elements.Link>, <Uu5Elements.Link href='http://getbootstrap.com' target='_blank'>Bootstrap</Uu5Elements.Link>, <Uu5Elements.Link href='https://reactjs.org' target='_blank'>React</Uu5Elements.Link>, <Uu5Elements.Link href='https://www.ruby-lang.org' target='_blank'>Ruby</Uu5Elements.Link>, <Uu5Elements.Link href='http://puma.io' target='_blank'>Puma</Uu5Elements.Link> a <Uu5Elements.Link href='https://www.docker.com' target='_blank'>Docker</Uu5Elements.Link>. Aplikace je provozována v rámci internetové služby <Uu5Elements.Link href='https://plus4u.net' target='_blank'>Plus4U</Uu5Elements.Link> s využitím cloudu <Uu5Elements.Link href='https://azure.microsoft.com' target='_blank'>Microsoft Azure</Uu5Elements.Link>."
+    "content": "<uu5string/>Aplikace Aktivo je bakalářský projekt vytvořený s cílem poskytnout moderní a responzivní alternativu k již existujícím řešením.",
+    "technologiesContent": "<uu5string/>Dále byly použity technologie: <Uu5Elements.Link href='http://www.w3schools.com/html/default.asp' target='_blank'>Html5</Uu5Elements.Link>, <Uu5Elements.Link href='http://www.w3schools.com/css/default.asp' target='_blank'>CSS</Uu5Elements.Link>, <Uu5Elements.Link href='http://www.w3schools.com/js/default.asp' target='_blank'>JavaScript</Uu5Elements.Link>, <Uu5Elements.Link href='http://getbootstrap.com' target='_blank'>Bootstrap</Uu5Elements.Link>, <Uu5Elements.Link href='https://reactjs.org' target='_blank'>React</Uu5Elements.Link>, <Uu5Elements.Link href='https://www.ruby-lang.org' target='_blank'>Ruby</Uu5Elements.Link>, <Uu5Elements.Link href='http://puma.io' target='_blank'>Puma</Uu5Elements.Link> a <Uu5Elements.Link href='https://www.docker.com' target='_blank'>Docker</Uu5Elements.Link>. Aplikace je provozována v rámci internetové služby <Uu5Elements.Link href='https://plus4u.net' target='_blank'>Plus4U</Uu5Elements.Link> s využitím cloudu <Uu5Elements.Link href='https://azure.microsoft.com' target='_blank'>Microsoft Azure</Uu5Elements.Link>.",
+    "packages": "<uu5string/>Byly použity následující balíčky třetích stran: <Uu5Elements.Link href='https://github.com/sebbo2002/ical-generator' target='_blank' >ical-generator</Uu5Elements.Link>."
   },
   "ControlPanel": {
     "rightsError": "K zobrazení komponenty nemáte dostatečná práva.",
@@ -15,7 +16,8 @@
   },
   "Home": {
     "welcome": "Vítejte v",
-    "intro": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Integer tempor. Aliquam ante. Fusce nibh. Aliquam in lorem sit amet leo accumsan lacinia. Duis risus. Praesent id justo in neque elementum ultrices. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce dui leo, imperdiet in, aliquam sit amet, feugiat eu, orci."
+    "intro1": "Aktivo je aplikace sloužící k organizování volnočasových skupinových aktivit. Pokud máte skupinu ve které se pravidelně scházíte a nebaví vás se zdlouhavě domlouvat SMSkami, emaily nebo skrze jiné komunikační prostředky, stačí si vytvořit vlastní aktivitu a pozvat do ní ostatní! V aktivitě si následně můžete vytvořit termín, nastavit jak často se má opakovat a kdy se má členům vaší aktivity posílat upozornění a pak už nemusíte nic řešit. Aplikace Aktivo vám v nastavenou dobu před termínem pošle na email upozornění o blížícím se termínu.",
+    "intro2": "V aktivitě mohou členové potvrdit svou účast na nadcházejícím termínu a dát tak ostatním vědět, zda přijdou nebo ne. V aktivitě také uvidíte kolik členů plánuje přijít a podle toho se rozhodnout, zda má vůbec smysl v daném termínu vaší aktivitu pořádat. Po proběhlém termínu můžete zkontrolovat kdo přišel a kdo se nezúčastnil prostřednictvím docházky."
   },
   "InitAppWorkspace": {
     "notAuthorized": "Nemáte dostatečná práva k použití aplikace.",
@@ -35,6 +37,7 @@
     "management/activities": "Správa aktivit",
     "management/invitations": "Správa pozvánek",
     "management/posts": "Správa příspěvků",
+    "management/attendance": "Správa docházek",
     "about": "O aplikaci"
   },
   "Placeholder": {
@@ -109,12 +112,17 @@
     },
     "deleteDatetime": {
       "header": "Opravdu chcete smazat termín aktivity?",
-      "info": "Termín bude trvale smazán a přeruší se tak jeho opakování (pokud je nastaveno). Vezměte prosím na vědomí, že smazáním termínu ztratíte všechna data o účasti členů na tomto termínu!",
+      "info": "Vezměte prosím na vědomí, že smazáním termínu ztratíte všechna data o účasti členů na tomto termínu, včetně docházky. Termín bude trvale smazán a přeruší se tak jeho opakování, pokud je nastaveno.",
       "confirm": "Smazat"
     },
     "deleteActivity": {
       "header": "Opravdu chcete smazat tuto aktivitu?",
       "info": "Tato aktivita a všechny informace v ní obsažené budou trvale ztraceny. Vezměte prosím na vědomí, že toto rozhodnutí nelze vzít zpět.",
+      "confirm": "Smazat"
+    },
+    "deleteAttendance": {
+      "header": "Opravdu chcete pokračovat?",
+      "info": "Vybraná docházka bude smazána bez upozornění členů aktivity.",
       "confirm": "Smazat"
     },
     "adminDeleteActivity": {
@@ -125,6 +133,11 @@
     "adminDeleteDatetime": {
       "header": "Opravdu chcete smazat termín aktivity '%s'?",
       "info": "Termín bude smazán bez upozornění členů aktivity a všechny informace o probíhajícím termínu budou ztraceny.",
+      "confirm": "Smazat"
+    },
+    "adminDeleteAttendance": {
+      "header": "Opravdu chcete pokračovat?",
+      "info": "Vybraná docházka bude smazána bez upozornění členů aktivity.",
       "confirm": "Smazat"
     }
   },
@@ -650,6 +663,10 @@
     "uu-aktivo-main/datetime/delete/activityDaoUpdateFailed": {
       "header": "Při pokusu o smazání termínu nastala chyba",
       "message": "Něco se pokazilo. Zkuste to prosím později."
+    },
+    "uu-aktivo-main/invitation/create/targetUserAlreadyMember": {
+      "header": "Při vytváření pozvánky nastala chyba",
+      "message": "Uživatel kterého chcete pozvat už je členem této aktivity."
     }
   }
 }

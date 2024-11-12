@@ -2,12 +2,13 @@
   "appName": "Application Aktivo",
   "About": {
     "header": "About application Aktivo",
-    "creatorsHeader": "Application creators",
+    "creatorsHeader": "Application creator",
     "termsOfUse": "Terms of use"
   },
   "AboutContent": {
-    "content": "<uu5string/>Demo application is a template for developing new applications.",
-    "technologiesContent": "<uu5string/>Other used technologies: <Uu5Elements.Link href='http://www.w3schools.com/html/default.asp' target='_blank'>Html5</Uu5Elements.Link>, <Uu5Elements.Link href='http://www.w3schools.com/css/default.asp' target='_blank'>CSS</Uu5Elements.Link>, <Uu5Elements.Link href='http://www.w3schools.com/js/default.asp' target='_blank'>JavaScript</Uu5Elements.Link>, <Uu5Elements.Link href='http://getbootstrap.com' target='_blank'>Bootstrap</Uu5Elements.Link>, <Uu5Elements.Link href='https://reactjs.org' target='_blank'>React</Uu5Elements.Link>, <Uu5Elements.Link href='https://www.ruby-lang.org' target='_blank'>Ruby</Uu5Elements.Link>, <Uu5Elements.Link href='http://puma.io' target='_blank'>Puma</Uu5Elements.Link> a <Uu5Elements.Link href='https://www.docker.com' target='_blank'>Docker</Uu5Elements.Link>. Application is operated in the <Uu5Elements.Link href='https://plus4u.net' target='_blank'>Plus4U</Uu5Elements.Link> internet service with the usage of <Uu5Elements.Link href='https://azure.microsoft.com' target='_blank'>Microsoft Azure</Uu5Elements.Link> cloud."
+    "content": "<uu5string/>Application Aktivo is a bachelor project made to provide a modern and responsive alternative to already existing solutions.",
+    "technologiesContent": "<uu5string/>Other used technologies: <Uu5Elements.Link href='http://www.w3schools.com/html/default.asp' target='_blank'>Html5</Uu5Elements.Link>, <Uu5Elements.Link href='http://www.w3schools.com/css/default.asp' target='_blank'>CSS</Uu5Elements.Link>, <Uu5Elements.Link href='http://www.w3schools.com/js/default.asp' target='_blank'>JavaScript</Uu5Elements.Link>, <Uu5Elements.Link href='http://getbootstrap.com' target='_blank'>Bootstrap</Uu5Elements.Link>, <Uu5Elements.Link href='https://reactjs.org' target='_blank'>React</Uu5Elements.Link>, <Uu5Elements.Link href='https://www.ruby-lang.org' target='_blank'>Ruby</Uu5Elements.Link>, <Uu5Elements.Link href='http://puma.io' target='_blank'>Puma</Uu5Elements.Link> a <Uu5Elements.Link href='https://www.docker.com' target='_blank'>Docker</Uu5Elements.Link>. Application is operated in the <Uu5Elements.Link href='https://plus4u.net' target='_blank'>Plus4U</Uu5Elements.Link> internet service with the usage of <Uu5Elements.Link href='https://azure.microsoft.com' target='_blank'>Microsoft Azure</Uu5Elements.Link> cloud.",
+    "packages": "<uu5string/>Following third-party packages were used: <Uu5Elements.Link href='https://github.com/sebbo2002/ical-generator' target='_blank' >ical-generator</Uu5Elements.Link>."
   },
   "ControlPanel": {
     "rightsError": "You do not have sufficient rights to display this component.",
@@ -15,7 +16,8 @@
   },
   "Home": {
     "welcome": "Welcome to",
-    "intro": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Integer tempor. Aliquam ante. Fusce nibh. Aliquam in lorem sit amet leo accumsan lacinia. Duis risus. Praesent id justo in neque elementum ultrices. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce dui leo, imperdiet in, aliquam sit amet, feugiat eu, orci."
+    "intro1": "Aktivo is an application used to organize leisure group activities. If you have a group where you meet regularly and you are tired of lengthy text messages, emails or other means of communication, just create your own activity and invite others to it! In the activity you can then create a deadline, set how often it should be repeated and when notifications should be sent to the members of your activity and then you don't have to worry about anything. The Aktivo app will send you an email notification of the upcoming deadline at a set time before the deadline.",
+    "intro2": "In the activity, members can confirm their attendance at an upcoming date and let others know whether they will be coming or not. In the activity you can also see how many members are planning to come and decide whether it makes sense to hold your activity on that date. After the date has passed, you can check who came and who didn't attend through the attendance tab in the activity."
   },
   "InitAppWorkspace": {
     "notAuthorized": "You do not have sufficient rights to use the application.",
@@ -35,6 +37,7 @@
     "management/activities": "Activity management",
     "management/invitations": "Invitation management",
     "management/posts": "Post management",
+    "management/attendance": "Attendance management",
     "about": "About Application"
   },
   "Placeholder": {
@@ -88,9 +91,9 @@
       "confirm": "Delete"
     },
     "declineInvitation": {
-      "header": "Are you sure you want to decline invitation to '%s'?",
+      "header": "Are you sure you want to reject invitation to '%s'?",
       "info": "The invitation will be deleted.",
-      "confirm": "Decline"
+      "confirm": "Reject"
     },
     "acceptInvitation": {
       "header": "You are about to accept an invitation to '%s'",
@@ -109,12 +112,17 @@
     },
     "deleteDatetime": {
       "header": "Are you sure you want to delete the datetime?",
-      "info": "The datetime will be permanently deleted and it's recurrence will be stopped (if it is recurrent). Please note that by deleting the datetime, you will lose all participation data in the current datetime!",
+      "info": "Please note that by deleting the datetime, you will lose all participation and attendance data. The datetime will be permanently deleted and it's recurrence, if set up, will be stopped.",
       "confirm": "Delete"
     },
     "deleteActivity": {
       "header": "Are you absolutely sure you want to delete this activity?",
       "info": "This activity and all information contained in it will be lost permanently. Please note that this decision cannot be reversed.",
+      "confirm": "Delete"
+    },
+    "deleteAttendance": {
+      "header": "Are you sure you want to continue?",
+      "info": "Selected attendance will be deleted without notifying the members of the activity.",
       "confirm": "Delete"
     },
     "adminDeleteActivity": {
@@ -125,6 +133,11 @@
     "adminDeleteDatetime": {
       "header": "Are you sure you want to delete the datetime of activity '%s'?",
       "info": "The datetime and all information it holds will be deleted without informing the members of the activity.",
+      "confirm": "Delete"
+    },
+    "adminDeleteAttendance": {
+      "header": "Are you sure you want to continue?",
+      "info": "Selected attendance will be deleted without notifying the members of the activity.",
       "confirm": "Delete"
     }
   },
@@ -650,6 +663,10 @@
     "uu-aktivo-main/datetime/delete/activityDaoUpdateFailed": {
       "header": "Error occurred while trying to delete datetime",
       "message": "Something went wrong. Please try again later."
+    },
+    "uu-aktivo-main/invitation/create/targetUserAlreadyMember": {
+      "header": "Error occurred while creating invitation",
+      "message": "The user you want to invite is already a member of this activity."
     }
   }
 }

@@ -1,8 +1,9 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Box, Grid, Icon, Line, Number, Text } from "uu5g05-elements";
-import { PersonItem } from "uu_plus4u5g02-elements";
+import { Block, DateTime, Grid, Icon, Number, Text } from "uu5g05-elements";
+import { useAuthorization } from "../contexts/authorization-context.js";
+import { useActivityAuthorization } from "../contexts/activity-authorization-context.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -23,33 +24,55 @@ const AttendanceTile = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    data: PropTypes.object,
+    onDelete: PropTypes.func,
+    onOpenDetail: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    data: {},
+    onDelete: () => {},
+    onOpenDetail: () => {},
+  },
   //@@viewOff:defaultProps
 
-  render(props) {
+  render({ data, onDelete, onOpenDetail }) {
     //@@viewOn:private
-    const { data } = props;
     const [screenSize] = useScreenSize();
+    const { isAuthority, isExecutive } = useAuthorization();
+    const { isAdministrator, isOwner } = useActivityAuthorization();
+    const canDeleteAttendance = isAuthority || isExecutive || isAdministrator || isOwner;
     //@@viewOff:private
+
+    const actionList = canDeleteAttendance
+      ? [
+          {
+            icon: "uugds-delete",
+            colorScheme: "negative",
+            onClick: () => onDelete(data),
+            collapsed: "always",
+            children: <Lsi lsi={{ en: "Delete attendance", cs: "Smazat docházku" }} />,
+          },
+          { icon: "uugds-open-in-modal", onClick: () => onOpenDetail(data) },
+        ]
+      : [{ icon: "uugds-open-in-modal", onClick: () => onOpenDetail(data) }];
 
     //@@viewOn:render
 
     return (
-      <Box shape="ground" borderRadius="moderate" style={{ padding: screenSize === "xs" ? "8px" : "16px" }}>
-        <Grid
-          templateColumns={{ xs: "auto" }}
-          templateRows={{ xs: "100%" }}
-          alignItems={{ xs: "center" }}
-          justifyContent={{ xs: "space-between" }}
-          style={{ padding: screenSize === "xs" ? "8px 12px" : "16px 24px" }}
-        >
-          <PersonItem uuIdentity={data.uuIdentity} />
-        </Grid>
-        <Line colorScheme="building" significance="subdued" />
+      <Block
+        card="full"
+        headerSeparator={true}
+        header={
+          <Text category="interface" segment="content" type="medium">
+            <DateTime value={data.datetime} timeFormat="short" dateFormat="short" />
+          </Text>
+        }
+        actionList={actionList}
+      >
         <Grid
           rowGap={{ xs: "8px", s: "16px" }}
           style={{
@@ -58,113 +81,41 @@ const AttendanceTile = createVisualComponent({
             fontSize: screenSize === "xs" ? "13px" : "16px",
           }}
         >
-          <Grid templateAreas={{ xs: `l l l l l l count count count perc perc perc` }} alignItems="center">
-            <Grid.Item gridArea="l" colSpan={6} rowSpan={1}>
-              <Text>
-                <Icon icon="uugdsstencil-communication-thumb-up" colorScheme="positive" margin="0 4px" />
-                <Lsi lsi={{ en: "Came", cs: "Přišel(a)" }} />
+          <Grid templateColumns={{ xs: "auto 48px" }}>
+            <Text category="interface" segment="content" type="medium">
+              <Icon icon="uugdsstencil-communication-thumb-up" colorScheme="positive" margin="0 4px" />
+              <Lsi lsi={{ en: "Confirmed", cs: "Potvrdilo" }} />
+            </Text>
+            <div style={{ textAlign: "right" }}>
+              <Text category="interface" segment="content" type="medium">
+                <Number value={data.confirmed.length} />
               </Text>
-            </Grid.Item>
-            <Grid.Item gridArea="count" colSpan={3} rowSpan={1}>
-              <div style={{ textAlign: "right" }}>
-                <Number value={data.confirmed} />
-              </div>
-            </Grid.Item>
-            <Grid.Item gridArea="perc" colSpan={3} rowSpan={1}>
-              <div style={{ textAlign: "right" }}>
-                {"("}
-                <Number
-                  value={data.confirmedPercentage}
-                  unit="percent"
-                  roundingMode="halfExpand"
-                  roundingPosition={-1}
-                  maxDecimalDigits={1}
-                />
-                {")"}
-              </div>
-            </Grid.Item>
+            </div>
           </Grid>
-          <Grid templateAreas={{ xs: `l l l l l l count count count perc perc perc` }} alignItems="center">
-            <Grid.Item gridArea="l" colSpan={6} rowSpan={1}>
-              <Text>
-                <Icon icon="uugds-help" colorScheme="neutral" margin="0 4px" />
-                <Lsi lsi={{ en: "Didn't decide", cs: "Nerozhodl(a) se" }} />
+          <Grid templateColumns={{ xs: "auto 48px" }}>
+            <Text category="interface" segment="content" type="medium">
+              <Icon icon="uugds-help" colorScheme="neutral" margin="0 4px" />
+              <Lsi lsi={{ en: "Undecided", cs: "Nerozhodlo se" }} />
+            </Text>
+            <div style={{ textAlign: "right" }}>
+              <Text category="interface" segment="content" type="medium">
+                <Number value={data.undecided.length} />
               </Text>
-            </Grid.Item>
-            <Grid.Item gridArea="count" colSpan={3} rowSpan={1}>
-              <div style={{ textAlign: "right" }}>
-                <Number value={data.undecided} />
-              </div>
-            </Grid.Item>
-            <Grid.Item gridArea="perc" colSpan={3} rowSpan={1}>
-              <div style={{ textAlign: "right" }}>
-                {"("}
-                <Number
-                  value={data.undecidedPercentage}
-                  unit="percent"
-                  roundingMode="halfExpand"
-                  roundingPosition={-1}
-                  maxDecimalDigits={1}
-                />
-                {")"}
-              </div>
-            </Grid.Item>
+            </div>
           </Grid>
-          <Grid templateAreas={{ xs: `l l l l l l count count count perc perc perc` }} alignItems="center">
-            <Grid.Item gridArea="l" colSpan={6} rowSpan={1}>
-              <Text>
-                <Icon icon="uugdsstencil-communication-thumb-down" colorScheme="negative" margin="0 4px" />
-                <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel(a)" }} />
+          <Grid templateColumns={{ xs: "auto 48px" }}>
+            <Text category="interface" segment="content" type="medium">
+              <Icon icon="uugdsstencil-communication-thumb-down" colorScheme="negative" margin="0 4px" />
+              <Lsi lsi={{ en: "Denied", cs: "Odmítlo" }} />
+            </Text>
+            <div style={{ textAlign: "right" }}>
+              <Text category="interface" segment="content" type="medium">
+                <Number value={data.denied.length} />
               </Text>
-            </Grid.Item>
-            <Grid.Item gridArea="count" colSpan={3} rowSpan={1}>
-              <div style={{ textAlign: "right" }}>
-                <Number value={data.denied} />
-              </div>
-            </Grid.Item>
-            <Grid.Item gridArea="perc" colSpan={3} rowSpan={1}>
-              <div style={{ textAlign: "right" }}>
-                {"("}
-                <Number
-                  value={data.deniedPercentage}
-                  unit="percent"
-                  roundingMode="halfExpand"
-                  roundingPosition={-1}
-                  maxDecimalDigits={1}
-                />
-                {")"}
-              </div>
-            </Grid.Item>
-          </Grid>
-          <Line colorScheme="neutral" significance="subdued" />
-          <Grid templateAreas={{ xs: `l l l l l l count count count perc perc perc` }} alignItems="center">
-            <Grid.Item gridArea="l" colSpan={6} rowSpan={1}>
-              <Text>
-                <Icon icon="uugdsstencil-commerce-sum" margin="0 4px" />
-                <Lsi lsi={{ en: "Datetimes as member", cs: "Termínů členem" }} />
-              </Text>
-            </Grid.Item>
-            <Grid.Item gridArea="count" colSpan={3} rowSpan={1}>
-              <div style={{ textAlign: "right" }}>
-                <Number value={data.denied + data.confirmed + data.undecided} />
-              </div>
-            </Grid.Item>
-            <Grid.Item gridArea="perc" colSpan={3} rowSpan={1}>
-              <div style={{ textAlign: "right" }}>
-                {"("}
-                <Number
-                  value={((data.denied + data.confirmed + data.undecided) / data.total) * 100}
-                  unit="percent"
-                  roundingMode="halfExpand"
-                  roundingPosition={-1}
-                  maxDecimalDigits={1}
-                />
-                {")"}
-              </div>
-            </Grid.Item>
+            </div>
           </Grid>
         </Grid>
-      </Box>
+      </Block>
     );
     //@@viewOff:render
   },

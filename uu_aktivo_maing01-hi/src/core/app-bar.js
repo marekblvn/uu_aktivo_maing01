@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useScreenSize, useEffect, useSession, useRoute, Lsi } from "uu5g05";
+import { createVisualComponent, useScreenSize, useEffect, useSession, useRoute, Lsi, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import Logo from "./logo.js";
 import { ActionGroup, RichIcon } from "uu5g05-elements";
@@ -25,11 +25,19 @@ const AppBar = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    handleCloseSideMenu: PropTypes.func,
+    handleOpenSideMenu: PropTypes.func,
+    sideMenuOpen: PropTypes.bool,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    handleCloseSideMenu: () => {},
+    handleOpenSideMenu: () => {},
+    sideMenuOpen: false,
+  },
   //@@viewOff:defaultProps
 
   render({ handleCloseSideMenu, handleOpenSideMenu, sideMenuOpen }) {
@@ -99,6 +107,14 @@ const AppBar = createVisualComponent({
             colorScheme: "building",
             onClick: () => {
               setRoute("management/posts");
+            },
+          },
+          {
+            children: <Lsi import={importLsi} path={["Menu", "management/attendance"]} />,
+            icon: "uugdsstencil-chart-bar-chart-square",
+            colorScheme: "building",
+            onClick: () => {
+              setRoute("management/attendance");
             },
           },
         ],

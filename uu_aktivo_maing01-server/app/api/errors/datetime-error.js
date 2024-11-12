@@ -142,11 +142,25 @@ const CreateNext = {
       this.message = "User is not authorized to create next datetime.";
     }
   },
-  DatetimeDaoUpdateFailed: class extends AktivoMainUseCaseError {
+  DatetimeDaoDeleteFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${CreateNext.UC_CODE}datetimeDaoUpdateFailed`;
-      this.message = "Update datetime by datetime DAO update failed.";
+      this.code = `${CreateNext.UC_CODE}datetimeDaoDeleteFailed`;
+      this.message = "Delete datetime by datetime DAO delete failed.";
+    }
+  },
+  DatetimeDaoCreateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}datetimeDaoCreateFailed`;
+      this.message = "Create datetime by datetime DAO create failed.";
+    }
+  },
+  ActivityDaoUpdateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${CreateNext.UC_CODE}activityDaoUpdateFailed`;
+      this.message = "Update activity by activity DAO update failed.";
     }
   },
 };
@@ -193,6 +207,31 @@ const Get = {
       super(...arguments);
       this.code = `${Get.UC_CODE}userNotAuthorized`;
       this.message = "User is not authorized to access datetime of this activity.";
+    }
+  },
+};
+
+const List = {
+  UC_CODE: `${ERR_PREFIX}list/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${List.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  DatetimeDaoListFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${List.UC_CODE}datetimeDaoListFailed`;
+      this.message = "List datetimes by datetime DAO list failed.";
+    }
+  },
+  DatetimeDaoListWithActivityFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${List.UC_CODE}datetimeDaoListWithActivityFailed`;
+      this.message = "List datetimes with activity by datetime DAO listWithActivity failed.";
     }
   },
 };
@@ -287,11 +326,11 @@ const Delete = {
       this.message = "User is not authorized to create datetime in this activity.";
     }
   },
-  AttendanceDaoUpdateManyFailed: class extends AktivoMainUseCaseError {
+  AttendanceDaoDeleteByActivityIdFailed: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${Delete.UC_CODE}AttendanceDaoUpdateManyFailed`;
-      this.message = "Update attendances by attendance DAO updateMany failed.";
+      this.code = `${Delete.UC_CODE}AttendanceDaoDeleteByActivityIdFailed`;
+      this.message = "Delete attendances by attendance DAO deleteByActivityId failed.";
     }
   },
   DatetimeDaoDeleteFailed: class extends AktivoMainUseCaseError {
@@ -314,6 +353,7 @@ module.exports = {
   Create,
   CreateNext,
   Get,
+  List,
   UpdateParticipation,
   Delete,
 };

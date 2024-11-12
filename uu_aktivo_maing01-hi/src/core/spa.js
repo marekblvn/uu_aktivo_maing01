@@ -9,6 +9,7 @@ import SideMenuDrawer from "./side-menu-drawer.js";
 import Config from "./config/config.js";
 import Home from "../routes/home.js";
 import AppBar from "./app-bar.js";
+import AttendanceManagement from "../routes/attendance-management.js";
 
 const ActivityPage = Utils.Component.lazy(() => import("../routes/activity-page.js"));
 const ActivityManagement = Utils.Component.lazy(() => import("../routes/activity-management.js"));
@@ -29,8 +30,9 @@ const ROUTE_MAP = {
   "management/activities": (props) => <ActivityManagement {...props} />,
   "management/invitations": (props) => <InvitationManagement {...props} />,
   "management/posts": (props) => <PostManagement {...props} />,
+  "management/attendance": (props) => <AttendanceManagement {...props} />,
   invitations: (props) => <Invitations {...props} />,
-  activity: ({ params }) => <ActivityPage id={params.id} />,
+  activity: ({ params }) => <ActivityPage id={params.id} tab={params.tab} />,
   about: (props) => <About {...props} />,
   "sys/uuAppWorkspace/initUve": (props) => <InitAppWorkspace {...props} />,
   controlPanel: (props) => <ControlPanel {...props} />,

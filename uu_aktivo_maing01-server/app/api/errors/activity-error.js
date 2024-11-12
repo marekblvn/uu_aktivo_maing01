@@ -172,11 +172,11 @@ const UpdateNotificationOffset = {
       this.message = "Update activity by activity DAO update failed.";
     }
   },
-  InvalidCombination: class extends AktivoMainUseCaseError {
+  InvalidNotificationOffset: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${UpdateNotificationOffset.UC_CODE}invalidCombination`;
-      this.message = "Invalid combination of frequency and notification offset.";
+      this.code = `${UpdateNotificationOffset.UC_CODE}invalidNotificationOffset`;
+      this.message = "Notification offset is too great in comparison with frequency.";
     }
   },
   ActivityDoesNotHaveDatetime: class extends AktivoMainUseCaseError {
@@ -193,10 +193,10 @@ const UpdateNotificationOffset = {
       this.message = "Get datetime by datetime DAO get failed.";
     }
   },
-  InvalidNotificationOffset: class extends AktivoMainUseCaseError {
+  NotificationOffsetTooSmall: class extends AktivoMainUseCaseError {
     constructor() {
       super(...arguments);
-      this.code = `${UpdateNotificationOffset.UC_CODE}invalidNotificationOffset`;
+      this.code = `${UpdateNotificationOffset.UC_CODE}notificationOffsetTooSmall`;
       this.message = "Notification offset must be at least 1 hour.";
     }
   },
@@ -633,6 +633,45 @@ const Delete = {
   },
 };
 
+const UpdateEmail = {
+  UC_CODE: `${ERR_PREFIX}updateEmail/`,
+  InvalidDtoIn: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateEmail.UC_CODE}invalidDtoIn`;
+      this.message = "DtoIn is not valid.";
+    }
+  },
+  ActivityDaoGetFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateEmail.UC_CODE}activityDaoGetFailed`;
+      this.message = "Get activity by activity DAO get failed.";
+    }
+  },
+  ActivityDoesNotExist: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateEmail.UC_CODE}activityDoesNotExist`;
+      this.message = "Activity with the provided id does not exist.";
+    }
+  },
+  UserNotAuthorized: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateEmail.UC_CODE}userNotAuthorized`;
+      this.message = "User is not authorized to change their email in this activity.";
+    }
+  },
+  ActivityDaoUpdateFailed: class extends AktivoMainUseCaseError {
+    constructor() {
+      super(...arguments);
+      this.code = `${UpdateEmail.UC_CODE}activityDaoUpdateFailed`;
+      this.message = "Update activity by activity DAO update failed.";
+    }
+  },
+};
+
 module.exports = {
   Create,
   Update,
@@ -646,4 +685,5 @@ module.exports = {
   RemoveMember,
   Leave,
   Delete,
+  UpdateEmail,
 };

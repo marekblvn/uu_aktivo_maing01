@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, useDataObject } from "uu5g05";
+import { createVisualComponent, PropTypes, useDataObject } from "uu5g05";
 import Config from "./config/config.js";
 import Calls from "../calls.js";
 //@@viewOff:imports
@@ -22,12 +22,16 @@ const ActivityProvider = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    activityId: PropTypes.string,
+    children: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
     activityId: "",
+    children: () => {},
   },
   //@@viewOff:defaultProps
 
@@ -46,6 +50,7 @@ const ActivityProvider = createVisualComponent({
         removeMember: Calls.Activity.removeMember,
         leave: Calls.Activity.leave,
         transferOwnership: Calls.Activity.transferOwnership,
+        updateEmail: Calls.Activity.updateEmail,
       },
     });
 

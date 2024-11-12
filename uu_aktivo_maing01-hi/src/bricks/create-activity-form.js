@@ -1,8 +1,9 @@
 //@@viewOn:imports
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, useCall, useEffect, useRef, useState } from "uu5g05";
 import Config from "./config/config.js";
-import { Grid } from "uu5g05-elements";
-import { Form, FormNumber, FormText, FormTextArea, useFormApi } from "uu5g05-forms";
+import { Grid, Line } from "uu5g05-elements";
+import { Form, FormNumber, FormSelect, FormText, FormTextArea, FormTextSelect, Radios, useFormApi } from "uu5g05-forms";
+import Calls from "../calls.js";
 //@@viewOff:imports
 
 //@@viewOn:constants
@@ -32,8 +33,22 @@ const CreateActivityForm = createVisualComponent({
 
   render({}) {
     //@@viewOn:private
-    const {} = useFormApi();
+    const { call: personalCardLoad, state, data, errorData } = useCall(Calls.loadPersonalCard);
+    const emailList = useRef([]);
+    const [showEmailSelect, setShowEmailSelect] = useState(false);
     //@@viewOff:private
+    useEffect(() => {
+      const load = async () => {
+        await personalCardLoad();
+      };
+      load();
+    }, []);
+
+    if (state === "ready") {
+      const emails = data.contactMap?.emailList?.map((email) => ({ value: email.value })) || [];
+      emailList.current = emails;
+    }
+
     //@@viewOn:render
     return (
       <Form.View>
@@ -89,7 +104,7 @@ const CreateActivityForm = createVisualComponent({
             <FormNumber
               name="minParticipants"
               label={{ en: "Minimum number of participants", cs: "Minimální počet účastníků" }}
-              iconRight="mdi-account-cancel"
+              iconLeft="mdi-account-cancel"
               initialValue={0}
               placeholder="0"
               max={1000}
@@ -126,7 +141,7 @@ const CreateActivityForm = createVisualComponent({
             <FormNumber
               name="idealParticipants"
               label={{ en: "Ideal number of participants", cs: "Ideální počet účastníků" }}
-              iconRight="mdi-account-check"
+              iconLeft="mdi-account-check"
               initialValue={0}
               placeholder="0"
               max={1000}
@@ -160,6 +175,70 @@ const CreateActivityForm = createVisualComponent({
               }}
             />
           </Grid>
+          <Line colorScheme="neutral" significance="subdued" />
+          <Radios
+            box={false}
+            label={{
+              en: "Would you like to receive email notifications about datetime from this activity? ",
+              cs: "Chcete dostávat upozornění na email ohledně termínu v této aktivitě?",
+            }}
+            itemList={[
+              {
+                value: true,
+                children: {
+                  en: "Yes — I want to receive email notifications.",
+                  cs: "Ano — chci dostávat upozornění na email.",
+                },
+              },
+              {
+                value: false,
+                children: {
+                  en: "No — I don't want to receive email notifications.",
+                  cs: "Ne — nechci dostávat upozornění na email.",
+                },
+              },
+            ]}
+            onChange={(e) => setShowEmailSelect(e.data.value)}
+            value={showEmailSelect}
+          />
+          {showEmailSelect && (
+            <FormTextSelect
+              required
+              name="email"
+              label={{ en: "Email address to send notifications to", cs: "Emailová adresa pro posílání upozornění" }}
+              placeholder={{
+                en: "Please choose an address from list or enter a custom one",
+                cs: "Vyberte prosím adresu ze seznamu nebo zadejte jinou",
+              }}
+              info={{
+                en: "You can enter a custom email address. The email address can be changed later.",
+                cs: "Můžete zadat jinou emailovou adresu. Adresu můžete později změnit.",
+              }}
+              itemList={emailList.current}
+              initialValue={emailList.current.length > 0 ? emailList.current[0].value : undefined}
+              insertable
+              iconLeft="mdi-at"
+              validateOnMount
+              onValidate={(e) => {
+                if (e.data.value !== undefined) {
+                  const isValidEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(e.data.value);
+                  if (!isValidEmail) {
+                    return {
+                      code: "invalidEmail",
+                      feedback: "error",
+                      message: { en: "Invalid email address format.", cs: "Neplatný formát e-mailové adresy." },
+                    };
+                  }
+                }
+              }}
+              lsi={{
+                noItems: {
+                  en: "No emails found.",
+                  cs: "Nebyly nalezeny žádné emaily",
+                },
+              }}
+            />
+          )}
         </Grid>
       </Form.View>
     );

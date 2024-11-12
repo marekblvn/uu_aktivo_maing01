@@ -1,7 +1,7 @@
 //@@viewOn:imports
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, Environment } from "uu5g05";
 import { Grid } from "uu5g05-elements";
-import { Form, FormText } from "uu5g05-forms";
+import { Form } from "uu5g05-forms";
 import { PersonalCard } from "uu_plus4upeopleg01-forms";
 import Config from "./config/config.js";
 //@@viewOff:imports
@@ -31,8 +31,9 @@ const CreateInvitationForm = createVisualComponent({
   defaultProps: {},
   //@@viewOff:defaultProps
 
-  render({ members }) {
+  render() {
     //@@viewOn:private
+    const uuPlus4UPeopleBaseUri = Environment.get("uu_plus4u5g02_peopleBaseUri");
     //@@viewOff:private
 
     //@@viewOn:render
@@ -40,40 +41,12 @@ const CreateInvitationForm = createVisualComponent({
     return (
       <Form.View>
         <Grid>
-          {/* <PersonalCard.FormSelect disabled={true} /> */}
-          <FormText
-            iconLeft="mdi-account-search"
-            name="uuIdentity"
-            label={{ en: "User's Plus4U ID", cs: "Plus4U ID uživatele" }}
+          <PersonalCard.FormSelect
+            name="user"
+            baseUri={uuPlus4UPeopleBaseUri}
             required
-            pattern="^\d{1,5}-\d{1,5}-\d{1,5}$"
-            onValidate={async (e) => {
-              if (members.includes(e.data.value)) {
-                return {
-                  feedback: "error",
-                  message: {
-                    en: "This user is already a member of this activity.",
-                    cs: "Tento uživatel už je členem této aktivity.",
-                  },
-                };
-              }
-            }}
-            validationMap={{
-              required: {
-                feedback: "error",
-                message: {
-                  en: "Please enter Plus4U ID of the user you want to invite.",
-                  cs: "Zadejte prosím Plus4U ID uživatele, kterého chcete pozvat.",
-                },
-              },
-              pattern: {
-                feedback: "error",
-                message: {
-                  en: "User's Plus4U ID must be in a correct format.",
-                  cs: "Plus4U ID musí být ve správném formátu.",
-                },
-              },
-            }}
+            iconLeft="uugds-account"
+            autoFocus
           />
         </Grid>
       </Form.View>

@@ -6,7 +6,8 @@ class ActivityController {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();
     const session = ucEnv.getSession();
-    return ActivityAbl.create(awid, dtoIn, session);
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.create(awid, dtoIn, session, authorizationResult);
   }
   get(ucEnv) {
     const awid = ucEnv.getUri().getAwid();
@@ -75,7 +76,8 @@ class ActivityController {
     const awid = ucEnv.getUri().getAwid();
     const dtoIn = ucEnv.getDtoIn();
     const session = ucEnv.getSession();
-    return ActivityAbl.leave(awid, dtoIn, session);
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.leave(awid, dtoIn, session, authorizationResult);
   }
   delete(ucEnv) {
     const awid = ucEnv.getUri().getAwid();
@@ -83,6 +85,13 @@ class ActivityController {
     const session = ucEnv.getSession();
     const authorizationResult = ucEnv.getAuthorizationResult();
     return ActivityAbl.delete(awid, dtoIn, session, authorizationResult);
+  }
+  updateEmail(ucEnv) {
+    const awid = ucEnv.getUri().getAwid();
+    const dtoIn = ucEnv.getDtoIn();
+    const session = ucEnv.getSession();
+    const authorizationResult = ucEnv.getAuthorizationResult();
+    return ActivityAbl.updateEmail(awid, dtoIn, session, authorizationResult);
   }
 }
 

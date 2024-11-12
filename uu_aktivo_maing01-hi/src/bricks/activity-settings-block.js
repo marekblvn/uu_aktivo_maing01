@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { ActionGroup, Button, Grid, ListLayout, Text } from "uu5g05-elements";
 import { useAuthorization } from "../contexts/authorization-context.js";
@@ -24,11 +24,21 @@ const ActivitySettingsBlock = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    data: PropTypes.object,
+    onClickEdit: PropTypes.func,
+    onClickTransferOwnership: PropTypes.func,
+    onClickDeleteActivity: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    data: {},
+    onClickEdit: () => {},
+    onClickDeleteActivity: () => {},
+    onClickTransferOwnership: () => {},
+  },
   //@@viewOff:defaultProps
 
   render({ onClickEdit, data, onClickTransferOwnership, onClickDeleteActivity }) {

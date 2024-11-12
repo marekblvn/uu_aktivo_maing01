@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useEffect, useScreenSize, useState } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useEffect, useScreenSize, useState } from "uu5g05";
 import Config from "./config/config.js";
 import {
   CancelButton,
@@ -35,7 +35,11 @@ const CreateDatetimeForm = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    onSubmit: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
@@ -149,23 +153,21 @@ const CreateDatetimeForm = createVisualComponent({
               {isRecurrent && (
                 <>
                   <Line colorScheme="neutral" significance="subdued" />
-                  <Grid>
-                    <Grid templateRows="1fr" templateColumns={{ xs: "auto 1fr" }} alignItems="start">
-                      <Label
-                        size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
-                        required={true}
-                        style={{ paddingTop: "7px" }}
-                      >
-                        <Lsi lsi={{ en: "Repeat every", cs: "Opakovat každý(é)" }} />
-                      </Label>
-                      <FormSelect
-                        style={{ width: screenSize === "xs" ? "auto" : "180px" }}
-                        name="frequency"
-                        required
-                        itemList={FREQUENCY_OPTIONS}
-                        initialValue={FREQUENCY_OPTIONS[3].value}
-                      />
-                    </Grid>
+                  <Grid templateRows="1fr" templateColumns={{ xs: "auto 1fr" }} alignItems="start">
+                    <Label
+                      size={["xl", "l", "m"].includes(screenSize) ? "m" : "s"}
+                      required={true}
+                      style={{ paddingTop: "7px" }}
+                    >
+                      <Lsi lsi={{ en: "Repeat every", cs: "Opakovat každý(é)" }} />
+                    </Label>
+                    <FormSelect
+                      style={{ width: screenSize === "xs" ? "auto" : "180px" }}
+                      name="frequency"
+                      required
+                      itemList={FREQUENCY_OPTIONS}
+                      initialValue={FREQUENCY_OPTIONS[3].value}
+                    />
                   </Grid>
                 </>
               )}

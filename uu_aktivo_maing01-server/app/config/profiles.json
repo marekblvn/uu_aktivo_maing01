@@ -27,110 +27,122 @@
         "profileList": ["Public"]
       },
       "sys/uuAppWorkspace/getAuthorizedProfiles": {
-        "sysStateList": ["active"],
+        "sysStateList": ["created", "assigned", "active", "restricted", "readOnly", "closed", "suspended"],
         "profileList": ["Authorities", "Executives", "StandardUsers", "Public"]
       },
       "defaultUve": {
         "profileList": ["Public"]
+      },
+      "sendEmailNotification": {
+        "sysStateList": ["active", "restricted"],
+        "profileList": ["Authorities"]
       },
       "sys/uuAppWorkspace/initUve": {
         "sysStateList": ["created", "assigned"],
         "profileList": ["Public", "AwidLicenseOwner", "AwidInitiator"]
       },
       "activity/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/get": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/list": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/update": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/updateFrequency": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/updateNotificationOffset": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/addAdministrator": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/removeAdministrator": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/transferOwnership": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/removeMember": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/leave": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "activity/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "activity/updateEmail": {
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "post/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "post/get": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives"]
       },
       "post/list": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "post/update": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "post/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/get": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/list": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/accept": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "invitation/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "attendance/get": {
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/list": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/getStatistics": {
@@ -138,28 +150,36 @@
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "attendance/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
+        "profileList": ["Authorities", "Executives", "StandardUsers"]
+      },
+      "attendance/deleteBulk": {
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/create": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/get": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted", "readOnly"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
+      "datetime/list": {
+        "sysStateList": ["active", "restricted", "readOnly"],
+        "profileList": ["Authorities", "Executives"]
+      },
       "datetime/updateParticipation": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/delete": {
-        "sysStateList": ["active"],
+        "sysStateList": ["active", "restricted"],
         "profileList": ["Authorities", "Executives", "StandardUsers"]
       },
       "datetime/createNext": {
-        "sysStateList": ["active"],
-        "profileList": ["Authorities", "Executives", "StandardUsers"]
+        "sysStateList": ["active", "restricted"],
+        "profileList": ["Authorities", "Executives"]
       }
     }
   }

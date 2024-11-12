@@ -5,6 +5,7 @@ const { Validator } = require("uu_appg01_server").Validation;
 const { DaoFactory, ObjectStoreError } = require("uu_appg01_server").ObjectStore;
 const { ValidationHelper } = require("uu_appg01_server").AppServer;
 const Errors = require("../api/errors/post-error");
+const InstanceChecker = require("../api/components/instance-checker");
 
 const UnsupportedKeysWarning = (error) => `${error?.UC_CODE}unsupportedKeys`;
 
@@ -31,6 +32,12 @@ class PostAbl {
       Errors.Create.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Create, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     let activity;
     try {
       activity = await this.activityDao.get(awid, dtoIn.activityId);
@@ -51,7 +58,7 @@ class PostAbl {
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
       !authorizedProfiles.includes(PROFILE_CODES.Executives)
     ) {
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Create.UserNotMember({ uuAppErrorMap });
       }
       if (dtoIn.type === "important") {
@@ -68,7 +75,7 @@ class PostAbl {
     dtoIn.activityId = ObjectId.createFromHexString(dtoIn.activityId);
     dtoIn.uuIdentity = userUuIdentity;
     dtoIn.uuIdentityName = session.getIdentity().getName();
-    dtoIn.createdAt = new Date();
+    dtoIn.createdAt = new Date(dtoIn.createdAt);
 
     let dtoOut;
     try {
@@ -84,7 +91,7 @@ class PostAbl {
     return dtoOut;
   }
 
-  async get(awid, dtoIn) {
+  async get(awid, dtoIn, authorizationResult) {
     let validationResult = this.validator.validate("postGetDtoInType", dtoIn);
     let uuAppErrorMap = ValidationHelper.processValidationResult(
       dtoIn,
@@ -92,6 +99,11 @@ class PostAbl {
       UnsupportedKeysWarning(Errors.Get),
       Errors.Get.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Get, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+    });
 
     let dtoOut;
     try {
@@ -120,6 +132,12 @@ class PostAbl {
       Errors.List.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.List, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted", "readOnly"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     const userUuIdentity = session.getIdentity().getUuIdentity();
     if (
@@ -130,6 +148,7 @@ class PostAbl {
         throw new Errors.List.UserNotAuthorized({ uuAppErrorMap });
       }
 
+      // don't allow any other filters for StandardUsers
       dtoIn.filters = { activityId: dtoIn.filters.activityId };
 
       let activity;
@@ -146,7 +165,7 @@ class PostAbl {
         throw new Errors.List.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: dtoIn.activityId });
       }
 
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.List.UserNotMember({ uuAppErrorMap });
       }
     }
@@ -215,6 +234,12 @@ class PostAbl {
       Errors.Update.InvalidDtoIn,
     );
 
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Update, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
+
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
       !authorizedProfiles.includes(PROFILE_CODES.Authorities) &&
@@ -253,7 +278,7 @@ class PostAbl {
         throw new Errors.Update.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: post.activityId });
       }
 
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Update.UserNotMember({ uuAppErrorMap });
       }
 
@@ -287,6 +312,12 @@ class PostAbl {
       UnsupportedKeysWarning(Errors.Delete),
       Errors.Delete.InvalidDtoIn,
     );
+
+    await InstanceChecker.ensureInstanceAndState(awid, Errors.Delete, uuAppErrorMap, authorizationResult, {
+      Authorities: ["active", "restricted"],
+      Executives: ["active", "restricted"],
+      StandardUsers: ["active"],
+    });
 
     const authorizedProfiles = authorizationResult.getAuthorizedProfiles();
     if (
@@ -322,7 +353,7 @@ class PostAbl {
         throw new Errors.Delete.ActivityDoesNotExist({ uuAppErrorMap }, { activityId: post.activityId });
       }
 
-      if (!activity.members.includes(userUuIdentity)) {
+      if (!activity.members.some((member) => member.uuIdentity === userUuIdentity)) {
         throw new Errors.Delete.UserNotMember({ uuAppErrorMap });
       }
 

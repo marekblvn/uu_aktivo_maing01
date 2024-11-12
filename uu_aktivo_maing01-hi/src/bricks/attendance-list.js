@@ -1,123 +1,42 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi } from "uu5g05";
+import { AutoLoad, createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
-import { Icon, Number, PlaceholderBox } from "uu5g05-elements";
+import { Block, DateTime, Number, Pending, RichIcon } from "uu5g05-elements";
 import { List } from "uu5tilesg02-elements";
-import { PersonItem } from "uu_plus4u5g02-elements";
-import AttendanceTile from "./attendance-tile.js";
+import { BulkActionBar, FilterBar, FilterButton, FilterManagerModal, SorterButton } from "uu5tilesg02-controls";
+import { useController } from "uu5tilesg02";
 //@@viewOff:imports
 
 //@@viewOn:constants
 const COLUMN_LIST = [
   {
-    value: "uuIdentity",
-    header: <Lsi lsi={{ en: "Member", cs: "Člen" }} />,
-    headerComponent: <List.HeaderCell verticalAlignment="center" />,
-    cell: ({ data }) => <PersonItem uuIdentity={data.uuIdentity} />,
+    value: "datetime",
+    header: <Lsi lsi={{ en: "Datetime date", cs: "Datum termínu" }} />,
+    cell: ({ data }) => <DateTime value={data.datetime} timeFormat="medium" dateFormat="long" />,
   },
   {
     value: "confirmed",
-    header: (
-      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
-        <Icon icon="uugdsstencil-communication-thumb-up" colorScheme="positive" />
-        <Lsi lsi={{ cs: "Přišel(a)", en: "Came" }} />
-      </div>
-    ),
-    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
-    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.confirmed} />,
-  },
-  {
-    value: "confirmedPercentage",
-    header: (
-      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
-        <Icon icon="uugdsstencil-communication-thumb-up" colorScheme="positive" />
-        (%)
-      </div>
-    ),
-    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
-    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.confirmedPercentage} unit="percent" roundingMode="halfExpand" />,
-    maxWidth: "80px",
+    header: <Lsi lsi={{ en: "Confirmed", cs: "Potvrdilo" }} />,
+    headerComponent: <List.HeaderCell horizontalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.confirmed.length} />,
+    cellComponent: <List.Cell horizontalAlignment="center" />,
+    maxWidth: "108px",
   },
   {
     value: "undecided",
-    header: (
-      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
-        <Icon icon="uugds-help" colorScheme="neutral" />
-        <Lsi lsi={{ en: "Didn't decide", cs: "Nerozhodnuto" }} />
-      </div>
-    ),
-    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
-    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.undecided} />,
-  },
-  {
-    value: "undecidedPercentage",
-    header: (
-      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
-        <Icon icon="uugds-help" colorScheme="neutral" />
-        (%)
-      </div>
-    ),
-    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
-    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.undecidedPercentage} unit="percent" roundingMode="halfExpand" />,
-    maxWidth: "80px",
+    header: <Lsi lsi={{ en: "Undecided", cs: "Nerozhodlo se" }} />,
+    headerComponent: <List.HeaderCell horizontalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.undecided.length} />,
+    cellComponent: <List.Cell horizontalAlignment="center" />,
+    maxWidth: "140px",
   },
   {
     value: "denied",
-    header: (
-      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
-        <Icon icon="uugdsstencil-communication-thumb-down" colorScheme="negative" />
-        <Lsi lsi={{ en: "Didn't come", cs: "Nepřišel(la)" }} />
-      </div>
-    ),
-    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
-    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.denied} />,
-  },
-  {
-    value: "deniedPercentage",
-    header: (
-      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
-        <Icon icon="uugdsstencil-communication-thumb-down" colorScheme="negative" />
-        (%)
-      </div>
-    ),
-    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
-    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => <Number value={data.deniedPercentage} unit="percent" roundingMode="halfExpand" />,
-    maxWidth: "80px",
-  },
-  {
-    value: "datetimesAsMember",
-    header: (
-      <div style={{ display: "flex", columnGap: "4px", alignItems: "center", justifyContent: "center" }}>
-        <Icon icon="uugdsstencil-commerce-sum" colorScheme="building" />
-        <Lsi lsi={{ en: "Datetimes as member (%)", cs: "Termínů členem (%)" }} />
-      </div>
-    ),
-    headerComponent: <List.HeaderCell horizontalAlignment="center" verticalAlignment="center" />,
-    cellComponent: <List.Cell horizontalAlignment="center" verticalAlignment="center" />,
-    cell: ({ data }) => (
-      <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-        <div style={{ marginRight: "4px" }}>
-          <Number value={data.datetimesAsMember} />
-        </div>
-        <div>
-          {"("}
-          <Number
-            value={(data.datetimesAsMember / data.total) * 100}
-            unit="percent"
-            roundingMode="halfExpand"
-            maxDecimalDigits={1}
-            roundingPosition={-1}
-          />
-          {")"}
-        </div>
-      </div>
-    ),
+    header: <Lsi lsi={{ en: "Denied", cs: "Odmítlo" }} />,
+    headerComponent: <List.HeaderCell horizontalAlignment="center" />,
+    cell: ({ data }) => <Number value={data.denied.length} />,
+    cellComponent: <List.Cell horizontalAlignment="center" />,
+    maxWidth: "100px",
   },
 ];
 //@@viewOff:constants
@@ -137,37 +56,69 @@ const AttendanceList = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    pending: PropTypes.bool,
+    data: PropTypes.array,
+    onDeleteBulk: PropTypes.func,
+    onLoadNext: PropTypes.func,
+    onRefresh: PropTypes.func,
+    getActionList: PropTypes.func,
+    children: PropTypes.node,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    data: [],
+    pending: false,
+    children: null,
+    onDeleteBulk: () => {},
+    onLoadNext: () => {},
+    onRefresh: () => {},
+    getActionList: () => {},
+  },
   //@@viewOff:defaultProps
 
-  render() {
+  render({ data, pending, getActionList, onDeleteBulk, onLoadNext, onRefresh, children }) {
     //@@viewOn:private
+    const [screenSize] = useScreenSize();
+    const { selectedData, clearSelected } = useController();
     //@@viewOff:private
 
     //@@viewOn:render
     return (
-      <List
-        columnList={COLUMN_LIST}
-        stickyHeader={true}
-        displayCellSelection="none"
-        emptyState={
-          <PlaceholderBox
-            code="items"
-            header={{ en: "No attendance to display", cs: "Žádná docházka k zobrazení" }}
-            info={{
-              en: "There is no attendance available in selected date range.",
-              cs: "V zadaném časovém rozmezí není dostupná žádná docházka.",
-            }}
-            style={{ margin: "16px" }}
-          />
-        }
+      <Block
+        card="full"
+        actionList={[
+          { component: <FilterButton type={["xs", "s"].includes(screenSize) ? "manager" : "bar"} /> },
+          { component: <SorterButton type="dropdown" /> },
+          { divider: true },
+          {
+            component: pending ? (
+              <Pending size="m" />
+            ) : (
+              <RichIcon icon="uugds-reload" colorScheme="dim" significance="subdued" borderRadius="moderate" />
+            ),
+            onClick: onRefresh,
+          },
+        ]}
       >
-        {AttendanceTile}
-      </List>
+        <FilterBar />
+        <FilterManagerModal />
+        <BulkActionBar
+          actionList={[
+            {
+              icon: "uugds-delete",
+              colorScheme: "negative",
+              onClick: () => onDeleteBulk(selectedData, () => clearSelected()),
+            },
+          ]}
+        />
+        <List columnList={COLUMN_LIST} getActionList={getActionList} verticalAlignment="center">
+          {children}
+        </List>
+        <AutoLoad data={data} handleLoadNext={onLoadNext} distance={window.innerHeight} />
+      </Block>
     );
     //@@viewOff:render
   },

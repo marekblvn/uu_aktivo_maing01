@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Lsi, useScreenSize } from "uu5g05";
+import { createVisualComponent, Lsi, PropTypes, useScreenSize } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, LinkPanel, ScrollableBox, Text } from "uu5g05-elements";
 import ParticipationList from "./participation-list.js";
@@ -23,11 +23,15 @@ const ParticipationBlock = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    items: PropTypes.object,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
-  defaultProps: {},
+  defaultProps: {
+    items: {},
+  },
   //@@viewOff:defaultProps
 
   render({ items }) {

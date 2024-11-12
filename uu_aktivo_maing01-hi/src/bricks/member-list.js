@@ -1,5 +1,5 @@
 //@@viewOn:imports
-import { createVisualComponent, Fragment, Lsi } from "uu5g05";
+import { createVisualComponent, Fragment, Lsi, PropTypes } from "uu5g05";
 import Config from "./config/config.js";
 import { Grid, Icon, Line, LinkPanel, Text } from "uu5g05-elements";
 import MemberTile from "./member-tile.js";
@@ -23,16 +23,41 @@ const MemberList = createVisualComponent({
   //@@viewOff:statics
 
   //@@viewOn:propTypes
-  propTypes: {},
+  propTypes: {
+    owner: PropTypes.string,
+    administrators: PropTypes.array,
+    members: PropTypes.array,
+    onRemoveMember: PropTypes.func,
+    onPromoteAdmin: PropTypes.func,
+    onDemoteAdmin: PropTypes.func,
+    onLeaveActivity: PropTypes.func,
+    onUpdateEmail: PropTypes.func,
+  },
   //@@viewOff:propTypes
 
   //@@viewOn:defaultProps
   defaultProps: {
-    collapsible: false,
+    owner: "",
+    administrators: [],
+    members: [],
+    onRemoveMember: () => {},
+    onPromoteAdmin: () => {},
+    onDemoteAdmin: () => {},
+    onLeaveActivity: () => {},
+    onUpdateEmail: () => {},
   },
   //@@viewOff:defaultProps
 
-  render({ owner, administrators, members, onRemoveMember, onPromoteAdmin, onDemoteAdmin, onLeaveActivity }) {
+  render({
+    owner,
+    administrators,
+    members,
+    onRemoveMember,
+    onPromoteAdmin,
+    onDemoteAdmin,
+    onLeaveActivity,
+    onUpdateEmail,
+  }) {
     //@@viewOn:private
     //@@viewOff:private
 
@@ -44,7 +69,7 @@ const MemberList = createVisualComponent({
             <Icon icon={"mdi-crown"} margin={{ right: "4px" }} style={{ color: "rgb(218,165,32)" }} />
             <Lsi lsi={{ en: "Activity owner", cs: "Vlastník aktivity" }} />
           </Text>
-          <MemberTile uuIdentity={owner} colorScheme="primary" />
+          <MemberTile uuIdentity={owner} colorScheme="primary" onUpdateEmail={onUpdateEmail} />
         </Fragment>
         <Line colorScheme="neutral" significance="subdued" />
         <LinkPanel
@@ -68,6 +93,7 @@ const MemberList = createVisualComponent({
               onRemoveMember={onRemoveMember}
               onPromoteAdmin={onPromoteAdmin}
               onDemoteAdmin={onDemoteAdmin}
+              onUpdateEmail={onUpdateEmail}
             />
           ))}
         </LinkPanel>
@@ -88,11 +114,12 @@ const MemberList = createVisualComponent({
           {members.map((item, idx) => (
             <MemberTile
               key={idx}
-              uuIdentity={item}
+              uuIdentity={item.uuIdentity}
               onLeaveActivity={onLeaveActivity}
               onRemoveMember={onRemoveMember}
               onPromoteAdmin={onPromoteAdmin}
               onDemoteAdmin={onDemoteAdmin}
+              onUpdateEmail={onUpdateEmail}
             />
           ))}
         </LinkPanel>

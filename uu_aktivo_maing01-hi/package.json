@@ -1,8 +1,8 @@
 {
   "name": "uu_aktivo_maing01-hi",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "private": true,
-  "description": "",
+  "description": "Aktivo is an application for organizing leisure group activities (sports etc.). It was created as a MVP for a bachelor's thesis.",
   "license": "License Commercial",
   "namespace": "UuAktivo",
   "spec": "uu5-app; uu_appg01_devkit@6.0.1; uu5devkitg01-plugin@1.0.5",

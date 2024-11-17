@@ -1,7 +1,7 @@
 {
   "name": "uu_aktivo_maing01-server",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.3",
+  "description": "Aktivo is an application for organizing leisure group activities (sports etc.). It was created as a MVP for a bachelor's thesis.",
   "license": "License Commercial",
   "spec": "nodejs-app; uu_appg01_devkit@6.0.1",
   "dependencies": {

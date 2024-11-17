@@ -1,6 +1,6 @@
 {
-  "product": "uu_aktivo_maing01",
-  "version": "1.0.0",
+  "product": "uun_aktivo_maing01",
+  "version": "1.0.3",
   "license": "License Commercial",
   "description": {
     "en": "Aktivo is an application for organizing leisure group activities (sports etc.). It was created as a MVP for a bachelor's thesis.",
@@ -8,15 +8,21 @@
   },
   "devkit": {
     "development": {
-      "uuAppBoxRegistryBaseUri": "----- VALUE REQUIRED -----",
-      "uuCloudUniverseBaseUri": "----- VALUE REQUIRED -----",
-      "uuCloudLogStoreBaseUri": "----- VALUE REQUIRED -----",
-      "appBoxRegistryBaseUri": "----- VALUE REQUIRED -----",
-      "scriptRepositoryBaseUri": "----- VALUE REQUIRED -----"
+      "uuCloudUniverseBaseUri": "https://uuapp.plus4u.net/uu-cloud-universeg01/499b255d2620f209353489fad4ccceb4",
+      "uuCloudLogStoreBaseUri": "https://uuapp.plus4u.net/uu-cloudlogstore-maing02/2fa3783cd44847dc91ac9e29010d7807",
+      "uuAppBoxRegistryBaseUri": "https://uuapp.plus4u.net/uu-cloud-appboxregistryg01/cf9e1c51b79a983a844cb4558342cf90",
+      "scriptRepositoryBaseUri": "https://uuapp-dev.plus4u.net/uu-script-repositoryg02/e472ba19a6214f5fa6fdb7d2ff2726cb"
     }
   },
   "uu_aktivo_maing01-hi": {},
-  "uu_aktivo_maing01-server": {},
+  "uu_aktivo_maing01-server": {
+    "devkit": {
+      "development": {
+        "uuAppBoxUri": "https://uuapp.plus4u.net/uu-cloud-appboxregistryg01/cf9e1c51b79a983a844cb4558342cf90/uuAppBox/get?id=67397c2ff4ee97bf39e6f732&extended=true",
+        "uuSubAppInstanceWorkloadOid": "67397c6f59b200ef0a702458"
+      }
+    }
+  },
   "uu_aktivo_maing01-uuscriptlib": {
     "scriptList": [
       {

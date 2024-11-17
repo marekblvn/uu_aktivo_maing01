@@ -1,9 +1,9 @@
 {
   "uuAppBoxDescriptor": {
     "schemaVersion": "2.0",
-    "code": "uu-aktivo-maing01",
+    "code": "uun-aktivo-maing01",
     "version": "${projectVersion}",
-    "name": "uuAktivoMaing01",
+    "name": "uunAktivoMaing01",
     "description": "",
     "productUri": null,
     "uuAppPackMap": {
@@ -13,7 +13,7 @@
     },
     "deliverySpecType": "uusubappspec:2.0",
     "deliverySpec": {
-      "urlPath": "uu-aktivo-maing01",
+      "urlPath": "uun-aktivo-maing01",
       "uuNodeSetMap": {
         "nodeSet01": {
           "uuNodeSetType": "cmdSync",
@@ -50,21 +50,19 @@
     "uuAppPack01": "docker://uuapp-dev-repo.plus4u.net/runtimestacks/uu_appruntimestackg02-nodejs:1.0"
   },
   "uuSubAppDeploymentConfig": {
-    "uuAppResourcePoolOid": "----- VALUE REQUIRED -----",
+    "uuAppResourcePoolOid": "6718e271bc4b35ed9aa806a6",
     "targetSlot": "production",
-    "asid": "----- VALUE REQUIRED -----",
-    "awidList": [
-      "----- VALUE REQUIRED -----"
-    ]
+    "asid": "8575f2d822cfcd3482aeb500515dae4d",
+    "awidList": ["d5ef0e1912e4662648d25d4db10fd759"]
   },
   "uuAppServerEnvironment": {
     "uu_app_secretstore_enable_encryption": true,
     "uu_app_secretstore_master_key_active_slot": "slot1",
     "uu_app_secretstore_master_key1_slot1": "w+rU9Ev#Sb%1gRb)X~6N(ZNaH&+-%lc3]YU+0^Ay;[<bVMhA)TkrSK]=U[bBU[U8",
-    "asid_license_owner_list": [
-      "3857-7491-1"
-    ],
+    "asid_license_owner_list": ["3857-7491-1"],
     "uu_app_oidc_providers_oidcg02_uri": "https://uuapp-dev.plus4u.net/uu-oidc-maing02/eca71064ecce44b0a25ce940eb8f053d/oidc",
+    "uu_app_oidc_providers_oidcg02_enabled": true,
+    "uu_app_oidc_primary_provider": "oidcg02",
     "uu5g05_libraryRegistryBaseUri": "https://uuapp-dev.plus4u.net/uu-applibraryregistry-maing01/000008ad5570455e83857a394f9a21c9",
     "uu5g05_plus4UGoBaseUri": "https://uuapp-dev.plus4u.net/uu-plus4ugo-maing01/00000c3f57074bfcb759aba2d562e013",
     "uu_plus4u5g02_identityManagementBaseUri": "https://uuapp-dev.plus4u.net/uu-identitymanagement-maing01/58ceb15c275c4b31bfe0fc9768aa6a9c",

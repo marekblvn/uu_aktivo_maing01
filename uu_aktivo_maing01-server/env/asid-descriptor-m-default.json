@@ -3,9 +3,9 @@
   "schemaSpecificationUri": "https://uuapp.plus4u.net/uu-bookkit-maing01/bef682626ed943f28cde360ccb325981/book/page?code=uuSubAppInstanceDescriptor",
   "uuSubApp": {
     "code": "UU.AKTIVO.MAING01",
-    "version": "0.1.0",
+    "version": "1.0.3",
     "name": "uuAktivoMaing01",
-    "description": "",
+    "description": "Aktivo is an application for organizing leisure group activities (sports etc.). It was created as a MVP for a bachelor's thesis.",
     "license": "License Commercial",
     "asidRequired": true,
     "awidCount": 1,
@@ -29,7 +29,6 @@
         "alias": "primary"
       }
     },
-    "uuConfigMap": {
-    }
+    "uuConfigMap": {}
   }
 }
